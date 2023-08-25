@@ -13,7 +13,8 @@
 #' @param create_shell A `logical(1)` vector specifying whether to create a
 #' shell file for the script.
 #' @param partition A `character(1)` vector with the name of the SLURM
-#' partition. Check how busy a given partition is by running [TODO].
+#' partition. Check how busy a given partition is by running
+#' `squeue -p [partition]`.
 #' @param memory The amount of memory per core to request. You can check how
 #' much a current job is utilizing using the `sstat` command.
 #' @param cores The number of cores to request. Note that the total memory
@@ -54,7 +55,7 @@
 #'
 job_single <- function(
         name, create_shell = FALSE, partition = "shared", memory = "10G",
-        cores = 1L, email = "e", logdir = "logs", task_num = NULL, tc = 20,
+        cores = 1L, email = "ALL", logdir = "logs", task_num = NULL, tc = 20,
         command = 'Rscript -e "options(width = 120); sessioninfo::session_info()"',
         create_logdir = TRUE) {
     ## Remove any spaces
@@ -87,9 +88,6 @@ job_single <- function(
     }
     cores = as.integer(cores)
 
-    ## Specify the job partition
-    partition <- paste0(trimws(queue), ",")
-
     ## Specify the array options if a task number was specified
     array_spec <- if (!is.null(task_num)) {
         paste0("#SBATCH --array=1-", task_num, "%", tc, "\n")
@@ -115,6 +113,7 @@ job_single <- function(
 
     ## For slurmjobs version
     version <- packageVersion("slurmjobs")
+    version = "testing"
 
     ## Now build the script
     script <- glue::glue(
