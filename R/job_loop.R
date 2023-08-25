@@ -1,8 +1,8 @@
-#' Build a bash script that loops over variables and submits SGE jobs
+#' Build a bash script that loops over variables and submits SLURM jobs
 #'
 #' This function builds a bash script that loops over a set of variables
 #' with pre-specified values to create an internal bash script that then
-#' gets submitted as a SGE job.
+#' gets submitted as a SLURM job.
 #'
 #' @param loops A named `list` where each of the elements are character vectors.
 #' The names of `loops` specify the variables used for the loops and the
@@ -14,6 +14,7 @@
 #' working directory.
 #' @export
 #' @author Leonardo Collado-Torres
+#' @author Nicholas J. Eagles
 #' @import glue purrr
 #'
 #' @examples
@@ -31,10 +32,9 @@
 #' )
 #'
 job_loop <- function(
-        loops,
-        name, create_shell = FALSE, queue = "shared",
-        memory = "10G", cores = 1L, email = "e", logdir = "logs", filesize = "100G",
-        task_num = NULL, tc = 20) {
+        loops, name, create_shell = FALSE, partition = "shared", memory = "10G",
+        cores = 1L, email = "ALL", logdir = "logs", task_num = NULL, tc = 20
+    ) {
     ## Check that the loops are correctly defined
     if (!is.list(loops)) {
         stop("'loops' should be a named list.", call. = FALSE)
@@ -89,21 +89,20 @@ job_loop <- function(
     ## Build the core script
     script <- job_single(
         name = "{SHORT}",
-        queue = queue,
+        partition = partition,
         memory = memory,
         cores = cores,
         email = email,
         logdir = logdir,
-        filesize = filesize,
         task_num = task_num,
         tc = tc,
         command = command,
         create_logdir = FALSE
     )
 
-    ## Deal with the scaping
+    ## Deal with the escaping
     script <- gsub(
-        "\\$TASK_ID", "\\\\$TASK_ID",
+        "\\$SLURM_ARRAY_TASK_ID", "\\\\$SLURM_ARRAY_TASK_ID",
         gsub(
             "\\{", "\\$\\{",
             gsub("\\$\\{", "\\\\{", script)
@@ -143,7 +142,7 @@ mkdir -p {logdir}
     footer <- paste0(rev(footer_spaces), "done", collapse = "\n")
 
     script_footer <- glue::glue('
-{indent}call="qsub .${{SHORT}}.sh"
+{indent}call="sbatch .${{SHORT}}.sh"
 {indent}echo $call
 {indent}$call
 {footer}
