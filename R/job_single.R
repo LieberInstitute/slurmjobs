@@ -1,30 +1,27 @@
-#' Build a SGE job bash script
+#' Build a SLURM job bash script
 #'
-#' This function builds a template for a Son of Grid Ending (SGE) job script
-#' including array jobs. Check this blog post by John Muschelli to learn
-#' more about array jobs:
+#' This function builds a template for a Simple Linux Utility for Resource
+#' Management (SLURM) job script including array jobs. Check this blog post by
+#' John Muschelli to learn more about array jobs:
 #' <https://hopstat.wordpress.com/2013/11/05/array-and-sequential-cluster-jobs/>.
 #'
-#' For a given SGE job that is currently running you can alter
-#' the options using `qalter`.
+#' For a given SLURM job that is currently running you can alter
+#' the options using `scontrol alter`.
 #'
 #' @param name A `character(1)` vector with the name of the script. Any spaces
 #' will be replaced by underscores.
 #' @param create_shell A `logical(1)` vector specifying whether to create a
 #' shell file for the script.
-#' @param queue A `character(1)` vector with the name of the SGE queue. Check
-#' how busy a given queue is by running `qpic -q queuename`.
-#' @param memory The amount of memory per core to request in SGE syntax. You
-#' can check how much a current job is utilizing using the `qmem` JHPCE command.
-#' For more detail on the memory options, check
-#' <https://jhpce.jhu.edu/knowledge-base/how-to/#MemSpec>.
+#' @param partition A `character(1)` vector with the name of the SLURM
+#' partition. Check how busy a given partition is by running [TODO].
+#' @param memory The amount of memory per core to request. You can check how
+#' much a current job is utilizing using the `sstat` command.
 #' @param cores The number of cores to request. Note that the total memory
 #' your job will request is `cores` multiplied by `memory`.
-#' @param email The email reporting option for the email. For more information
-#' check <https://jhpce.jhu.edu/knowledge-base/how-to/#Email>.
-#' @param logdir The directory for the SGE log files relative to the current
+#' @param email The email reporting option for the email address ("BEGIN",
+#' "END", "FAIL", or "ALL")
+#' @param logdir The directory for the log files relative to the current
 #' working directory.
-#' @param filesize The maximum file size in SGE format.
 #' @param task_num The number of tasks for your job, which will make it into an
 #' array job. If `NULL` this is ignored.
 #' @param tc If `task_num` is specified, this option controls the number of
@@ -32,22 +29,23 @@
 #' @param command An example command to start your script.
 #' @param create_logdir A `logical(1)` vector specifying whether to create the
 #' `logdir` directory. Note that if `logdir` doesn't exist and you submit your
-#' job with `qsub`, it will immediately fail.
+#' job with `sbatch`, it will immediately fail.
 #'
 #' @return A character vector with the script contents. If `create_shell` was
 #' specified then it also creates the actual script in the current
 #' working directory.
 #' @export
 #' @author Leonardo Collado-Torres
+#' @author Nicholas J. Eagles
 #'
 #' @examples
 #'
 #' ## A regular job
 #' job_single("jhpce_job", create_logdir = FALSE)
 #'
-#' ## A regular job with 10 cores on the 'imaginary' queue
+#' ## A regular job with 10 cores on the 'imaginary' partition
 #' job_single("jhpce_job",
-#'     cores = 10, queue = "imaginary",
+#'     cores = 10, partition = "imaginary",
 #'     create_logdir = FALSE
 #' )
 #'
