@@ -53,9 +53,8 @@
 #' job_single("jhpce_job_array", task_num = 20, create_logdir = FALSE)
 #'
 job_single <- function(
-        name, create_shell = FALSE, queue = "shared",
-        memory = "10G", cores = 1L, email = "e", logdir = "logs", filesize = "100G",
-        task_num = NULL, tc = 20,
+        name, create_shell = FALSE, partition = "shared", memory = "10G",
+        cores = 1L, email = "e", logdir = "logs", task_num = NULL, tc = 20,
         command = 'Rscript -e "options(width = 120); sessioninfo::session_info()"',
         create_logdir = TRUE) {
     ## Remove any spaces
@@ -70,7 +69,7 @@ job_single <- function(
     }
 
     ## Check the email options
-    valid_email_opts <- c("a", "e", "n", "b", "be")
+    valid_email_opts <- c("BEGIN", "END", "FAIL", "ALL")
     if (!email %in% valid_email_opts) {
         stop("'email' should be one of the following options:\n",
             paste(valid_email_opts, collapse = ", "),
@@ -83,27 +82,17 @@ job_single <- function(
         stop("'logdir' has to be a relative path.")
     }
 
-    ## Specify the cores options
-    cores_text <- if (cores > 1) {
-        paste0("#$ -pe local ", as.integer(cores), "\n")
-    } else if (cores < 1) {
+    if (cores < 1) {
         stop("'cores' should be at least 1", call. = FALSE)
-    } else {
-        ## No need to specify -pe local 1
-        ""
     }
+    cores = as.integer(cores)
 
-    ## Specify the job queue
-    queue <- if (queue == "shared" || queue == "") {
-        ## There's no queue for shared
-        ""
-    } else {
-        paste0(trimws(queue), ",")
-    }
+    ## Specify the job partition
+    partition <- paste0(trimws(queue), ",")
 
     ## Specify the array options if a task number was specified
     array_spec <- if (!is.null(task_num)) {
-        paste0("#$ -t 1-", task_num, "\n#$ -tc ", tc, "\n")
+        paste0("#SBATCH --array=1-", task_num, "%", tc, "\n")
     } else {
         ""
     }
@@ -117,33 +106,39 @@ job_single <- function(
     ## Specify the log file
     log_file <- file.path(
         logdir,
-        paste0(name, ifelse(!is.null(task_num), ".$TASK_ID", ""), ".txt")
+        paste0(
+            name,
+            ifelse(!is.null(task_num), ".$SLURM_ARRAY_TASK_ID", ""),
+            ".txt"
+        )
     )
 
-    ## For sgejobs version
-    version <- packageVersion("sgejobs")
+    ## For slurmjobs version
+    version <- packageVersion("slurmjobs")
 
     ## Now build the script
     script <- glue::glue(
         '#!/bin/bash
-#$ -cwd
-#$ -l {queue}mem_free={memory},h_vmem={memory},h_fsize={filesize}
-{cores_text}#$ -N {name}
-#$ -o {log_file}
-#$ -e {log_file}
-#$ -m {email}
+#SBATCH -p {partition}
+#SBATCH --mem-per-cpu={memory}
+#SBATCH --job-name={name}
+#SBATCH -c {cores}
+#SBATCH -o {log_file}
+#SBATCH -e {log_file}
+#SBATCH --mail-type={email}
 {array_spec}
+
 echo "**** Job starts ****"
 date
 
 echo "**** JHPCE info ****"
 echo "User: ${{USER}}"
-echo "Job id: ${{JOB_ID}}"
-echo "Job name: ${{JOB_NAME}}"
-echo "Hostname: ${{HOSTNAME}}"
-echo "Task id: ${{SGE_TASK_ID}}"
+echo "Job id: ${{SLURM_JOB_ID}}"
+echo "Job name: ${{SLURM_JOB_NAME}}"
+echo "Node name: ${{SLURMD_NODENAME}}"
+echo "Task id: ${{SLURM_ARRAY_TASK_ID}}"
 
-## Load the R module (absent since the JHPCE upgrade to CentOS v7)
+## Load the R module
 module load conda_R
 
 ## List current modules for reproducibility
@@ -155,8 +150,8 @@ module list
 echo "**** Job ends ****"
 date
 
-## This script was made using sgejobs version {version}
-## available from http://research.libd.org/sgejobs/
+## This script was made using slurmjobs version {version}
+## available from http://research.libd.org/slurmjobs/
 
 '
     )
@@ -164,7 +159,7 @@ date
     ## Write to a file?
     if (create_shell) {
         message(paste(Sys.time(), "creating the shell file", sh_file))
-        message(paste("To submit the job use: qsub", sh_file))
+        message(paste("To submit the job use: sbatch", sh_file))
         cat(script, file = sh_file)
         return(invisible(script))
     }
