@@ -1,6 +1,7 @@
 Package: slurmjobs
 Title: Helper Functions for SLURM jobs
-Version: 0.0.0.9000
+Version: 0.99.0
+Date: 2023-09-19
 Authors@R: 
     person("Nicholas J.", "Eagles", email = "nickeagles77@gmail.com", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-9808-5254"))
@@ -8,7 +9,10 @@ Description: This package contains helper functions for interacting with
     machines or computing clusters managed by SLURM. It was developed
     specifically on the JHPCE cluster https://jhpce.jhu.edu/, but is intended
     to work with other SLURM-managed computing environments.
-License: GPL (>= 3)
+License: Artistic-2.0
+URL: https://github.com/LieberInstitute/slurmjobs
+BugReports: https://support.bioconductor.org/tag/slurmjobs
+biocViews: Software
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3
