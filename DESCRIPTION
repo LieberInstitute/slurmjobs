@@ -1,12 +1,14 @@
 Package: slurmjobs
-Title: What the Package Does (One Line, Title Case)
+Title: Helper Functions for SLURM jobs
 Version: 0.0.0.9000
 Authors@R: 
-    person("First", "Last", , "first.last@example.com", role = c("aut", "cre"),
-           comment = c(ORCID = "YOUR-ORCID-ID"))
-Description: What the package does (one paragraph).
-License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
-    license
+    person("Nicholas J.", "Eagles", email = "nickeagles77@gmail.com", role = c("aut", "cre"),
+           comment = c(ORCID = "0000-0002-9808-5254"))
+Description: This package contains helper functions for interacting with
+    machines or computing clusters managed by SLURM. It was developed
+    specifically on the JHPCE cluster https://jhpce.jhu.edu/, but is intended
+    to work with other SLURM-managed computing environments.
+License: GPL (>= 3)
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3
