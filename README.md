@@ -26,6 +26,8 @@ commit](https://bioconductor.org/shields/lastcommit/devel/bioc/slurmjobs.svg)](h
 [![Bioc
 dependencies](https://bioconductor.org/shields/dependencies/release/slurmjobs.svg)](https://bioconductor.org/packages/release/bioc/html/slurmjobs.html#since)
 [![R-CMD-check-bioc](https://github.com/LieberInstitute/slurmjobs/actions/workflows/R-CMD-check-bioc.yaml/badge.svg)](https://github.com/LieberInstitute/slurmjobs/actions/workflows/R-CMD-check-bioc.yaml)
+[![Codecov test
+coverage](https://codecov.io/gh/LieberInstitute/slurmjobs/branch/devel/graph/badge.svg)](https://app.codecov.io/gh/LieberInstitute/slurmjobs?branch=devel)
 <!-- badges: end -->
 
 The goal of `slurmjobs` is to …
