@@ -1,0 +1,29 @@
+pkgVer <- function(pkg) {
+    if (!exists("meta") || is.null(meta)) meta <- packageDescription(pkg)
+    ver <- meta$Version
+    paste0('https://github.com/LieberInstitute/slurmjobs/', pkg, ' - R package version ', ver)
+}
+
+c(
+
+    bibentry(bibtype="manual",
+        title = "slurmjobs: Helper Functions for SLURM Jobs",
+        author = personList(
+            as.person("LieberInstitute")
+        ),
+        year = format(Sys.Date(), "%Y"),
+        url = "http://www.bioconductor.org/packages/slurmjobs",
+        note = pkgVer('slurmjobs'),
+        doi = '10.18129/B9.bioc.slurmjobs'
+    ),
+    bibentry(bibtype="article",
+        title = "slurmjobs: Helper Functions for SLURM Jobs",
+        author = personList(
+            as.person("LieberInstitute")
+        ),
+        year = format(Sys.Date(), "%Y"),
+        journal = "bioRxiv",
+        doi = "10.1101/TODO",
+        url = "https://www.biorxiv.org/content/10.1101/TODO"
+    )
+)
