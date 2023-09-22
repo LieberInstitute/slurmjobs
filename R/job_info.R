@@ -54,63 +54,75 @@ job_info = function(user = Sys.getenv('USER'), partition = 'shared') {
         select(-ST)
     colnames(job_df) = tolower(colnames(job_df))
 
-    #   Form a list of tibbles, containing job ID and maximum physical and
-    #   virtual memory used
-    mem_df_list = lapply(
-        #   Only have permission to check memory of this user's jobs
-        job_df |> filter(user == Sys.getenv('USER')) |> pull(job_id),
-        function(x) {
-            command = sprintf(
-                'sstat -P -j %s --format="JobID,MaxRSS,MaxVMSize"', x
-            )
-            mem_df = read.csv(
-                    text = system(command, intern = TRUE), sep = "|"
-                ) |>
-                as_tibble()
-        }
-    )
-
-    #   Combine list of tibbles and merge with existing tibble
-    job_df = do.call(rbind, mem_df_list) |>
-        rename(
-            job_id = JobID,
-            max_rss_gb = MaxRSS,
-            max_vmem_gb = MaxVMSize
-        ) |>
-        right_join(job_df)
+    these_job_ids = job_df |>
+        filter(user == Sys.getenv('USER')) |>
+        pull(job_id)
     
-    #   Given a character vector containing an amount of memory (containing a
-    #   numeric piece and unit, e.g. "1.03G"), return a numeric vector with the
-    #   amount in GB (e.g. 1.03).
-    parse_memory_str = function(mem_str) {
-        #   Grab the numeric and character portions of the string. Verify one is
-        #   NA only when the other is (an indirect way of suggesting parsing
-        #   succeeded, and in particular memory units are expected)
-        coeff = as.numeric(str_extract(mem_str, '[0-9]+'))
-        unit = str_extract(mem_str, '[KMG]$')
-        if (!all(is.na(coeff) == is.na(unit))) {
-            stop("Failed to parse memory information. This is a slurmjobs bug!")
+    if (length(these_job_ids) > 0) {
+        #   Form a list of tibbles, containing job ID and maximum physical and
+        #   virtual memory used
+        mem_df_list = lapply(
+            #   Only have permission to check memory of this user's jobs
+            these_job_ids,
+            function(x) {
+                command = sprintf(
+                    'sstat -P -j %s --format="JobID,MaxRSS,MaxVMSize"', x
+                )
+                mem_df = read.csv(
+                        text = system(command, intern = TRUE), sep = "|"
+                    ) |>
+                    as_tibble()
+            }
+        )
+
+        #   Combine list of tibbles and merge with existing tibble
+        job_df = do.call(rbind, mem_df_list) |>
+            rename(
+                job_id = JobID,
+                max_rss_gb = MaxRSS,
+                max_vmem_gb = MaxVMSize
+            ) |>
+            right_join(job_df)
+    
+
+        #   Given a character vector containing an amount of memory (containing
+        #   a numeric piece and unit, e.g. "1.03G"), return a numeric vector
+        #   with the amount in GB (e.g. 1.03).
+        parse_memory_str = function(mem_str) {
+            #   Grab the numeric and character portions of the string. Verify
+            #   one is NA only when the other is (an indirect way of suggesting
+            #   parsing succeeded, and in particular memory units are expected)
+            coeff = as.numeric(str_extract(mem_str, '[0-9]+'))
+            unit = str_extract(mem_str, '[KMG]$')
+            if (!all(is.na(coeff) == is.na(unit))) {
+                stop("Failed to parse memory information. This is a slurmjobs bug!")
+            }
+
+            mem_num = case_when(
+                unit == 'K' ~ coeff / 1e6,
+                unit == 'M' ~ coeff / 1e3,
+                unit == 'G' ~ coeff,
+                TRUE ~ NA  # note this case is impossible
+            )
+
+            return(mem_num)
         }
 
-        mem_num = case_when(
-            unit == 'K' ~ coeff / 1e6,
-            unit == 'M' ~ coeff / 1e3,
-            unit == 'G' ~ coeff,
-            TRUE ~ NA  # note this case is impossible
-        )
-
-        return(mem_num)
-    }
-
-    #   Clean up memory-related columns so they're numeric and represent amounts
-    #   in GB
-    job_df = job_df |>
-        mutate(
-            across(
-                c('max_rss_gb', 'max_vmem_gb', 'requested_mem_gb'),
-                ~ parse_memory_str(.x)
+        #   Clean up memory-related columns so they're numeric and represent
+        #   amounts in GB
+        job_df = job_df |>
+            mutate(
+                across(
+                    c('max_rss_gb', 'max_vmem_gb', 'requested_mem_gb'),
+                    ~ parse_memory_str(.x)
+                )
             )
-        )
+    } else {
+        #   Even though no memory information is returned, define the relevant
+        #   columns for consistent output behavior
+        job_df$max_rss_gb = NA
+        job_df$max_vmem_gb = NA
+    }
     
     return(job_df)
 }
