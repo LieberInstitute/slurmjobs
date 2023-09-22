@@ -1,4 +1,8 @@
-#' TODO
+#' Return a tibble containing information about currently running jobs.
+#' 
+#' This function imports the output of 'squeue' into tibble, also adding
+#' information about maximal virtual memory and RSS used by jobs of this user
+#' (you).
 #'
 #' @param user A `character(1)` vector specifying the username of the jobs to
 #' query. Set NULL to return info about all users' jobs.
@@ -12,7 +16,11 @@
 #'
 #' @examples
 #'
-#' [TODO!]
+#' #    Must be run in a SLURM environment where a 'shared' partition exists
+#' job_df = job_info(partition = 'shared')
+#' 
+#' #    Sum up requested CPUs across all running jobs
+#' print(sprintf("I'm using %s CPUs total right now.", sum(job_df$cpus)))
 
 job_info = function(user = Sys.getenv('USER'), partition = 'shared') {
     #   Read several key fields from squeue and parse into a tibble
