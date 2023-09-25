@@ -40,9 +40,8 @@
 #'     )
 #' })
 #'
-array_submit <- function(
-        job_bash, task_ids, submit = file.exists("/cm/shared/apps/sge/sge-8.1.9/default/common/accounting_20191007_0300.txt"),
-        restore = TRUE) {
+array_submit <- function(job_bash, task_ids, submit = file.exists("/cm/shared/apps/sge/sge-8.1.9/default/common/accounting_20191007_0300.txt"),
+    restore = TRUE) {
     ## Check that the script is local, in case the script uses -cwd
     if (basename(job_bash) != job_bash) {
         stop(

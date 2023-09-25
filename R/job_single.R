@@ -53,11 +53,10 @@
 #' ## An array job
 #' job_single("jhpce_job_array", task_num = 20, create_logdir = FALSE)
 #'
-job_single <- function(
-        name, create_shell = FALSE, partition = "shared", memory = "10G",
-        cores = 1L, email = "ALL", logdir = "logs", task_num = NULL, tc = 20,
-        command = 'Rscript -e "options(width = 120); sessioninfo::session_info()"',
-        create_logdir = TRUE) {
+job_single <- function(name, create_shell = FALSE, partition = "shared", memory = "10G",
+    cores = 1L, email = "ALL", logdir = "logs", task_num = NULL, tc = 20,
+    command = 'Rscript -e "options(width = 120); sessioninfo::session_info()"',
+    create_logdir = TRUE) {
     ## Remove any spaces
     name <- gsub(" ", "_", name)
 
@@ -86,7 +85,7 @@ job_single <- function(
     if (cores < 1) {
         stop("'cores' should be at least 1", call. = FALSE)
     }
-    cores = as.integer(cores)
+    cores <- as.integer(cores)
 
     ## Specify the array options if a task number was specified
     array_spec <- if (!is.null(task_num)) {
@@ -113,7 +112,7 @@ job_single <- function(
 
     ## For slurmjobs version
     version <- packageVersion("slurmjobs")
-    version = "testing"
+    version <- "testing"
 
     ## Now build the script
     script <- glue::glue(
