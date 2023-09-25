@@ -13,6 +13,7 @@
 #' @export
 #' @author Nicholas J. Eagles
 #' @import dplyr
+#' @import stringr
 #'
 #' @examples
 #'
@@ -26,8 +27,9 @@ job_info = function(user = Sys.getenv('USER'), partition = 'shared') {
     #   Read several key fields from squeue and parse into a tibble
     job_df = read.csv(
             text = system(
-                'squeue --format="%u,%A,%K,%j,%P,%C,%m,%t"', intern = TRUE
-            )
+                'squeue --format="%u|%A|%K|%j|%P|%C|%m|%t"', intern = TRUE
+            ),
+            sep = '|'
         ) |>
         as_tibble()
     
