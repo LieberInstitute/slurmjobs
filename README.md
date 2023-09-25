@@ -93,7 +93,7 @@ Please run this yourself to check for any updates on how to cite
 **slurmjobs**.
 
 ``` r
-print(citation('slurmjobs'), bibtex = TRUE)
+print(citation("slurmjobs"), bibtex = TRUE)
 #> To cite package 'slurmjobs' in publications use:
 #> 
 #>   LieberInstitute (2023). _slurmjobs: Helper Functions for SLURM Jobs_.
