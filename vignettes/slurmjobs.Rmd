@@ -112,7 +112,7 @@ job_df <- job_info(partition = NULL)
 
 The benefit to having this data in R, now, is to be able to trivially ask summarizing questions. First, "how much memory and how many CPUs am I currently using?" Knowing this answer can help ensure fair and civil use of shared computing resources, for example on a computing cluster.
 
-```{r "job_info_total_resources"}
+```{r "job_info_total_resources", eval = FALSE}
 job_df |>
     filter(partition == "shared") |>
     summarize(
@@ -124,7 +124,7 @@ job_df |>
 
 Another use case could be to get a quick idea of the maximum memory required among all running tasks in an array job, for example for a script where you'd like to tune the requested memory to be as low as necessary to complete all tasks. [TODO: really this use case makes more sense only for completed jobs]
 
-```{r "job_info_max_memory"}
+```{r "job_info_max_memory", eval = FALSE}
 job_df |>
     #   Grab only array jobs
     filter(!is.na(array_task_id)) |>
