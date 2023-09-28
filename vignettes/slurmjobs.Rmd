@@ -103,7 +103,7 @@ The `job_info()` function provides wrappers around the `squeue` and `sstat` util
 
 Retrieve info about your currently running jobs like this:
 
-```{r "job_info_basic"}
+```{r "job_info_basic", eval = FALSE}
 #   Get information about your jobs (default 'user' argument) on any partition
 job_df <- job_info(partition = NULL)
 ```
