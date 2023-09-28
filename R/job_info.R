@@ -17,10 +17,12 @@
 #' @examples
 #'
 #' #    Must be run in a SLURM environment where a 'shared' partition exists
-#' job_df <- job_info(partition = "shared")
+#' if (system('which sbatch') == 0) {
+#'     job_df <- job_info(partition = "shared")
 #'
-#' #    Sum up requested CPUs across all running jobs
-#' print(sprintf("I'm using %s CPUs total right now.", sum(job_df$cpus)))
+#'     #    Sum up requested CPUs across all running jobs
+#'     print(sprintf("I'm using %s CPUs total right now.", sum(job_df$cpus)))
+#' }
 job_info <- function(user = Sys.getenv("USER"), partition = "shared") {
     #   Read several key fields from squeue and parse into a tibble
     job_df <- read.csv(
