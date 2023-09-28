@@ -38,6 +38,7 @@ library("RefManageR")
 
 ## Write bibliography information
 bib <- c(
+    dplyr = citation("dplyr")[1],
     R = citation(),
     BiocStyle = citation("BiocStyle")[1],
     knitr = citation("knitr")[1],
@@ -89,6 +90,7 @@ citation("slurmjobs")
 
 ```{r "start", message=FALSE}
 library("slurmjobs")
+library("dplyr")
 ```
 
 Edit this as you see fit =)
@@ -139,6 +141,7 @@ The `r Biocpkg("slurmjobs")` package `r Citep(bib[["slurmjobs"]])` was made poss
 
 * R `r Citep(bib[["R"]])`
 * `r Biocpkg("BiocStyle")` `r Citep(bib[["BiocStyle"]])`
+* `r CRANpkg("dplyr")` `r Citep(bib[["dplyr"]])`
 * `r CRANpkg("knitr")` `r Citep(bib[["knitr"]])`
 * `r CRANpkg("RefManageR")` `r Citep(bib[["RefManageR"]])`
 * `r CRANpkg("rmarkdown")` `r Citep(bib[["rmarkdown"]])`
