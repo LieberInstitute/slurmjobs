@@ -82,10 +82,18 @@ job_single <- function(name, create_shell = FALSE, partition = "shared", memory 
         stop("'logdir' has to be a relative path.")
     }
 
+    ## Check the validity of core and memory requests
     if (cores < 1) {
         stop("'cores' should be at least 1", call. = FALSE)
     }
     cores <- as.integer(cores)
+
+    if (!grepl('^[1-9][0-9]*[KMGT]$', memory)) {
+        stop(
+            "Could not parse memory request. Must be a character containing a positive integer and units 'K', 'M', 'G', or 'T'.",
+            call. = FALSE
+        )
+    }
 
     ## Specify the array options if a task number was specified
     array_spec <- if (!is.null(task_num)) {
