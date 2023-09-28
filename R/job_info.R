@@ -12,8 +12,7 @@
 #' @return A tibble with job information about currently running jobs.
 #' @export
 #' @author Nicholas J. Eagles
-#' @import dplyr
-#' @import stringr
+#' @import dplyr stringr
 #'
 #' @examples
 #'

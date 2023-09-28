@@ -38,6 +38,7 @@
 #' @export
 #' @author Leonardo Collado-Torres
 #' @author Nicholas J. Eagles
+#' @import glue
 #'
 #' @examples
 #'
