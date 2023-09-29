@@ -1,8 +1,8 @@
-job_info <- function(job_id, partition = "shared") {
+job_report <- function(job_id, partition = "shared") {
     job_df <- read.csv(
         text = system(
             sprintf(
-                'sacct -j %s -P -o "JobID,User,JobName,Partition,AllocCPUS,ReqMem,State,MaxRSS,MaxVMSize" --units=G',
+                'sacct -j %s -P -o "JobID,JobIDRaw,User,JobName,Partition,AllocCPUS,ReqMem,State,MaxRSS,MaxVMSize" --units=G',
                 job_id
             ),
             intern = TRUE
@@ -11,7 +11,14 @@ job_info <- function(job_id, partition = "shared") {
         na.strings = c("", "NA")
     ) |>
         as_tibble() |>
-        filter(!grepl('\\.(batch|extern)$', JobID))
+        mutate(
+            array_task_id = as.integer(
+                str_extract(JobID, '[0-9]+_([0-9]+).*', group = 1)
+            ),
+            JobID = str_extract(JobIDRaw, '^[0-9]+'),
+            job_step = str_extract(JobIDRaw, '[0-9]+\\.?(.*)$', group = 1)
+        ) |>
+        select(-JobIDRaw)
     
     #   Filter to the requested partition. Passing NULL signals to not subset/
     #   filter.
