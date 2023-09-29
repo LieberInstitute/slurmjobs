@@ -9,7 +9,7 @@
 #'
 #' @examples
 #'
-#' #    Must be run in a SLURM environment where a 'shared' partition exists
+#' #    Must be run in a SLURM environment
 #' if (system("which sbatch") == 0) {
 #'     TODO
 #' }
@@ -34,11 +34,24 @@ job_report <- function(job_id) {
             job_step = str_extract(JobIDRaw, '[0-9]+\\.?(.*)$', group = 1)
         ) |>
         select(-JobIDRaw)
+    
+    #   For batch jobs, memory-related information is only reported in the
+    #   'batch' job step, but all other info we care about is in the ordinary
+    #   job step, called '' here. For interactive jobs, 'sacct' doesn't return
+    #   memory info
+    if ('batch' %in% job_df$job_step) {
+        job_df[job_df$job_step == '', c('MaxRSS', 'MaxVMSize')] = job_df[
+            job_df$job_step == 'batch',
+            c('MaxRSS', 'MaxVMSize')
+        ]
+    }
 
     #   Clean up column names and types
     job_df <- job_df |>
+        #   Drop redundant job steps
+        filter(job_step == '') |>
+        #   Some character columns should be factors
         mutate(
-            #   Some character columns should be factors
             Partition = as.factor(Partition),
             status = as.factor(State)
         ) |>
@@ -51,7 +64,7 @@ job_report <- function(job_id) {
             max_vmem_gb = MaxVMSize,
             max_rss_gb = MaxRSS
         ) |>
-        select(-State)
+        select(-c(State, job_step))
     colnames(job_df) <- tolower(colnames(job_df))
 
     #   Convert memory-related columns to numeric (in terms of GB)
