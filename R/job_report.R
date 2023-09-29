@@ -1,4 +1,19 @@
-job_report <- function(job_id, partition = "shared") {
+#' TODO
+#'
+#' @param job_id TODO
+#'
+#' @return A tibble with information about the requested job.
+#' @export
+#' @author Nicholas J. Eagles
+#' @import dplyr stringr utils
+#'
+#' @examples
+#'
+#' #    Must be run in a SLURM environment where a 'shared' partition exists
+#' if (system("which sbatch") == 0) {
+#'     TODO
+#' }
+job_report <- function(job_id) {
     job_df <- read.csv(
         text = system(
             sprintf(
@@ -19,10 +34,6 @@ job_report <- function(job_id, partition = "shared") {
             job_step = str_extract(JobIDRaw, '[0-9]+\\.?(.*)$', group = 1)
         ) |>
         select(-JobIDRaw)
-    
-    #   Filter to the requested partition. Passing NULL signals to not subset/
-    #   filter.
-    if (!is.null(partition)) job_df <- job_df |> filter(Partition == partition)
 
     #   Clean up column names and types
     job_df <- job_df |>
