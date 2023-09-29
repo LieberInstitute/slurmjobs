@@ -35,27 +35,13 @@ test_that("job_loop", {
         run_test(cores = 0.5, loops = list("a" = letters)),
         "should be at least 1"
     )
-    expect_equal(grep("pe local", run_test(
-        cores = 1,
-        loops = list("a" = letters)
-    )), integer(0))
-    expect_equal(grepl("#\\$ -pe local 10", run_test(
-        cores = 10,
-        loops = list("a" = letters)
-    )), TRUE)
-    expect_equal(grep("shared", run_test(
-        queue = "shared",
-        loops = list("a" = letters)
-    )), integer(0))
-    expect_equal(grepl(
-        "#\\$ -l bluejay,",
+    expect_error(run_test(memory = 10), "Could not parse memory request")
+    expect_error(run_test(memory = "5GB"), "Could not parse memory request")
+    run_test(create_shell = TRUE, loops = list("a" = letters))
+    expect_error(
         run_test(
-            queue = " bluejay ", create_shell = TRUE,
-            loops = list("a" = letters[1:5], "b" = letters[6:10])
-        )
-    ), TRUE)
-    expect_error(run_test(FALSE,
-        create_shell = TRUE,
-        loops = list("a" = letters)
-    ), "already exists!")
+            delete = FALSE, loops = list("b" = letters), create_shell = TRUE
+        ),
+        "already exists!"
+    )
 })
