@@ -3,6 +3,7 @@
 export(job_info)
 export(job_loop)
 export(job_single)
+export(with_wd)
 import(dplyr)
 import(glue)
 import(purrr)

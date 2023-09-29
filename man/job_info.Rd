@@ -24,10 +24,12 @@ information about maximal virtual memory and RSS used by jobs of this user
 \examples{
 
 #    Must be run in a SLURM environment where a 'shared' partition exists
-job_df <- job_info(partition = "shared")
+if (system('which sbatch') == 0) {
+    job_df <- job_info(partition = "shared")
 
-#    Sum up requested CPUs across all running jobs
-print(sprintf("I'm using \%s CPUs total right now.", sum(job_df$cpus)))
+    #    Sum up requested CPUs across all running jobs
+    print(sprintf("I'm using \%s CPUs total right now.", sum(job_df$cpus)))
+}
 }
 \author{
 Nicholas J. Eagles
