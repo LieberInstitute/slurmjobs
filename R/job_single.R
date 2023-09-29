@@ -115,7 +115,7 @@ job_single <- function(
         logdir,
         paste0(
             name,
-            ifelse(!is.null(task_num), ".$SLURM_ARRAY_TASK_ID", ""),
+            ifelse(!is.null(task_num), ".%a", ""),
             ".txt"
         )
     )

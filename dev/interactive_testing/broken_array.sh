@@ -3,8 +3,8 @@
 #SBATCH --mem=3G
 #SBATCH --job-name=broken_array
 #SBATCH -c 1
-#SBATCH -o logs/broken_array.$SLURM_ARRAY_TASK_ID.txt
-#SBATCH -e logs/broken_array.$SLURM_ARRAY_TASK_ID.txt
+#SBATCH -o logs/broken_array.%a.txt
+#SBATCH -e logs/broken_array.%a.txt
 #SBATCH --array=1-10%10
 
 echo "**** Job starts ****"
