@@ -17,7 +17,7 @@
 #' @examples
 #'
 #' #    Must be run in a SLURM environment where a 'shared' partition exists
-#' if (system('which sbatch') == 0) {
+#' if (system("which sbatch") == 0) {
 #'     job_df <- job_info(partition = "shared")
 #'
 #'     #    Sum up requested CPUs across all running jobs

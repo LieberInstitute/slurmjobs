@@ -54,10 +54,11 @@
 #' ## An array job
 #' job_single("jhpce_job_array", task_num = 20, create_logdir = FALSE)
 #'
-job_single <- function(name, create_shell = FALSE, partition = "shared", memory = "10G",
-    cores = 1L, email = "ALL", logdir = "logs", task_num = NULL, tc = 20,
-    command = 'Rscript -e "options(width = 120); sessioninfo::session_info()"',
-    create_logdir = TRUE) {
+job_single <- function(
+        name, create_shell = FALSE, partition = "shared", memory = "10G",
+        cores = 1L, email = "ALL", logdir = "logs", task_num = NULL, tc = 20,
+        command = 'Rscript -e "options(width = 120); sessioninfo::session_info()"',
+        create_logdir = TRUE) {
     ## Remove any spaces
     name <- gsub(" ", "_", name)
 
@@ -89,7 +90,7 @@ job_single <- function(name, create_shell = FALSE, partition = "shared", memory 
     }
     cores <- as.integer(cores)
 
-    if (!grepl('^[1-9][0-9]*[KMGT]$', memory)) {
+    if (!grepl("^[1-9][0-9]*[KMGT]$", memory)) {
         stop(
             "Could not parse memory request. Must be a character containing a positive integer and units 'K', 'M', 'G', or 'T'.",
             call. = FALSE
