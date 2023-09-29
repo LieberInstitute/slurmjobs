@@ -35,8 +35,14 @@ test_that("job_loop", {
         run_test(cores = 0.5, loops = list("a" = letters)),
         "should be at least 1"
     )
-    expect_error(run_test(memory = 10), "Could not parse memory request")
-    expect_error(run_test(memory = "5GB"), "Could not parse memory request")
+    expect_error(
+        run_test(loops = list("a" = letters), memory = 10),
+        "Could not parse memory request"
+    )
+    expect_error(
+        run_test(memory = "5GB", loops = list("a" = letters)),
+        "Could not parse memory request"
+    )
     run_test(create_shell = TRUE, loops = list("a" = letters))
     expect_error(
         run_test(
