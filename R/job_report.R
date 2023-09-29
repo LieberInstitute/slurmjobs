@@ -1,6 +1,9 @@
-#' TODO
+#' Given the ID for a completed or currently running SLURM job, return a tibble
+#' containing outputs from 'sacct'. In particular, returns information about
+#' job name, ID, user, status, and allocated and used memory and CPUs.
 #'
-#' @param job_id TODO
+#' @param job_id The ID associated with a finished or currently running SLURM
+#' job (character(1) or integer(1))
 #'
 #' @return A tibble with information about the requested job.
 #' @export
@@ -11,7 +14,10 @@
 #'
 #' #    Must be run in a SLURM environment
 #' if (system("which sbatch") == 0) {
-#'     TODO
+#'     job_df = job_report('234904')
+#'     
+#'     #    Check max virtual memory reached by this job
+#'     print(job_df$max_vmem_gb)
 #' }
 job_report <- function(job_id) {
     job_df <- read.csv(
