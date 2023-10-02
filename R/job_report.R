@@ -180,7 +180,7 @@ job_report <- function(job_id) {
         #   Grab the numeric and character portions of the string. Verify
         #   one is NA only when the other is (an indirect way of suggesting
         #   parsing succeeded, and in particular memory units are expected)
-        coeff <- as.numeric(str_extract(mem_str, "[0-9]+"))
+        coeff <- as.numeric(str_extract(mem_str, "[0-9]+(\\.[0-9]+)?"))
         unit <- str_extract(mem_str, "[KMG]$")
         if (!all(is.na(coeff) == is.na(unit))) {
             stop("Failed to parse memory information. This is a slurmjobs bug!")
