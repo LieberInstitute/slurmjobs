@@ -108,14 +108,48 @@ job_report <- function(job_id) {
     #   'batch' job step, but all other info we care about is in the ordinary
     #   job step, called '' here. For interactive jobs, memory info appears to
     #   be in the '0' job step. Only applies for completed jobs!
-    if (any(job_df$State %in% 'COMPLETED')) {
-        job_df[
-            (job_df$job_step == '') & (job_df$State == 'COMPLETED'),
-            c('MaxRSS', 'MaxVMSize')
-        ] = job_df[
-            job_df$job_step %in% c('batch', '0'),
-            c('MaxRSS', 'MaxVMSize')
-        ]
+    job_df[
+        (job_df$job_step == '') & (job_df$State == 'COMPLETED'),
+        c('MaxRSS', 'MaxVMSize')
+    ] = job_df[
+        job_df$job_step %in% c('batch', '0'),
+        c('MaxRSS', 'MaxVMSize')
+    ]
+    
+    #   For currently running jobs, 'sacct' doesn't report memory info. Use
+    #   'sstat' instead
+    running_jobs = job_df |>
+        filter(State == 'RUNNING') |>
+        pull(JobID) |>
+        unique()
+    
+    if (length(running_jobs) > 0) {
+        #   Form a list of tibbles with memory info
+        mem_df_list <- lapply(
+            running_jobs,
+            function(x) {
+                command <- sprintf(
+                    'sstat -P -j %s --format="JobID,MaxRSS,MaxVMSize"', x
+                )
+                mem_df <- read.csv(
+                    text = system(command, intern = TRUE), sep = "|"
+                ) |>
+                    as_tibble()
+            }
+        )
+
+        #   Combine list of tibbles and merge with existing tibble
+        job_df = do.call(rbind, mem_df_list) |>
+            mutate(JobID = as.character(JobID)) |>
+            #   Here we manually take whichever the non-NA value is for each
+            #   memory-related column
+            rename(max_rss = MaxRSS, max_vmem = MaxVMSize) |>
+            right_join(job_df, by = 'JobID') |>
+            mutate(
+                MaxRSS = ifelse(is.na(MaxRSS), max_rss, MaxRSS),
+                MaxVMSize = ifelse(is.na(MaxVMSize), max_vmem, MaxVMSize)
+            ) |>
+            select(-c(max_rss, max_vmem))
     }
 
     #   Clean up column names and types
@@ -139,12 +173,35 @@ job_report <- function(job_id) {
         select(-c(State, job_step, JobIDRaw))
     colnames(job_df) <- tolower(colnames(job_df))
 
+    #   Given a character vector containing an amount of memory (containing
+    #   a numeric piece and unit, e.g. "1.03G"), return a numeric vector
+    #   with the amount in GB (e.g. 1.03).
+    parse_memory_str <- function(mem_str) {
+        #   Grab the numeric and character portions of the string. Verify
+        #   one is NA only when the other is (an indirect way of suggesting
+        #   parsing succeeded, and in particular memory units are expected)
+        coeff <- as.numeric(str_extract(mem_str, "[0-9]+"))
+        unit <- str_extract(mem_str, "[KMG]$")
+        if (!all(is.na(coeff) == is.na(unit))) {
+            stop("Failed to parse memory information. This is a slurmjobs bug!")
+        }
+
+        mem_num <- case_when(
+            unit == "K" ~ coeff / 1e6,
+            unit == "M" ~ coeff / 1e3,
+            unit == "G" ~ coeff,
+            TRUE ~ NA # note this case is impossible
+        )
+
+        return(mem_num)
+    }
+
     #   Convert memory-related columns to numeric (in terms of GB)
     job_df = job_df |>
         mutate(
             across(
                 c("max_rss_gb", "max_vmem_gb", "requested_mem_gb"),
-                ~ as.numeric(sub('G', '', .x))
+                ~ parse_memory_str(.x)
             )
         )
     
