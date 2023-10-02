@@ -32,16 +32,7 @@ job_report <- function(job_id) {
         na.strings = c("", "NA")
     ) |>
         as_tibble() |>
-        mutate(
-            array_task_id = as.integer(
-                str_extract(JobID, '[0-9]+_([0-9]+).*', group = 1)
-            ),
-            #   For a group of pending array tasks, take the full JobID (e.g.
-            #   '254220_[1-10%10]'). Otherwise, take just the initial number
-            #   (e.g. '254220').
-            JobID = str_extract(JobID, '^[0-9]+(_\\[[0-9]+-[0-9]+%[0-9]+\\]$)?'),
-            job_step = str_extract(JobIDRaw, '[0-9]+\\.?(.*)$', group = 1)
-        )
+        mutate(array_task_id = NA)
     
     #   Pending array tasks are output in a single row, but we want one row per
     #   unique task. Break into multiple rows if this is an array job with
@@ -57,8 +48,7 @@ job_report <- function(job_id) {
             stop("Bug: multiple array tasks per row only expected to occur for pending tasks.")
         }
 
-        #   Determine the range of task IDs this array covers. Use 'setdiff' as
-        #   it appears the full range of task IDs is reported, even when 
+        #   Determine the range of task IDs this array covers
         start = as.numeric(
             str_extract(
                 job_df[has_multiple_tasks, 'JobID'],
@@ -73,24 +63,56 @@ job_report <- function(job_id) {
                 group = 1
             )
         )
-        pending_ids = setdiff(start:end, job_df$array_task_id)
 
         #   Duplicate rows and overwrite with the pending task IDs. Then merge
         #   back into the original tibble
-        a = job_df[rep(has_multiple_tasks, length(pending_ids)),]
-        a$array_task_id = pending_ids
-        a$job_step = 'pending'
+        a = job_df[rep(has_multiple_tasks, end - start + 1),]
+        a$array_task_id = start:end
         job_df = job_df |>
             slice(-has_multiple_tasks) |>
             rbind(a)
     }
+    
+    #   The 'JobID' and 'JobIDRaw' fields from 'sacct' together contain 3
+    #   pieces of info. Parse them into 3 columns
+    job_df = job_df |>
+        mutate(
+            array_task_id = ifelse(
+                is.na(array_task_id),
+                as.integer(
+                    str_extract(JobID, '[0-9]+_([0-9]+).*', group = 1)
+                ),
+                array_task_id
+            ),
+            JobID = str_extract(JobIDRaw, '^[0-9]+'),
+            job_step = str_extract(JobIDRaw, '[0-9]+\\.?(.*)$', group = 1)
+        )
+
+    #   For some reason, SLURM reports the full range of tasks as PENDING, even
+    #   when some tasks may be running (or in another state). Filter out
+    #   PENDING array tasks for tasks that exist in another state in a different
+    #   row
+    job_df = job_df |>
+        filter(
+            !(
+                (State == 'PENDING') &
+                !is.na(array_task_id) &
+                (array_task_id %in% job_df$array_task_id[
+                        job_df$State != 'PENDING'
+                    ]
+                )
+            )
+        )
     
     #   For batch jobs, memory-related information is only reported in the
     #   'batch' job step, but all other info we care about is in the ordinary
     #   job step, called '' here. For interactive jobs, 'sacct' doesn't return
     #   memory info
     if ('batch' %in% job_df$job_step) {
-        job_df[job_df$job_step == '', c('MaxRSS', 'MaxVMSize')] = job_df[
+        job_df[
+            (job_df$job_step == '') & (job_df$State != 'PENDING'),
+            c('MaxRSS', 'MaxVMSize')
+        ] = job_df[
             job_df$job_step == 'batch',
             c('MaxRSS', 'MaxVMSize')
         ]
@@ -99,7 +121,7 @@ job_report <- function(job_id) {
     #   Clean up column names and types
     job_df <- job_df |>
         #   Drop redundant job steps
-        filter(job_step %in% c('', 'pending')) |>
+        filter(job_step == '') |>
         #   Some character columns should be factors
         mutate(
             Partition = as.factor(Partition),
