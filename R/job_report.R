@@ -106,14 +106,14 @@ job_report <- function(job_id) {
     
     #   For batch jobs, memory-related information is only reported in the
     #   'batch' job step, but all other info we care about is in the ordinary
-    #   job step, called '' here. For interactive jobs, 'sacct' doesn't return
-    #   memory info
-    if ('batch' %in% job_df$job_step) {
+    #   job step, called '' here. For interactive jobs, memory info appears to
+    #   be in the '0' job step. Only applies for completed jobs!
+    if (any(job_df$State %in% 'COMPLETED')) {
         job_df[
-            (job_df$job_step == '') & (job_df$State != 'PENDING'),
+            (job_df$job_step == '') & (job_df$State == 'COMPLETED'),
             c('MaxRSS', 'MaxVMSize')
         ] = job_df[
-            job_df$job_step == 'batch',
+            job_df$job_step %in% c('batch', '0'),
             c('MaxRSS', 'MaxVMSize')
         ]
     }
