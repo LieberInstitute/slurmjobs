@@ -79,6 +79,7 @@ job_report <- function(job_id) {
         #   back into the original tibble
         a = job_df[rep(has_multiple_tasks, length(pending_ids)),]
         a$array_task_id = pending_ids
+        a$job_step = 'pending'
         job_df = job_df |>
             slice(-has_multiple_tasks) |>
             rbind(a)
@@ -98,7 +99,7 @@ job_report <- function(job_id) {
     #   Clean up column names and types
     job_df <- job_df |>
         #   Drop redundant job steps
-        filter(job_step == '') |>
+        filter(job_step %in% c('', 'pending')) |>
         #   Some character columns should be factors
         mutate(
             Partition = as.factor(Partition),
