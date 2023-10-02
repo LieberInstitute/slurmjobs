@@ -31,7 +31,25 @@ job_report <- function(job_id) {
         sep = "|",
         na.strings = c("", "NA")
     ) |>
-        as_tibble() |>
+        as_tibble()
+    
+    has_multiple_tasks = grepl('_\\[[0-9]+-[0-9]+%[0-9]+\\]$', job_df$JobID)
+    start = as.numeric(
+        str_extract(
+            job_df[has_multiple_tasks, 'JobID'],
+            '.*_\\[([0-9]+)-.*',
+            group = 1
+        )
+    )
+    end = as.numeric(
+        str_extract(
+            job_df[has_multiple_tasks, 'JobID'],
+            '.*_\\[[0-9]+-([0-9]+)%.*',
+            group = 1
+        )
+    )
+
+    job_df = job_df |>
         mutate(
             array_task_id = as.integer(
                 str_extract(JobID, '[0-9]+_([0-9]+).*', group = 1)
@@ -40,6 +58,14 @@ job_report <- function(job_id) {
             job_step = str_extract(JobIDRaw, '[0-9]+\\.?(.*)$', group = 1)
         ) |>
         select(-JobIDRaw)
+    
+    index = which(has_multiple_tasks)
+    pending_ids = setdiff(start:end, job_df$array_task_id)
+    a = job_df[rep(index, length(pending_ids)),]
+    a$array_task_id = pending_ids
+    job_df = job_df |>
+        filter(!has_multiple_tasks) |>
+        rbind(a)
     
     #   For batch jobs, memory-related information is only reported in the
     #   'batch' job step, but all other info we care about is in the ordinary
