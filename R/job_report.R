@@ -175,13 +175,14 @@ job_report <- function(job_id) {
 
     #   Given a character vector containing an amount of memory (containing
     #   a numeric piece and unit, e.g. "1.03G"), return a numeric vector
-    #   with the amount in GB (e.g. 1.03).
+    #   with the amount in GB (e.g. 1.03). If a unit is not provided, GB
+    #   are assumed (e.g. '0.12' is a valid input)
     parse_memory_str <- function(mem_str) {
         #   Grab the numeric and character portions of the string. Verify
         #   one is NA only when the other is (an indirect way of suggesting
         #   parsing succeeded, and in particular memory units are expected)
         coeff <- as.numeric(str_extract(mem_str, "[0-9]+(\\.[0-9]+)?"))
-        unit <- str_extract(mem_str, "[KMG]$")
+        unit <- str_extract(mem_str, "[0-9]+(\\.[0-9]+)?([KMGTP]|)$", group = 2)
         if (!all(is.na(coeff) == is.na(unit))) {
             stop("Failed to parse memory information. This is a slurmjobs bug!")
         }
@@ -189,7 +190,9 @@ job_report <- function(job_id) {
         mem_num <- case_when(
             unit == "K" ~ coeff / 1e6,
             unit == "M" ~ coeff / 1e3,
-            unit == "G" ~ coeff,
+            unit %in% c("G", "") ~ coeff,
+            unit == "T" ~ coeff * 1e3,
+            unit == "P" ~ coeff * 1e6,
             TRUE ~ NA # note this case is impossible
         )
 
