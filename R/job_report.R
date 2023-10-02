@@ -31,41 +31,58 @@ job_report <- function(job_id) {
         sep = "|",
         na.strings = c("", "NA")
     ) |>
-        as_tibble()
-    
-    has_multiple_tasks = grepl('_\\[[0-9]+-[0-9]+%[0-9]+\\]$', job_df$JobID)
-    start = as.numeric(
-        str_extract(
-            job_df[has_multiple_tasks, 'JobID'],
-            '.*_\\[([0-9]+)-.*',
-            group = 1
-        )
-    )
-    end = as.numeric(
-        str_extract(
-            job_df[has_multiple_tasks, 'JobID'],
-            '.*_\\[[0-9]+-([0-9]+)%.*',
-            group = 1
-        )
-    )
-
-    job_df = job_df |>
+        as_tibble() |>
         mutate(
             array_task_id = as.integer(
                 str_extract(JobID, '[0-9]+_([0-9]+).*', group = 1)
             ),
-            JobID = str_extract(JobIDRaw, '^[0-9]+'),
+            #   For a group of pending array tasks, take the full JobID (e.g.
+            #   '254220_[1-10%10]'). Otherwise, take just the initial number
+            #   (e.g. '254220').
+            JobID = str_extract(JobID, '^[0-9]+(_\\[[0-9]+-[0-9]+%[0-9]+\\]$)?'),
             job_step = str_extract(JobIDRaw, '[0-9]+\\.?(.*)$', group = 1)
-        ) |>
-        select(-JobIDRaw)
+        )
     
-    index = which(has_multiple_tasks)
-    pending_ids = setdiff(start:end, job_df$array_task_id)
-    a = job_df[rep(index, length(pending_ids)),]
-    a$array_task_id = pending_ids
-    job_df = job_df |>
-        filter(!has_multiple_tasks) |>
-        rbind(a)
+    #   Pending array tasks are output in a single row, but we want one row per
+    #   unique task. Break into multiple rows if this is an array job with
+    #   pending tasks
+    has_multiple_tasks = grep('_\\[[0-9]+-[0-9]+%[0-9]+\\]$', job_df$JobID)
+    if (length(has_multiple_tasks) > 0) {
+        #   Verify assumptions: there should only be one row associated with
+        #   multiple task IDs, and this should only occur for pending tasks
+        if (length(has_multiple_tasks) > 1) {
+            stop("Bug: only expected one row containing a range of pending array tasks.")
+        }
+        if (job_df[has_multiple_tasks, 'State'] != 'PENDING') {
+            stop("Bug: multiple array tasks per row only expected to occur for pending tasks.")
+        }
+
+        #   Determine the range of task IDs this array covers. Use 'setdiff' as
+        #   it appears the full range of task IDs is reported, even when 
+        start = as.numeric(
+            str_extract(
+                job_df[has_multiple_tasks, 'JobID'],
+                '.*_\\[([0-9]+)-.*',
+                group = 1
+            )
+        )
+        end = as.numeric(
+            str_extract(
+                job_df[has_multiple_tasks, 'JobID'],
+                '.*_\\[[0-9]+-([0-9]+)%.*',
+                group = 1
+            )
+        )
+        pending_ids = setdiff(start:end, job_df$array_task_id)
+
+        #   Duplicate rows and overwrite with the pending task IDs. Then merge
+        #   back into the original tibble
+        a = job_df[rep(has_multiple_tasks, length(pending_ids)),]
+        a$array_task_id = pending_ids
+        job_df = job_df |>
+            slice(-has_multiple_tasks) |>
+            rbind(a)
+    }
     
     #   For batch jobs, memory-related information is only reported in the
     #   'batch' job step, but all other info we care about is in the ordinary
@@ -96,7 +113,7 @@ job_report <- function(job_id) {
             max_vmem_gb = MaxVMSize,
             max_rss_gb = MaxRSS
         ) |>
-        select(-c(State, job_step))
+        select(-c(State, job_step, JobIDRaw))
     colnames(job_df) <- tolower(colnames(job_df))
 
     #   Convert memory-related columns to numeric (in terms of GB)
