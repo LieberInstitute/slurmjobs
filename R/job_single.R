@@ -122,7 +122,6 @@ job_single <- function(
 
     ## For slurmjobs version
     version <- packageVersion("slurmjobs")
-    version <- "testing"
 
     ## Now build the script
     script <- glue::glue(
@@ -135,6 +134,7 @@ job_single <- function(
 #SBATCH -e {log_file}
 #SBATCH --mail-type={email}
 {array_spec}
+set -e
 
 echo "**** Job starts ****"
 date
