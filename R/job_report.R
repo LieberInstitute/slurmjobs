@@ -109,7 +109,7 @@ job_report <- function(job_id) {
     #   job step, called '' here. For interactive jobs, memory info appears to
     #   be in the '0' job step. Only applies for completed jobs!
     job_df[
-        (job_df$job_step == '') & (job_df$State == 'COMPLETED'),
+        (job_df$job_step == '') & (job_df$State %in% c('COMPLETED', 'FAILED')),
         c('MaxRSS', 'MaxVMSize')
     ] = job_df[
         job_df$job_step %in% c('batch', '0'),
