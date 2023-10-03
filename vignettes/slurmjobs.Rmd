@@ -130,7 +130,7 @@ Similarly, we can specify `task_num` to create an array job-- in this case, one 
 job_single(
     name = "my_array_job", memory = "5G", cores = 1, create_shell = FALSE,
     task_num = 10
-)[`job_loop()`](../articles/job_loop.html) is a little bit more complicated since you have to specify the `loops` named list argument. The `loops` argument specifies the `bash` variable names and values to loop through for creating a series of `bash` scripts that will get submitted to SGE. This type of `bash` script is something we use frequently, for example in the [`compute_weights.sh`](https://github.com/LieberInstitute/brainseq_phase2/blob/master/twas/compute_weights.sh) script `r citep('doi.org/10.1016/j.neuron.2019.05.013')`. This type of script generator I believe is something [Alyssa Frazee](http://alyssafrazee.com/) taught me back in the day which you can see in some old repositories such as [`leekgroup/derSoftware`](https://github.com/leekgroup/derSoftware). Besides the `loops` argument, [`job_loop()`](../articles/job_loop.html) shares most of the options with [`job_single()`](../articles/job_single.html).
+)
 ```
 
 `job_loop()` is a little bit more complicated since you have to specify the `loops` named list argument. The `loops` argument specifies the `bash` variable names and values to loop through for creating a series of `bash` scripts that will get submitted to SLURM. This type of `bash` script is something we use frequently, for example in the [`compute_weights.sh`](https://github.com/LieberInstitute/brainseq_phase2/blob/master/twas/compute_weights.sh) script `r citep('doi.org/10.1016/j.neuron.2019.05.013')`. This type of script generator I believe is something [Alyssa Frazee](http://alyssafrazee.com/) taught me back in the day which you can see in some old repositories such as [`leekgroup/derSoftware`](https://github.com/leekgroup/derSoftware). Besides the `loops` argument, `job_loop()` shares most of the options with `job_single()`.
@@ -150,7 +150,7 @@ On a SLURM system, you'd run `job_df = job_info(user = NULL, partition = "shared
 
 ```{r "job_info_quick_look"}
 #   On a real SLURM system
-job_df = readRDS(
+job_df <- readRDS(
     system.file("extdata", "job_info_df.rds", package = "slurmjobs")
 )
 print(job_df)
@@ -179,7 +179,7 @@ Suppose you have a workflow that operates as an array job, and you'd like to pro
 On an actual system with SLURM installed, you'd normally run something like `job_df = job_report(slurm_job_id)` for the `slurm_job_id` (character or integer) representing the small test. For convenience, we'll start from the output of `job_report` as available in the `slurmjobs` package.
 
 ```{r "job_report_quick_look"}
-job_df = readRDS(
+job_df <- readRDS(
     system.file("extdata", "job_report_df.rds", package = "slurmjobs")
 )
 print(job_df)
@@ -188,10 +188,10 @@ print(job_df)
 Now let's choose a better memory request:
 
 ```{r "job_report_adjust_mem"}
-stat_df = job_df |>
+stat_df <- job_df |>
     #   This example includes tasks that fail. We're only interested in memory
     #   for successfully completed tasks
-    filter(status != 'FAILED') |>
+    filter(status != "FAILED") |>
     summarize(
         mean_mem = mean(max_vmem_gb),
         std_mem = sd(max_vmem_gb),
@@ -200,7 +200,7 @@ stat_df = job_df |>
 
 #   We could choose a new memory request as 3 standard deviations above the mean
 #   of actual memory usage
-new_limit = stat_df$mean_mem + 3 * stat_df$std_mem
+new_limit <- stat_df$mean_mem + 3 * stat_df$std_mem
 
 print(
     sprintf(

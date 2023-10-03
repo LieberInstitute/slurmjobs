@@ -24,8 +24,8 @@ job name, ID, user, status, and allocated and used memory and CPUs.
 
 #    Must be run in a SLURM environment
 if (system("which sbatch") == 0) {
-    job_df = job_report('234904')
-    
+    job_df <- job_report("234904")
+
     #    Check max virtual memory reached by this job
     print(job_df$max_vmem_gb)
 }
