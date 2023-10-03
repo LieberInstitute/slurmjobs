@@ -189,10 +189,31 @@ is to provide the information output from <code>squeue</code> into a
 <code>tibble</code>, while retrieving memory-utilization information
 that ordinarily must be retrieved manually on a job-by-job basis with
 <code>sstat -j [specific job ID]</code>.</p>
-<p>Retrieve info about your currently running jobs like this:</p>
+<p>On a SLURM system, you’d run
+<code>job_df = job_info(user = NULL, partition = "shared")</code> here,
+to get every user’s jobs running on the “shared” partition. We’ll load
+an example output directly here.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co">#   Get information about your jobs (default 'user' argument) on any partition</span></span>
-<span><span class="va">job_df</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/job_info.html">job_info</a></span><span class="op">(</span>partition <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="co">#   On a real SLURM system</span></span>
+<span><span class="va">job_df</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"job_info_df.rds"</span>, package <span class="op">=</span> <span class="st">"slurmjobs"</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">job_df</span><span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 100 × 10</span></span></span>
+<span><span class="co">#&gt;    job_id max_rss_gb max_vmem_gb user  array_task_id name     partition  cpus</span></span>
+<span><span class="co">#&gt;     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> <span style="text-decoration: underline;">158</span>071         <span style="color: #BB0000;">NA</span>          <span style="color: #BB0000;">NA</span> user1 6             my_job_1 shared        2</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> <span style="text-decoration: underline;">158</span>072         <span style="color: #BB0000;">NA</span>          <span style="color: #BB0000;">NA</span> user1 7             my_job_1 shared        2</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> <span style="text-decoration: underline;">158</span>074         <span style="color: #BB0000;">NA</span>          <span style="color: #BB0000;">NA</span> user1 9             my_job_1 shared        2</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> <span style="text-decoration: underline;">221</span>130         <span style="color: #BB0000;">NA</span>          <span style="color: #BB0000;">NA</span> user1 54            my_job_1 shared        2</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> <span style="text-decoration: underline;">221</span>145         <span style="color: #BB0000;">NA</span>          <span style="color: #BB0000;">NA</span> user1 4             my_job_2 shared        2</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> <span style="text-decoration: underline;">221</span>148         <span style="color: #BB0000;">NA</span>          <span style="color: #BB0000;">NA</span> user1 7             my_job_2 shared        2</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> <span style="text-decoration: underline;">221</span>874         <span style="color: #BB0000;">NA</span>          <span style="color: #BB0000;">NA</span> user1 57            my_job_1 shared        2</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> <span style="text-decoration: underline;">222</span>104         <span style="color: #BB0000;">NA</span>          <span style="color: #BB0000;">NA</span> user1 67            my_job_1 shared        2</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> <span style="text-decoration: underline;">222</span>709         <span style="color: #BB0000;">NA</span>          <span style="color: #BB0000;">NA</span> user1 74            my_job_3 shared        2</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> <span style="text-decoration: underline;">223</span>262         <span style="color: #BB0000;">NA</span>          <span style="color: #BB0000;">NA</span> user1 77            my_job_1 shared        2</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 90 more rows</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 2 more variables: requested_mem_gb &lt;dbl&gt;, status &lt;fct&gt;</span></span></span></code></pre></div>
 <p>The benefit to having this data in R, now, is to be able to trivially
 ask summarizing questions. First, “how much memory and how many CPUs am
 I currently using?” Knowing this answer can help ensure fair and civil
@@ -200,34 +221,27 @@ use of shared computing resources, for example on a computing
 cluster.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">job_df</span> <span class="op">|&gt;</span></span>
-<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">partition</span> <span class="op">==</span> <span class="st">"shared"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="co">#   Or your username here</span></span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">user</span> <span class="op">==</span> <span class="st">"user17"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="co">#   Get the number of CPUs requested and the memory requested in GB</span></span>
 <span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarize</a></span><span class="op">(</span></span>
 <span>        total_mem_req <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">requested_mem_gb</span><span class="op">)</span>,</span>
 <span>        total_cpus <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">cpus</span><span class="op">)</span></span>
 <span>    <span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>    <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<p>Another use case could be to get a quick idea of the maximum memory
-required among all running tasks in an array job, for example for a
-script where you’d like to tune the requested memory to be as low as
-necessary to complete all tasks. [TODO: really this use case makes more
-sense only for completed jobs]</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">job_df</span> <span class="op">|&gt;</span></span>
-<span>    <span class="co">#   Grab only array jobs</span></span>
-<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">array_task_id</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>    <span class="co">#   Now for each unique array job, find the highest peak memory reached</span></span>
-<span>    <span class="co">#   across tasks</span></span>
-<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">job_id</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarize</a></span><span class="op">(</span>max_peak_mem <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">max_vmem_gb</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>    <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 1 × 2</span></span></span>
+<span><span class="co">#&gt;   total_mem_req total_cpus</span></span>
+<span><span class="co">#&gt;           <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>            24          4</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="analyzing-finished-jobs">Analyzing Finished Jobs<a class="anchor" aria-label="anchor" href="#analyzing-finished-jobs"></a>
 </h2>
 <p>The <code><a href="../reference/job_report.html">job_report()</a></code> function returns in-depth information
-about a single queued, running, or finished job. Note that through
-SLURM, an array job can be referenced as a whole, or by one of its
-tasks.</p>
+about a single queued, running, or finished job (including a single
+array job). It combines functionality from SLURM’s <code>sstat</code>
+and <code>sacct</code> to return a tibble for easy manipulation in
+R.</p>
 <p>Suppose you have a workflow that operates as an array job, and you’d
 like to profile memory usage across the many tasks. Suppose we’ve done
 an initial trial, setting memory relatively high just to get the jobs
@@ -241,7 +255,7 @@ something like <code>job_df = job_report(slurm_job_id)</code> for the
 test. For convenience, we’ll start from the output of
 <code>job_report</code> as available in the <code>slurmjobs</code>
 package.</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">job_df</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span></span>
 <span>    <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"job_report_df.rds"</span>, package <span class="op">=</span> <span class="st">"slurmjobs"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
@@ -261,7 +275,7 @@ package.</p>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> 297331 user1 broken_… shared        2                5       1.16        1.16</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 3 more variables: array_task_id &lt;int&gt;, exit_code &lt;dbl&gt;, status &lt;fct&gt;</span></span></span></code></pre></div>
 <p>Now let’s choose a better memory request,</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">stat_df</span> <span class="op">=</span> <span class="va">job_df</span> <span class="op">|&gt;</span></span>
 <span>    <span class="co">#   This example includes tasks that fail. We're only interested in memory</span></span>
 <span>    <span class="co">#   for successfully completed tasks</span></span>
@@ -317,7 +331,7 @@ Cheng, Chang, and Iannone, 2023)</li>
 </ul>
 <p>This package was developed using <em><a href="https://bioconductor.org/packages/3.17/biocthis" class="external-link">biocthis</a></em>.</p>
 <p>Code for creating the vignette</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">## Create the vignette</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://github.com/rstudio/rmarkdown" class="external-link">"rmarkdown"</a></span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="fu"><a href="https://pkgs.rstudio.com/rmarkdown/reference/render.html" class="external-link">render</a></span><span class="op">(</span><span class="st">"slurmjobs.Rmd"</span>, <span class="st">"BiocStyle::html_document"</span><span class="op">)</span><span class="op">)</span></span>
@@ -326,9 +340,9 @@ Cheng, Chang, and Iannone, 2023)</li>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://yihui.org/knitr/" class="external-link">"knitr"</a></span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/knit.html" class="external-link">knit</a></span><span class="op">(</span><span class="st">"slurmjobs.Rmd"</span>, tangle <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <p>Date the vignette was generated.</p>
-<pre><code><span><span class="co">#&gt; [1] "2023-10-03 16:16:11 UTC"</span></span></code></pre>
+<pre><code><span><span class="co">#&gt; [1] "2023-10-03 18:04:05 UTC"</span></span></code></pre>
 <p>Wallclock time spent generating the vignette.</p>
-<pre><code><span><span class="co">#&gt; Time difference of 1.66 secs</span></span></code></pre>
+<pre><code><span><span class="co">#&gt; Time difference of 1.944 secs</span></span></code></pre>
 <p><code>R</code> session information.</p>
 <pre><code><span><span class="co">#&gt; <span style="color: #00BBBB; font-weight: bold;">─ Session info ───────────────────────────────────────────────────────────────────────────────────────────────────────</span></span></span>
 <span><span class="co">#&gt;  <span style="color: #555555; font-style: italic;">setting </span> <span style="color: #555555; font-style: italic;">value</span></span></span>
