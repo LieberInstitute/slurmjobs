@@ -156,8 +156,11 @@ job_report <- function(job_id) {
     job_df <- job_df |>
         #   Drop redundant job steps
         filter(job_step == '') |>
-        #   Some character columns should be factors
         mutate(
+            exit_code = as.integer(
+                str_extract(ExitCode, '^([0-9]+):', group = 1)
+            ),
+            #   Some character columns should be factors
             Partition = as.factor(Partition),
             status = as.factor(State)
         ) |>
@@ -169,9 +172,8 @@ job_report <- function(job_id) {
             requested_mem_gb = ReqMem,
             max_vmem_gb = MaxVMSize,
             max_rss_gb = MaxRSS,
-            exit_code = ExitCode
         ) |>
-        select(-c(State, job_step, JobIDRaw))
+        select(-c(State, job_step, JobIDRaw, ExitCode))
     colnames(job_df) <- tolower(colnames(job_df))
 
     #   Given a character vector containing an amount of memory (containing
