@@ -3,8 +3,13 @@ title: "Introduction to slurmjobs"
 author: 
   - name: Nicholas J. Eagles
     affiliation:
-    - Lieber Institute for Brain Development
+    - &libd Lieber Institute for Brain Development
     email: nickeagles77@gmail.com
+  - name: Leonardo Collado-Torres
+    affiliation:
+    - *libd
+    - &ccb Center for Computational Biology, Johns Hopkins University
+    email: lcolladotor@gmail.com
 output: 
   BiocStyle::html_document:
     self_contained: yes
@@ -125,6 +130,15 @@ Similarly, we can specify `task_num` to create an array job-- in this case, one 
 job_single(
     name = "my_array_job", memory = "5G", cores = 1, create_shell = FALSE,
     task_num = 10
+)[`job_loop()`](../articles/job_loop.html) is a little bit more complicated since you have to specify the `loops` named list argument. The `loops` argument specifies the `bash` variable names and values to loop through for creating a series of `bash` scripts that will get submitted to SGE. This type of `bash` script is something we use frequently, for example in the [`compute_weights.sh`](https://github.com/LieberInstitute/brainseq_phase2/blob/master/twas/compute_weights.sh) script `r citep('doi.org/10.1016/j.neuron.2019.05.013')`. This type of script generator I believe is something [Alyssa Frazee](http://alyssafrazee.com/) taught me back in the day which you can see in some old repositories such as [`leekgroup/derSoftware`](https://github.com/leekgroup/derSoftware). Besides the `loops` argument, [`job_loop()`](../articles/job_loop.html) shares most of the options with [`job_single()`](../articles/job_single.html).
+```
+
+[`job_loop()`](../articles/job_loop.html) is a little bit more complicated since you have to specify the `loops` named list argument. The `loops` argument specifies the `bash` variable names and values to loop through for creating a series of `bash` scripts that will get submitted to SGE. This type of `bash` script is something we use frequently, for example in the [`compute_weights.sh`](https://github.com/LieberInstitute/brainseq_phase2/blob/master/twas/compute_weights.sh) script `r citep('doi.org/10.1016/j.neuron.2019.05.013')`. This type of script generator I believe is something [Alyssa Frazee](http://alyssafrazee.com/) taught me back in the day which you can see in some old repositories such as [`leekgroup/derSoftware`](https://github.com/leekgroup/derSoftware). Besides the `loops` argument, [`job_loop()`](../articles/job_loop.html) shares most of the options with [`job_single()`](../articles/job_single.html).
+
+```{r 'loop'}
+job_loop(
+    loops = list(region = c("DLPFC", "HIPPO"), feature = c("gene", "exon", "tx", "jxn")),
+    name = "bsp2_test"
 )
 ```
 
@@ -171,7 +185,7 @@ job_df = readRDS(
 print(job_df)
 ```
 
-Now let's choose a better memory request,
+Now let's choose a better memory request:
 
 ```{r "job_report_adjust_mem"}
 stat_df = job_df |>
