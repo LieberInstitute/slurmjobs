@@ -1,11 +1,13 @@
 #!/bin/bash
 #SBATCH -p shared
-#SBATCH --mem=3G
+#SBATCH --mem=5G
 #SBATCH --job-name=broken_array
 #SBATCH -c 1
 #SBATCH -o logs/broken_array.%a.txt
 #SBATCH -e logs/broken_array.%a.txt
 #SBATCH --array=1-10%10
+
+set -e
 
 echo "**** Job starts ****"
 date
