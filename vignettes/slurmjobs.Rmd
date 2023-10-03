@@ -99,6 +99,35 @@ Here is an example of you can cite your package inside the vignette:
 
 * `r Biocpkg("slurmjobs")` `r Citep(bib[["slurmjobs"]])`
 
+# Creating Shell Scripts to `sbatch`
+
+When processing data on a [SLURM](https://slurm.schedmd.com/)-managed system, primarily
+running R code, you'll likely find yourself writing many "wrapper" shell scripts that can be
+submitted via `sbatch` to the job scheduler. This process requires precise SLURM-specific
+syntax and a large amount of repetition. `job_single` aims to reduce required configuration
+from the user to just a handful of options that tend to vary most often between shell scripts
+(e.g. memory, number of CPUs), and automate the rest of the shell-script-creation process.
+
+Shell scripts created by `job_single` log key reproducibility information, such as the user,
+job ID, job name, node name, and when the job starts and ends.
+
+```{r "job_single_basic"}
+#   With 'create_shell = FALSE', the contents of the potential shell script are
+#   only printed to the screen
+job_single(
+    name = "my_shell_script", memory = "10G", cores = 2, create_shell = FALSE
+)
+```
+
+Similarly, we can specify `task_num` to create an array job-- in this case, one with 10 tasks.
+
+```{r "job_single_array"}
+job_single(
+    name = "my_array_job", memory = "5G", cores = 1, create_shell = FALSE,
+    task_num = 10
+)
+```
+
 # Monitoring Running Jobs
 
 The `job_info()` function provides wrappers around the `squeue` and `sstat` utilities SLURM provides for monitoring specific jobs and how busy partitions are. The general idea is to provide the information output from `squeue` into a `tibble`, while retrieving memory-utilization information that ordinarily must be retrieved manually on a job-by-job basis with `sstat -j [specific job ID]`.
