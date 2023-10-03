@@ -47,6 +47,7 @@ bib <- c(
     dplyr = citation("dplyr")[1],
     R = citation(),
     BiocStyle = citation("BiocStyle")[1],
+    knitcitations = citation("knitcitations"),
     knitr = citation("knitr")[1],
     RefManageR = citation("RefManageR")[1],
     rmarkdown = citation("rmarkdown")[1],
