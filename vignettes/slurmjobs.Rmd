@@ -40,6 +40,7 @@ startTime <- Sys.time()
 
 ## Bib setup
 library("RefManageR")
+library("knitcitations")
 
 ## Write bibliography information
 bib <- c(

@@ -19,6 +19,7 @@ Suggests:
     BiocStyle,
     knitr,
     RefManageR,
+    knitcitations,
     rmarkdown,
     sessioninfo,
     testthat (>= 3.0.0)
