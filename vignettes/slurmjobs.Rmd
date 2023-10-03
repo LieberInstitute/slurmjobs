@@ -137,7 +137,7 @@ job_df |>
 
 # Analyzing Finished Jobs
 
-The `job_report()` function returns in-depth information about a single queued, running, or finished job. Note that through SLURM, an array job can be referenced as a whole, or by one of its tasks.
+The `job_report()` function returns in-depth information about a single queued, running, or finished job (including a single array job). It combines functionality from SLURM's `sstat` and `sacct` to return a tibble for easy manipulation in R.
 
 Suppose you have a workflow that operates as an array job, and you'd like to profile memory usage across the many tasks. Suppose we've done an initial trial, setting memory relatively high just to get the jobs running without issues. One use of `job_report` could be to determine a better memory request in a data-driven way-- the better settings can then be run on the larger dataset after the initial test.
 
