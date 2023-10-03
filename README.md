@@ -37,6 +37,10 @@ environments from R. It includes functions for creating submittable jobs
 running or complete jobs. For details, check out the [documentation
 site](http://research.libd.org/slurmjobs/).
 
+It was developed at [JHPCE](https://jhpce.jhu.edu/) with SLURM 22.05.9
+in mind, but is intended to generalize to other clusters and newer SLURM
+versions.
+
 ## Installation instructions
 
 Get the latest stable `R` release from
