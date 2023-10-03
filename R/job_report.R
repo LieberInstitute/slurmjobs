@@ -23,7 +23,7 @@ job_report <- function(job_id) {
     job_df <- read.csv(
         text = system(
             sprintf(
-                'sacct -j %s -P -o "JobID,JobIDRaw,User,JobName,Partition,AllocCPUS,ReqMem,State,MaxRSS,MaxVMSize" --units=G',
+                'sacct -j %s -P -o "JobID,JobIDRaw,User,JobName,Partition,AllocCPUS,ReqMem,State,MaxRSS,MaxVMSize,ExitCode" --units=G',
                 job_id
             ),
             intern = TRUE
@@ -168,7 +168,8 @@ job_report <- function(job_id) {
             cpus = AllocCPUS,
             requested_mem_gb = ReqMem,
             max_vmem_gb = MaxVMSize,
-            max_rss_gb = MaxRSS
+            max_rss_gb = MaxRSS,
+            exit_code = ExitCode
         ) |>
         select(-c(State, job_step, JobIDRaw))
     colnames(job_df) <- tolower(colnames(job_df))
