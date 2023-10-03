@@ -85,7 +85,7 @@ job_info <- function(user = Sys.getenv("USER"), partition = "shared") {
                 max_rss_gb = MaxRSS,
                 max_vmem_gb = MaxVMSize
             ) |>
-            right_join(job_df)
+            right_join(job_df, by = "job_id")
 
 
         #   Given a character vector containing an amount of memory (containing
