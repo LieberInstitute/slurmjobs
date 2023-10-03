@@ -75,7 +75,7 @@ BiocManager::valid()
 
 ## Required knowledge
 
-`r Biocpkg("slurmjobs")` is based on many other packages and in particular in those that have implemented the infrastructure needed for dealing with RNA-seq data (EDIT!). That is, packages like `r Biocpkg("SummarizedExperiment")` (EDIT!).
+`r Biocpkg("slurmjobs")` is designed for interacting with the [SLURM](https://slurm.schedmd.com/) job scheduler, and assumes basic familiarity with terms like "job", "task", and "array", as well as the [sbatch](https://slurm.schedmd.com/sbatch.html) command. Background knowledge about memory (such as virtual memory and resident set size (RSS)) is helpful but not critical in using this package.
 
 If you are asking yourself the question "Where do I start using Bioconductor?" you might be interested in [this blog post](http://lcolladotor.github.io/2014/10/16/startbioc/#.VkOKbq6rRuU).
 
@@ -92,18 +92,14 @@ We hope that `r Biocpkg("slurmjobs")` will be useful for your research. Please u
 citation("slurmjobs")
 ```
 
-# Quick start to using `slurmjobs`
+# Overview
+
+`slurmjobs` provides helper functions for interacting with [SLURM](https://slurm.schedmd.com/)-managed high-performance-computing environments from R. It includes functions for creating submittable jobs (including array jobs), monitoring partitions, and extracting info about running or complete jobs. In addition to loading `slurmjobs`, we'll be using `dplyr` to manipulate example data about jobs.
 
 ```{r "start", message=FALSE}
 library("slurmjobs")
 library("dplyr")
 ```
-
-Edit this as you see fit =)
-
-Here is an example of you can cite your package inside the vignette:
-
-* `r Biocpkg("slurmjobs")` `r Citep(bib[["slurmjobs"]])`
 
 # Creating Shell Scripts to `sbatch`
 
