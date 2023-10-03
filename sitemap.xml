@@ -30,4 +30,19 @@
   <url>
     <loc>/reference/index.html</loc>
   </url>
+  <url>
+    <loc>/reference/job_info.html</loc>
+  </url>
+  <url>
+    <loc>/reference/job_loop.html</loc>
+  </url>
+  <url>
+    <loc>/reference/job_report.html</loc>
+  </url>
+  <url>
+    <loc>/reference/job_single.html</loc>
+  </url>
+  <url>
+    <loc>/reference/with_wd.html</loc>
+  </url>
 </urlset>
