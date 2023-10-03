@@ -103,35 +103,27 @@ Here is an example of you can cite your package inside the vignette:
 
 The `job_info()` function provides wrappers around the `squeue` and `sstat` utilities SLURM provides for monitoring specific jobs and how busy partitions are. The general idea is to provide the information output from `squeue` into a `tibble`, while retrieving memory-utilization information that ordinarily must be retrieved manually on a job-by-job basis with `sstat -j [specific job ID]`.
 
-Retrieve info about your currently running jobs like this:
+On a SLURM system, you'd run `job_df = job_info(user = NULL, partition = "shared")` here, to get every user's jobs running on the "shared" partition. We'll load an example output directly here.
 
-```{r "job_info_basic", eval = FALSE}
-#   Get information about your jobs (default 'user' argument) on any partition
-job_df <- job_info(partition = NULL)
+```{r "job_info_quick_look"}
+#   On a real SLURM system
+job_df = readRDS(
+    system.file("extdata", "job_info_df.rds", package = "slurmjobs")
+)
+print(job_df)
 ```
 
 The benefit to having this data in R, now, is to be able to trivially ask summarizing questions. First, "how much memory and how many CPUs am I currently using?" Knowing this answer can help ensure fair and civil use of shared computing resources, for example on a computing cluster.
 
-```{r "job_info_total_resources", eval = FALSE}
+```{r "job_info_total_resources"}
 job_df |>
-    filter(partition == "shared") |>
+    #   Or your username here
+    filter(user == "user17") |>
+    #   Get the number of CPUs requested and the memory requested in GB
     summarize(
         total_mem_req = sum(requested_mem_gb),
         total_cpus = sum(cpus)
     ) |>
-    print()
-```
-
-Another use case could be to get a quick idea of the maximum memory required among all running tasks in an array job, for example for a script where you'd like to tune the requested memory to be as low as necessary to complete all tasks. [TODO: really this use case makes more sense only for completed jobs]
-
-```{r "job_info_max_memory", eval = FALSE}
-job_df |>
-    #   Grab only array jobs
-    filter(!is.na(array_task_id)) |>
-    #   Now for each unique array job, find the highest peak memory reached
-    #   across tasks
-    group_by(job_id) |>
-    summarize(max_peak_mem = max(max_vmem_gb)) |>
     print()
 ```
 
