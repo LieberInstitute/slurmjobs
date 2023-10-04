@@ -15,6 +15,7 @@ basic_job <- function() {
                 tc = 5
             )
         }
+    )
 }
 
 #   Write a basic shell script but break it by removing the '--array' line
