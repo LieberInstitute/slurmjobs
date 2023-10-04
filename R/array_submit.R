@@ -139,7 +139,17 @@ array_submit <- function(job_bash, task_ids = NULL, submit = FALSE, restore = TR
 
         #   Read in the log for the highest array task to grab the job ID (which
         #   SLURM associates with the entire array)
-        max_log <- readLines(max_logs[1])
+        if (file.exists(max_logs[1])) {
+            max_log <- readLines(max_logs[1])
+        } else {
+            stop(
+                paste(
+                    "Could not find the log from the original array job.",
+                    err_string,
+                    sep = "\\n"
+                )
+            )
+        }
         orig_job_id <- max_log[grep("^Job id: ", max_log)] |>
             str_extract("[0-9]+")
 
