@@ -2,34 +2,24 @@ script_name <- "my_array_job"
 
 #   Write a basic shell script with 'job_single()'
 basic_job <- function() {
-    with_wd(
-        tempdir(),
-        {
-            #   Delete the shell script if it exists
-            unlink(paste0(script_name, ".sh"))
+    #   Delete the shell script if it exists
+    unlink(paste0(script_name, ".sh"))
 
-            job_single(
-                name = script_name,
-                create_shell = TRUE,
-                task_num = 10,
-                tc = 5
-            )
-        }
+    job_single(
+        name = script_name,
+        create_shell = TRUE,
+        task_num = 10,
+        tc = 5
     )
 }
 
 #   Write a basic shell script but break it by removing the '--array' line
 broken_job <- function() {
-    with_wd(
-        tempdir(),
-        {
-            basic_job()
+    basic_job()
 
-            orig_script <- readLines(paste0(script_name, ".sh"))
-            orig_script <- sub("^#SBATCH", "something", orig_script)
-            writeLines(orig_script, paste0(script_name, ".sh"))
-        }
-    )
+    orig_script <- readLines(paste0(script_name, ".sh"))
+    orig_script <- sub("^#SBATCH", "something", orig_script)
+    writeLines(orig_script, paste0(script_name, ".sh"))
 }
 
 #   Create (write) some shell script with the 'shell_creation_fun' function,
