@@ -3,23 +3,23 @@
 #' Given a bash script that specifies the --array `sbatch` option (that is, an
 #' array job), this function overwrites (temporarily if `restore` = TRUE) the
 #' script in place and resubmits (when `submit` = TRUE) the array with the
-#' specified `task_ids`. Alternatively, the job ID (`job_id`) for the original
-#' run of the array job may be specified, and failed tasks are automatically
-#' inferred. This function is intended to help re-run failed tasks of a large
-#' array job that was previously submitted.
+#' specified `task_ids`. If this array was created with `job_single`, `task_ids`
+#' may be ommitted and failed tasks are automatically inferred. This function is
+#' intended to help re-run failed tasks of a large array job that was previously
+#' submitted.
 #'
 #' @param job_bash A `character(1)` vector with the name of a bash script
 #' in the current working directory.
-#' @param task_ids A numeric vector specifying which (relative) task IDs to
-#' resubmit (e.g. c(1, 4, 6)), or NULL if 'job_id' is provided.
-#' @param job_id Optional `numeric(1)` or `character(1)` specifying the job ID
-#' for the initial submission of the array job whose path is given by
-#' `job_bash`. The array is assumed to have run with all of its tasks. If
-#' provided, `task_ids` will automatically be inferred by which tasks failed.
+#' @param task_ids An optional numeric vector specifying which (relative) task
+#' IDs to resubmit (e.g. c(1, 4, 6)). If NULL, the task IDs will be inferred
+#' by scraping the log file for the job ID for the array job as originally
+#' submitted, and using `job_report()` to pull failed task IDs
 #' @param submit A `logical(1)` vector determining whether to actually submit
 #' the tasks or not using `qsub`.
 #' @param restore A `logical(1)` vector determining whether to restore the
 #' script to the original state.
+#' @param verbose A `logical(1)` vector specifying whether to print details
+#' about how failed tasks were determined (applicable when `task_ids` is NULL).
 #'
 #' @return The path to `job_bash`.
 #' @export
@@ -57,7 +57,7 @@
 #' })
 #'
 array_submit <- function(
-        job_bash, task_ids = NULL, job_id = NULL, submit = FALSE, restore = TRUE
+        job_bash, task_ids = NULL, submit = FALSE, restore = TRUE, verbose = FALSE
     ) {
     ## Check that the script is in the working directory
     if (basename(job_bash) != job_bash) {
@@ -66,6 +66,128 @@ array_submit <- function(
             "since code may depend on relative paths.",
             call. = FALSE
         )
+    }
+
+    job_original <- readLines(job_bash)
+
+    ############################################################################
+    #   Infer failed task IDs if 'task_ids' is NULL
+    ############################################################################
+
+    if (is.null(task_ids)) {
+        if (verbose) {
+            print("Attempting to automatically find failed task IDs since 'task_ids' was NULL.")
+        }
+
+        #   Various errors may arise when trying to infer failed task IDs
+        #   automatically. In all cases, suggest specifying 'task_ids'
+        #   explicitly
+        err_string = paste(
+            "Please specify 'task_ids' explicitly, as the array does not appear to have",
+            "been generated with 'job_single()' or have been run completely",
+            sep = "\\n"
+        )
+
+        #-----------------------------------------------------------------------
+        #   Grab the highest task of the array as originally submitted
+        #-----------------------------------------------------------------------
+
+        max_task = str_extract(
+            job_original[grep('^#SBATCH --array', job_original)],
+            '^#SBATCH --array=[0-9]+-([0-9]+)%[0-9]+$',
+            group = 1
+        )
+
+        if (verbose) {
+            print(sprintf("The highest task in %s was %s.", job_bash, max_task))
+        }
+
+        #   Halt with an error if it couldn't be found
+        if(is.na(max_task)) {
+            stop(
+                paste(
+                    "Failed to find the highest task of the original array job.",
+                    err_string,
+                    sep = "\\n"
+                )
+            )
+        }
+
+        #-----------------------------------------------------------------------
+        #   Find the log associated with that highest task
+        #-----------------------------------------------------------------------
+
+        max_logs = job_original[grep('^#SBATCH -[oe] ', job_original)] |>
+            str_extract('-[oe] (.*)$', group = 1) |>
+            str_replace('%a', max_task)
+        
+        if (verbose) {
+            print("Found these logs (should be 2 identical) for the highest array task:")
+            print(max_logs)
+        }
+        
+        #   Halt if anything unexpected occurs when finding the log file
+        if (any(is.na(max_logs)) || (length(max_logs) != 2) || (max_logs[1] != max_logs[2])) {
+            stop(
+                paste(
+                    "Failed to find the original log for the highest task in the array.",
+                    err_string,
+                    sep = "\\n"
+                )
+            )
+        }
+
+        #-----------------------------------------------------------------------
+        #   Grab the job ID from the log for the highest task
+        #-----------------------------------------------------------------------
+
+        #   Read in the log for the highest array task to grab the job ID (which
+        #   SLURM associates with the entire array)
+        max_log = readLines(max_logs[1])
+        orig_job_id = max_log[grep('^Job id: ', max_log)] |>
+            str_extract('[0-9]+')
+        
+        if (verbose) {
+            print(
+                sprintf(
+                    "Found %s as the job ID for the highest array task",
+                    orig_job_id
+                )
+            )
+        }
+
+        if (is.na(orig_job_id)) {
+            stop(
+                paste(
+                    "Failed to find the job ID of the original array job.",
+                    err_string,
+                    sep = "\\n"
+                )
+            )
+        }
+
+        #-----------------------------------------------------------------------
+        #   Use 'job_report' to grab failed task IDs
+        #-----------------------------------------------------------------------
+
+        task_ids = job_report(orig_job_id) |>
+            filter(status != 'COMPLETED') |>
+            pull(array_task_id)
+        
+        if (verbose) {
+            print("The following task IDs failed:")
+            print(task_ids)
+        }
+
+        if(any(is.na(task_ids))) {
+            stop(
+                paste(
+                    "Failed to find failed tasks of the original array job",
+                    err_string,
+                    sep = "\\n"
+                )
+            )
+        }
     }
 
     #   Check that at least one of 'task_ids' and 'job_id' is not NULL. If both
@@ -77,7 +199,6 @@ array_submit <- function(
         warning("Ignoring 'task_ids' since 'job_id' was not NULL.")
     }
 
-    job_original <- readLines(job_bash)
     t_line <- grep("^#SBATCH --array=", job_original)
     if (length(t_line) != 1) {
         stop("Could not find the line that specifies that this is an array job,\n",
