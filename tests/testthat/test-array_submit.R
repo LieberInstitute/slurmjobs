@@ -3,7 +3,7 @@ script_name <- "my_array_job.sh"
 #   Write a basic shell script with 'job_single()'
 basic_job <- function() {
     #   Delete the shell script if it exists
-    unlink(file.path(tempdir(), script_name))
+    unlink(script_name)
 
     job_single(
         name = script_name,
