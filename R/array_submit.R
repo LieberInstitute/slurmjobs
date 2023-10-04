@@ -47,11 +47,9 @@
 #'         submit = FALSE
 #'     )
 #' 
-#'     ## Or specify the ID for the original array submission to automatically
-#'     ## grab those same failed task IDs
+#'     ## Or omit 'task_ids' to automatically grab those same failed task IDs
 #'     array_submit(
 #'         job_bash = paste0(job_name, ".sh"),
-#'         job_id = 235510,
 #'         submit = FALSE
 #'     )
 #' })
@@ -76,7 +74,7 @@ array_submit <- function(
 
     if (is.null(task_ids)) {
         if (verbose) {
-            print("Attempting to automatically find failed task IDs since 'task_ids' was NULL.")
+            message("Attempting to automatically find failed task IDs since 'task_ids' was NULL.")
         }
 
         #   Various errors may arise when trying to infer failed task IDs
@@ -99,7 +97,7 @@ array_submit <- function(
         )
 
         if (verbose) {
-            print(sprintf("The highest task in %s was %s.", job_bash, max_task))
+            message(sprintf("The highest task in %s was %s.", job_bash, max_task))
         }
 
         #   Halt with an error if it couldn't be found
@@ -122,7 +120,7 @@ array_submit <- function(
             str_replace('%a', max_task)
         
         if (verbose) {
-            print("Found these logs (should be 2 identical) for the highest array task:")
+            message("Found these logs (should be 2 identical) for the highest array task:")
             print(max_logs)
         }
         
@@ -148,7 +146,7 @@ array_submit <- function(
             str_extract('[0-9]+')
         
         if (verbose) {
-            print(
+            message(
                 sprintf(
                     "Found %s as the job ID for the highest array task",
                     orig_job_id
@@ -175,7 +173,7 @@ array_submit <- function(
             pull(array_task_id)
         
         if (verbose) {
-            print("The following task IDs failed:")
+            message("The following task IDs failed:")
             print(task_ids)
         }
 
@@ -188,15 +186,6 @@ array_submit <- function(
                 )
             )
         }
-    }
-
-    #   Check that at least one of 'task_ids' and 'job_id' is not NULL. If both
-    #   are defined, 'task_ids' is ignored with a warning
-    if (!(is.null(job_id) || is.null(task_ids))) {
-        stop("Either 'job_id' or 'task_ids' must be non-NULL.")
-    }
-    if (!is.null(job_id) & !is.null(task_ids)) {
-        warning("Ignoring 'task_ids' since 'job_id' was not NULL.")
     }
 
     t_line <- grep("^#SBATCH --array=", job_original)
