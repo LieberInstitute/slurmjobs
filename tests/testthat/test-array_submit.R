@@ -1,4 +1,4 @@
-script_name <- "my_array_job.sh"
+script_name <- "my_array_job"
 
 #   Write a basic shell script with 'job_single()'
 basic_job <- function() {
@@ -6,7 +6,7 @@ basic_job <- function() {
         tempdir(),
         {
             #   Delete the shell script if it exists
-            unlink(script_name)
+            unlink(paste0(script_name, ".sh"))
 
             job_single(
                 name = script_name,
@@ -25,9 +25,9 @@ broken_job <- function() {
         {
             basic_job()
 
-            orig_script <- readLines(script_name)
+            orig_script <- readLines(paste0(script_name, ".sh"))
             orig_script <- sub("^#SBATCH", "something", orig_script)
-            writeLines(orig_script, script_name)
+            writeLines(orig_script, paste0(script_name, ".sh"))
         }
     )
 }
@@ -41,14 +41,14 @@ run_test <- function(shell_creation_fun, ...) {
         {
             shell_creation_fun()
 
-            original <- readLines(script_name)
+            original <- readLines(paste0(script_name, ".sh"))
 
             array_submit(
-                job_bash = script_name,
+                job_bash = paste0(script_name, ".sh"),
                 ...
             )
 
-            final <- readLines(script_name)
+            final <- readLines(paste0(script_name, ".sh"))
             return(NULL)
         }
     )
