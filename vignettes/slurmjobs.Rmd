@@ -140,6 +140,40 @@ job_loop(
 )
 ```
 
+# Submitting and Resubmitting Jobs
+
+Shell scripts created with `job_single()` or `job_loop()` may be submitted as batch jobs with `sbatch` (e.g. `sbatch myscript.sh`). Note no additional arguments to `sbatch` are required since all configuration is specified within the shell script.
+
+The `array_submit()` helper function was also intended to make job submission easier. In
+particular, it addresses a common case where after a large array job was run, a handful of
+tasks fail (such as due to temporary file-system issues). `array_submit()` helps re-submit
+failed tasks.
+
+Below we'll create an example array job with `job_single()`, then do a dry run of
+`array_submit()` to demonstrate its basic usage.
+
+```{r "array_submit_manual"}
+job_single(
+    name = "my_array_job", memory = "5G", cores = 1, create_shell = TRUE,
+    task_num = 10
+)
+
+#   Suppose that tasks 3, 6, 7, and 8 failed
+array_submit("my_array_job.sh", task_ids = c(3, 6:8), submit = FALSE)
+```
+
+While `task_ids` can be provided explicitly as above, the real convenience comes from the
+ability to run `array_submit()` without specifying `task_ids`. As long as the original array
+job was created with `job_single()` or `job_loop()` and submitted as-is (on the full set of
+tasks), `array_submit()` can automatically find the failed tasks by reading the shell script
+(`my_array_job.sh`), grabbing the original array job ID from the log, and internally calling
+`job_report()`).
+
+```{r "array_submit_auto", eval = FALSE}
+#   Not run here, since we aren't on a SLURM cluster
+array_submit("my_array_job.sh", submit = FALSE)
+```
+
 # Monitoring Running Jobs
 
 The `job_info()` function provides wrappers around the `squeue` and `sstat` utilities SLURM provides for monitoring specific jobs and how busy partitions are. The general idea is to provide the information output from `squeue` into a `tibble`, while retrieving memory-utilization information that ordinarily must be retrieved manually on a job-by-job basis with `sstat -j [specific job ID]`.
