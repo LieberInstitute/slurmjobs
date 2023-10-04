@@ -46,7 +46,7 @@
 #'         task_ids = c(1, 6, 8:20, 67),
 #'         submit = FALSE
 #'     )
-#' 
+#'
 #'     ## Or omit 'task_ids' to automatically grab those same failed task IDs
 #'     array_submit(
 #'         job_bash = paste0(job_name, ".sh"),
@@ -54,9 +54,7 @@
 #'     )
 #' })
 #'
-array_submit <- function(
-        job_bash, task_ids = NULL, submit = FALSE, restore = TRUE, verbose = FALSE
-    ) {
+array_submit <- function(job_bash, task_ids = NULL, submit = FALSE, restore = TRUE, verbose = FALSE) {
     ## Check that the script is in the working directory
     if (basename(job_bash) != job_bash) {
         stop(
@@ -80,7 +78,7 @@ array_submit <- function(
         #   Various errors may arise when trying to infer failed task IDs
         #   automatically. In all cases, suggest specifying 'task_ids'
         #   explicitly
-        err_string = paste(
+        err_string <- paste(
             "Please specify 'task_ids' explicitly, as the array does not appear to have",
             "been generated with 'job_single()' or have been run completely",
             sep = "\\n"
@@ -90,9 +88,9 @@ array_submit <- function(
         #   Grab the highest task of the array as originally submitted
         #-----------------------------------------------------------------------
 
-        max_task = str_extract(
-            job_original[grep('^#SBATCH --array', job_original)],
-            '^#SBATCH --array=[0-9]+-([0-9]+)%[0-9]+$',
+        max_task <- str_extract(
+            job_original[grep("^#SBATCH --array", job_original)],
+            "^#SBATCH --array=[0-9]+-([0-9]+)%[0-9]+$",
             group = 1
         )
 
@@ -101,7 +99,7 @@ array_submit <- function(
         }
 
         #   Halt with an error if it couldn't be found
-        if(is.na(max_task)) {
+        if (is.na(max_task)) {
             stop(
                 paste(
                     "Failed to find the highest task of the original array job.",
@@ -115,15 +113,15 @@ array_submit <- function(
         #   Find the log associated with that highest task
         #-----------------------------------------------------------------------
 
-        max_logs = job_original[grep('^#SBATCH -[oe] ', job_original)] |>
-            str_extract('-[oe] (.*)$', group = 1) |>
-            str_replace('%a', max_task)
-        
+        max_logs <- job_original[grep("^#SBATCH -[oe] ", job_original)] |>
+            str_extract("-[oe] (.*)$", group = 1) |>
+            str_replace("%a", max_task)
+
         if (verbose) {
             message("Found these logs (should be 2 identical) for the highest array task:")
             print(max_logs)
         }
-        
+
         #   Halt if anything unexpected occurs when finding the log file
         if (any(is.na(max_logs)) || (length(max_logs) != 2) || (max_logs[1] != max_logs[2])) {
             stop(
@@ -141,10 +139,10 @@ array_submit <- function(
 
         #   Read in the log for the highest array task to grab the job ID (which
         #   SLURM associates with the entire array)
-        max_log = readLines(max_logs[1])
-        orig_job_id = max_log[grep('^Job id: ', max_log)] |>
-            str_extract('[0-9]+')
-        
+        max_log <- readLines(max_logs[1])
+        orig_job_id <- max_log[grep("^Job id: ", max_log)] |>
+            str_extract("[0-9]+")
+
         if (verbose) {
             message(
                 sprintf(
@@ -168,16 +166,16 @@ array_submit <- function(
         #   Use 'job_report' to grab failed task IDs
         #-----------------------------------------------------------------------
 
-        task_ids = job_report(orig_job_id) |>
-            filter(status != 'COMPLETED') |>
+        task_ids <- job_report(orig_job_id) |>
+            filter(status != "COMPLETED") |>
             pull(array_task_id)
-        
+
         if (verbose) {
             message("The following task IDs failed:")
             print(task_ids)
         }
 
-        if(any(is.na(task_ids))) {
+        if (any(is.na(task_ids))) {
             stop(
                 paste(
                     "Failed to find failed tasks of the original array job",
@@ -198,7 +196,7 @@ array_submit <- function(
 
     #   Just replace the array line with the specified tasks, and overwrite the
     #   script in place
-    job_new = sub(
+    job_new <- sub(
         "^#SBATCH --array=[0-9,\\-]+%(.*)$",
         paste0("#SBATCH --array=", paste(task_ids, collapse = ","), "%\\1"),
         job_original
