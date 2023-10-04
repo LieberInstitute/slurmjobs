@@ -48,10 +48,10 @@
 #'     )
 #'
 #'     ## Or omit 'task_ids' to automatically grab those same failed task IDs
-#'     array_submit(
-#'         job_bash = paste0(job_name, ".sh"),
-#'         submit = FALSE
-#'     )
+#'     # array_submit(
+#'     #    job_bash = paste0(job_name, ".sh"),
+#'     #    submit = FALSE
+#'     # )
 #' })
 #'
 array_submit <- function(job_bash, task_ids = NULL, submit = FALSE, restore = TRUE, verbose = FALSE) {
