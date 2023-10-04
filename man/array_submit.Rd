@@ -56,16 +56,11 @@ with_wd(tempdir(), {
         task_num = 100
     )
 
-    ## Now we can submit the job for a set of task IDs
+    ## Now we can submit the job for a set of task IDs (or omit 'task_ids'
+    ## to automatically grab those same failed task IDs)
     array_submit(
         job_bash = paste0(job_name, ".sh"),
         task_ids = c(1, 6, 8:20, 67),
-        submit = FALSE
-    )
-
-    ## Or omit 'task_ids' to automatically grab those same failed task IDs
-    array_submit(
-        job_bash = paste0(job_name, ".sh"),
         submit = FALSE
     )
 })
