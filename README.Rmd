@@ -19,14 +19,7 @@ knitr::opts_chunk$set(
 [![GitHub issues](https://img.shields.io/github/issues/LieberInstitute/slurmjobs)](https://github.com/LieberInstitute/slurmjobs/issues)
 [![GitHub pulls](https://img.shields.io/github/issues-pr/LieberInstitute/slurmjobs)](https://github.com/LieberInstitute/slurmjobs/pulls)
 [![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
-[![Bioc release status](http://www.bioconductor.org/shields/build/release/bioc/slurmjobs.svg)](https://bioconductor.org/checkResults/release/bioc-LATEST/slurmjobs)
-[![Bioc devel status](http://www.bioconductor.org/shields/build/devel/bioc/slurmjobs.svg)](https://bioconductor.org/checkResults/devel/bioc-LATEST/slurmjobs)
-[![Bioc downloads rank](https://bioconductor.org/shields/downloads/release/slurmjobs.svg)](http://bioconductor.org/packages/stats/bioc/slurmjobs/)
-[![Bioc support](https://bioconductor.org/shields/posts/slurmjobs.svg)](https://support.bioconductor.org/tag/slurmjobs)
-[![Bioc history](https://bioconductor.org/shields/years-in-bioc/slurmjobs.svg)](https://bioconductor.org/packages/release/bioc/html/slurmjobs.html#since)
-[![Bioc last commit](https://bioconductor.org/shields/lastcommit/devel/bioc/slurmjobs.svg)](http://bioconductor.org/checkResults/devel/bioc-LATEST/slurmjobs/)
-[![Bioc dependencies](https://bioconductor.org/shields/dependencies/release/slurmjobs.svg)](https://bioconductor.org/packages/release/bioc/html/slurmjobs.html#since)
-[![R-CMD-check-bioc](https://github.com/LieberInstitute/slurmjobs/actions/workflows/R-CMD-check-bioc.yaml/badge.svg)](https://github.com/LieberInstitute/slurmjobs/actions/workflows/R-CMD-check-bioc.yaml)
+[![R-CMD-check-bioc](https://github.com/LieberInstitute/slurmjobs/actions/workflows/R-CMD-check-bioc/badge.svg)](https://github.com/LieberInstitute/slurmjobs/actions/workflows/check-bioc.yaml)
 [![Codecov test coverage](https://codecov.io/gh/LieberInstitute/slurmjobs/branch/devel/graph/badge.svg)](https://app.codecov.io/gh/LieberInstitute/slurmjobs?branch=devel)
 <!-- badges: end -->
 
