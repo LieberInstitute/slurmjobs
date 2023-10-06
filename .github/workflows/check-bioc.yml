@@ -34,7 +34,7 @@ name: R-CMD-check-bioc
 ## Note that you can always run a GHA test without the cache by using the word
 ## "/nocache" in the commit message.
 env:
-  has_testthat: 'false'
+  has_testthat: 'true'
   run_covr: 'true'
   run_pkgdown: 'true'
   has_RUnit: 'false'
@@ -253,7 +253,7 @@ jobs:
       - name: Test coverage
         if: github.ref == 'refs/heads/devel' && env.run_covr == 'true' && runner.os == 'Linux'
         run: |
-          covr::codecov(coverage = covr::package_coverage(type = "all"))
+          covr::codecov()
         shell: Rscript {0}
 
       - name: Install package
