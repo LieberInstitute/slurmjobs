@@ -131,7 +131,12 @@ job_single(
 )
 ```
 
-`job_loop()` is a little bit more complicated since you have to specify the `loops` named list argument. The `loops` argument specifies the `bash` variable names and values to loop through for creating a series of `bash` scripts that will get submitted to SLURM. This type of `bash` script is something we use frequently, for example in the [`compute_weights.sh`](https://github.com/LieberInstitute/brainseq_phase2/blob/master/twas/compute_weights.sh) script `r citep('doi.org/10.1016/j.neuron.2019.05.013')`. This type of script generator I believe is something [Alyssa Frazee](http://alyssafrazee.com/) taught me back in the day which you can see in some old repositories such as [`leekgroup/derSoftware`](https://github.com/leekgroup/derSoftware). Besides the `loops` argument, `job_loop()` shares most of the options with `job_single()`.
+Another function, `job_loop()`, can be used to create more complex array jobs as compared with
+`job_single()`. It's useful when looping through one or more variables with pre-defined
+values, and applying the same processing steps. The key difference is that rather than
+specifying `task_num`, you specify `loops`, a named list of variables to loop through. An
+array job then gets created that can directly refer to the values of these variables, rather
+than referring to just the array's task ID.
 
 ```{r 'loop'}
 job_loop(
@@ -139,6 +144,11 @@ job_loop(
     name = "bsp2_test"
 )
 ```
+
+Notice also that logs from executing this shell script get named with each of the variables'
+values in addition to the array task ID. For example, the log for the first task would be
+`logs/DLPFC_gene_1.txt`. Also, the array specifies 8 tasks total (the product of the number
+of `region`s and `feature`s).
 
 # Submitting and Resubmitting Jobs
 
