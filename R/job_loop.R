@@ -51,8 +51,8 @@ job_loop <- function(loops, name, create_shell = FALSE, partition = "shared", me
     ## Build an example command
     command <- paste0(
         'Rscript -e "options(width = 120); ',
-        "print('{",
-        paste(names(loops), collapse = "}'); print('{"),
+        "print('${",
+        paste(names(loops), collapse = "}'); print('${"),
         "}');", ' sessioninfo::session_info()"'
     )
 
