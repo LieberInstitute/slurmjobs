@@ -1,8 +1,7 @@
 #' Build a bash script that loops over variables and submits SLURM jobs
 #'
-#' This function builds a bash script that loops over a set of variables
-#' with pre-specified values to create an internal bash script that then
-#' gets submitted as a SLURM job.
+#' This function builds a bash script functioning as an array job that loops
+#' over a set of variables with pre-specified values.
 #'
 #' @param loops A named `list` where each of the elements are character vectors.
 #' The names of `loops` specify the variables used for the loops and the
@@ -13,22 +12,16 @@
 #' specified then it also creates the actual script in the current
 #' working directory.
 #' @export
-#' @author Leonardo Collado-Torres
 #' @author Nicholas J. Eagles
-#' @import glue purrr
+#' @author Leonardo Collado-Torres
+#' @import purrr
 #'
 #' @examples
 #'
 #' job_loop(
 #'     loops = list(region = c("DLPFC", "HIPPO"), feature = c("gene", "exon", "tx", "jxn")),
-#'     name = "bsp2_test"
-#' )
-#'
-#' job_loop(
-#'     loops = list(region = c("DLPFC", "HIPPO"), feature = c("gene", "exon", "tx", "jxn")),
-#'     cores = 5,
-#'     task_num = 10,
-#'     name = "bsp2_test_array"
+#'     name = "bsp2_test_array",
+#'     cores = 2
 #' )
 #'
 job_loop <- function(loops, name, create_shell = FALSE, partition = "shared", memory = "10G",
@@ -77,6 +70,10 @@ job_loop <- function(loops, name, create_shell = FALSE, partition = "shared", me
         create_logdir = FALSE
     )
 
+    #   Given integer(1) 'i', an index of 'loops', return a character vector
+    #   whose elements represent lines of bash code. This code creates an
+    #   array (the contents of loops[[i]]) and subsets it appropriately
+    #   given the array's task ID
     make_bash_statements = function(i) {
         #   Define a bash array containing all elements of this loop
         all_variable = sprintf(
@@ -85,6 +82,9 @@ job_loop <- function(loops, name, create_shell = FALSE, partition = "shared", me
             paste(loops[[i]], collapse = " ")
         )
 
+        #   Calculate the divisor and modulus, which determine the appropriate
+        #   way to index the variable associated with this loop:
+        #       index = ([SLURM_ARRAY_TASK_ID] // [divisor]) % [modulus]
         if (i == length(loops)) {
             divisor = 1
         } else {
@@ -92,9 +92,9 @@ job_loop <- function(loops, name, create_shell = FALSE, partition = "shared", me
                 sapply(loops, length)[(i + 1): length(loops)]
             )
         }
-        
         modulus = length(loops[[i]])
 
+        #   The bash code for indexing this loop's variable given the task ID
         this_variable = sprintf(
             '%s=${all_%s[$(( $SLURM_ARRAY_TASK_ID / %s %% %s ))]}',
             names(loops)[i],
@@ -140,6 +140,7 @@ job_loop <- function(loops, name, create_shell = FALSE, partition = "shared", me
         script_core[1:(set_e_line - 1)],
         #   Define the log path: will contain each subsetted variable as well as
         #   the array task ID
+        "## Explicitly pipe script output to a log",
         sprintf(
             'log_path=%s/$%s_${SLURM_ARRAY_TASK_ID}.log',
             logdir,
@@ -149,6 +150,7 @@ job_loop <- function(loops, name, create_shell = FALSE, partition = "shared", me
         "{",
         script_core[set_e_line:last_echo_line],
         "",
+        "## Define loops and appropriately subset each variable for the array task ID"
         #   Define the variables through which to loop, and subset based on the
         #   array task ID
         unlist(lapply(1:length(loops), make_bash_statements)),
