@@ -1,5 +1,36 @@
-library(dplyr)
-
+#' Return a tibble containing information about partitions.
+#'
+#' This function imports the output of 'sinfo' into tibble, focusing on
+#' available vs. total CPUs and memory by either node or partition (depending
+#' on `all_nodes`).
+#'
+#' @param partition A `character(1)` vector specifying the partition to show
+#' information about. Set NULL to return info about all partitions.
+#' @param all_nodes A `logical(1)` vector. When TRUE, return one row per node.
+#' When FALSE, summarize information over nodes and return one row per
+#' partition.
+#'
+#' @return A tibble with memory and CPU information about partitions.
+#' @export
+#' @author Nicholas J. Eagles
+#' @import dplyr utils
+#'
+#' @examples
+#'
+#' #    Must be run in a SLURM environment where a 'shared' partition exists
+#' if (system("which sbatch") == 0) {
+#'     part_df <- partition_info(partition = "shared", all_nodes = FALSE)
+#'
+#'     #    Print summary of CPU availability for the 'shared' partition
+#'     print(
+#'         sprintf(
+#'             'The %s partition has %i CPUs free (%.1f%% of total)',
+#'             part_df$partition,
+#'             part_df$free_cpus,
+#'             100 * part_df$prop_free_cpus
+#'         )
+#'     )
+#' }
 partition_info <- function(partition = "shared", all_nodes = FALSE) {
     command = paste(
         #   Grab info about CPUs and memory with 'sinfo'
