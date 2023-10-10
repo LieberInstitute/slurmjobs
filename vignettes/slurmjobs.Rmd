@@ -178,22 +178,19 @@ array_submit("my_array_job.sh", submit = FALSE)
 
 The `job_info()` function provides wrappers around the `squeue` and `sstat` utilities SLURM provides for monitoring specific jobs and how busy partitions are. The general idea is to provide the information output from `squeue` into a `tibble`, while retrieving memory-utilization information that ordinarily must be retrieved manually on a job-by-job basis with `sstat -j [specific job ID]`.
 
-On a SLURM system, you'd run `job_df = job_info(user = NULL, partition = "shared")` here, to get every user's jobs running on the "shared" partition. We'll load an example output directly here.
+On a SLURM system, you'd run `job_info_df = job_info(user = NULL, partition = "shared")` here, to get every user's jobs running on the "shared" partition. We'll load an example output directly here.
 
 ```{r "job_info_quick_look"}
 #   On a real SLURM system
-job_df <- readRDS(
-    system.file("extdata", "job_info_df.rds", package = "slurmjobs")
-)
-print(job_df)
+print(job_info_df)
 ```
 
 The benefit to having this data in R, now, is to be able to trivially ask summarizing questions. First, "how much memory and how many CPUs am I currently using?" Knowing this answer can help ensure fair and civil use of shared computing resources, for example on a computing cluster.
 
 ```{r "job_info_total_resources"}
-job_df |>
+job_info_df |>
     #   Or your username here
-    filter(user == "user17") |>
+    filter(user == "user21") |>
     #   Get the number of CPUs requested and the memory requested in GB
     summarize(
         total_mem_req = sum(requested_mem_gb),
