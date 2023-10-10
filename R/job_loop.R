@@ -32,7 +32,7 @@
 #' )
 #'
 job_loop <- function(loops, name, create_shell = FALSE, partition = "shared", memory = "10G",
-    cores = 1L, email = "ALL", logdir = "logs", task_num = NULL, tc = 20) {
+    cores = 1L, tc = 20, email = "ALL", logdir = "logs") {
     ## Check that the loops are correctly defined
     if (!is.list(loops)) {
         stop("'loops' should be a named list.", call. = FALSE)
@@ -55,23 +55,6 @@ job_loop <- function(loops, name, create_shell = FALSE, partition = "shared", me
         }
     }
 
-    loop_builder <- function(loop, loop_values) {
-        loop_values <- paste(loop_values, collapse = " ")
-        glue::glue("for {loop} in {loop_values}; do\n")
-    }
-
-    loop_header <- purrr::map2_chr(names(loops), loops, loop_builder)
-    if (length(loop_header) > 1) {
-        ## Add the corresponding spaces
-        header_spaces <- purrr::map2_chr(
-            rep(" ", length(loop_header)),
-            c(0, seq_len(length(loop_header) - 1)) * 4,
-            ~ paste0(rep(.x, .y), collapse = "")
-        )
-        loop_header <- paste0(header_spaces, loop_header, collapse = "\n")
-    }
-
-
     ## Build an example command
     command <- paste0(
         'Rscript -e "options(width = 120); ',
@@ -80,86 +63,106 @@ job_loop <- function(loops, name, create_shell = FALSE, partition = "shared", me
         "}');", ' sessioninfo::session_info()"'
     )
 
-    ## Define the name of the jobs inside the loop
-    inside_name <- paste0(name, "_{", paste(names(loops), collapse = "}_{"), "}")
-
-
     ## Build the core script
     script <- job_single(
-        name = "{SHORT}",
+        name = name,
         partition = partition,
         memory = memory,
         cores = cores,
         email = email,
         logdir = logdir,
-        task_num = task_num,
-        tc = tc,
         command = command,
+        #   The number of tasks is the product of lengths of each loop
+        task_num = prod(sapply(loops, length)),
         create_logdir = FALSE
     )
 
-    ## Deal with the escaping
-    script <- gsub(
-        "\\$SLURM_ARRAY_TASK_ID", "\\\\$SLURM_ARRAY_TASK_ID",
-        gsub(
-            "\\{", "\\$\\{",
-            gsub("\\$\\{", "\\\\{", script)
+    make_bash_statements = function(i) {
+        #   Define a bash array containing all elements of this loop
+        all_variable = sprintf(
+            'all_%s=(%s)',
+            names(loops)[i],
+            paste(loops[[i]], collapse = " ")
         )
+
+        if (i == length(loops)) {
+            divisor = 1
+        } else {
+            divisor = prod(
+                sapply(loops, length)[(i + 1): length(loops)]
+            )
+        }
+        
+        modulus = length(loops[[i]])
+
+        this_variable = sprintf(
+            '%s=${all_%s[$(( $SLURM_ARRAY_TASK_ID / %s %% %s ))]}',
+            names(loops)[i],
+            names(loops)[i],
+            divisor,
+            modulus
+        )
+
+        return(c(all_variable, this_variable, ""))
+    }
+
+    #   Most of the script's content is created via 'job_single'
+    script_core = job_single(
+        name = name,
+        partition = partition,
+        memory = memory,
+        cores = cores,
+        email = email,
+        logdir = logdir,
+        command = command,
+        #   The number of tasks is the product of lengths of each loop
+        task_num = prod(sapply(loops, length)),
+        create_logdir = FALSE
+    ) |>
+        #   Convert to a character vector with elements as lines of the file
+        str_split("\\n")
+    
+    #   Write to /dev/null, since we'll directly pipe outputs to a file
+    script_core = script_core[[1]] |>
+        str_replace('^(#SBATCH -[oe]) .*', '\\1 /dev/null')
+    
+    #   Get the numbers of key lines. We'll have to insert different
+    #   pieces into this original script at these points
+    last_echo_line = grep(
+        '^echo "Task id: \\$\\{SLURM_ARRAY_TASK_ID\\}"$', script_core
     )
-    inside_name <- gsub("\\{", "\\$\\{", inside_name)
-
-
-    ## Indentation
-    indent <- paste(rep(" ", 4 * length(loop_header)), collapse = "")
-
-    script_header <- glue::glue(
-        '#!/bin/bash
-
-## Usage:
-# sh {name}.sh
-
-## Create the logs directory
-mkdir -p {logdir}
-
-{loop_header}
-
-{indent}## Internal script name
-{indent}SHORT="{inside_name}"
-
-{indent}# Construct shell file
-{indent}echo "Creating script {inside_name}"
-{indent}cat > .${{SHORT}}.sh <<EOF
-'
+    set_e_line = grep('^set -e$', script_core)
+    version_line = grep(
+        '^## This script was made using slurmjobs version', script_core
     )
 
-    footer_spaces <- purrr::map2_chr(
-        rep(" ", length(loops)),
-        c(0, seq_len(length(loops) - 1)) * 4,
-        ~ paste0(rep(.x, .y), collapse = "")
+    script_final = c(
+        script_core[1:(set_e_line - 1)],
+        #   Define the log path: will contain each subsetted variable as well as
+        #   the array task ID
+        sprintf(
+            'log_path=%s/$%s_${SLURM_ARRAY_TASK_ID}.log',
+            logdir,
+            paste(names(loops), collapse = "_$")
+        ),
+        "",
+        "{",
+        script_core[set_e_line:last_echo_line],
+        "",
+        #   Define the variables through which to loop, and subset based on the
+        #   array task ID
+        unlist(lapply(1:length(loops), make_bash_statements)),
+        script_core[(last_echo_line + 1):(version_line - 1)],
+        "} > $log_path 2>&1",
+        "",
+        script_core[version_line:length(script_core)]
     )
-    footer <- paste0(rev(footer_spaces), "done", collapse = "\n")
-
-    script_footer <- glue::glue('
-{indent}call="sbatch .${{SHORT}}.sh"
-{indent}echo $call
-{indent}$call
-{footer}
-
-')
-
-    script_final <- glue::glue("{script_header}
-{script}
-
-EOF
-
-{script_footer}
-")
 
     ## Write to a file?
     if (create_shell) {
         message(paste(Sys.time(), "creating the shell file", sh_file))
-        message(paste("To execute the script builder, use: sh", sh_file))
-        cat(script_final, file = sh_file)
+        message(paste("To submit the script, use: sbatch", sh_file))
+        writeLines(script_final, con = sh_file)
         return(invisible(script_final))
     }
 
