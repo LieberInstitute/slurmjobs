@@ -128,9 +128,6 @@ job_loop <- function(loops, name, create_shell = FALSE, partition = "shared", me
     
     #   Get the numbers of key lines. We'll have to insert different
     #   pieces into this original script at these points
-    last_echo_line = grep(
-        '^echo "Task id: \\$\\{SLURM_ARRAY_TASK_ID\\}"$', script_core
-    )
     set_e_line = grep('^set -e$', script_core)
     version_line = grep(
         '^## This script was made using slurmjobs version', script_core
@@ -138,23 +135,21 @@ job_loop <- function(loops, name, create_shell = FALSE, partition = "shared", me
 
     script_final = c(
         script_core[1:(set_e_line - 1)],
+        #   Define the variables through which to loop, and subset based on the
+        #   array task ID
+        "## Define loops and appropriately subset each variable for the array task ID",
+        unlist(lapply(1:length(loops), make_bash_statements)),
         #   Define the log path: will contain each subsetted variable as well as
         #   the array task ID
         "## Explicitly pipe script output to a log",
         sprintf(
-            'log_path=%s/$%s_${SLURM_ARRAY_TASK_ID}.log',
+            'log_path=%s/${%s}_${SLURM_ARRAY_TASK_ID}.log',
             logdir,
-            paste(names(loops), collapse = "_$")
+            paste(names(loops), collapse = "}_${")
         ),
         "",
         "{",
-        script_core[set_e_line:last_echo_line],
-        "",
-        "## Define loops and appropriately subset each variable for the array task ID"
-        #   Define the variables through which to loop, and subset based on the
-        #   array task ID
-        unlist(lapply(1:length(loops), make_bash_statements)),
-        script_core[(last_echo_line + 1):(version_line - 1)],
+        script_core[set_e_line:(version_line - 1)],
         "} > $log_path 2>&1",
         "",
         script_core[version_line:length(script_core)]
