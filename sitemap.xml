@@ -37,6 +37,9 @@
     <loc>/reference/job_info.html</loc>
   </url>
   <url>
+    <loc>/reference/job_info_df.html</loc>
+  </url>
+  <url>
     <loc>/reference/job_loop.html</loc>
   </url>
   <url>
@@ -44,6 +47,9 @@
   </url>
   <url>
     <loc>/reference/job_single.html</loc>
+  </url>
+  <url>
+    <loc>/reference/partition_info.html</loc>
   </url>
   <url>
     <loc>/reference/with_wd.html</loc>
