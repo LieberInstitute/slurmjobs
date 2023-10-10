@@ -199,6 +199,39 @@ job_info_df |>
     print()
 ```
 
+# Monitoring Partitions
+
+Sometimes, it's useful to know about the partitions as a whole rather than about specific
+jobs. `partition_info()` serves this purpose, and parses `sinfo` output into a `tibble`.
+We'll load an example of the output from `partition_info(partition = NULL, all_nodes = FALSE)`.
+
+```{r "partition_info_quick_look"}
+print(partition_df)
+```
+
+Since `all_nodes` was `FALSE`, there's one row per partition, summarizing information across
+all nodes that compose each partition. Alternatively, set `all_nodes` to `TRUE` to yield one
+row per node.
+
+With `partition_df`, let's summarize how busy the cluster is as a whole, then rank partitions
+by amount of free memory.
+
+```{r "partition_info_deep_dive"}
+#   Print the proportion of CPUs and memory available for the whole cluster
+partition_df |>
+    summarize(
+        prop_free_cpus = sum(free_cpus) / sum(total_cpus),
+        prop_free_mem_gb = sum(free_mem_gb) / sum(total_mem_gb)
+    ) |>
+    print()
+
+#   Now let's take the top 3 partitions by memory currently available
+partition_df |>
+    arrange(desc(free_mem_gb)) |>
+    select(partition, free_mem_gb) |>
+    slice_head(n = 3)
+```
+
 # Analyzing Finished Jobs
 
 The `job_report()` function returns in-depth information about a single queued, running, or finished job (including a single array job). It combines functionality from SLURM's `sstat` and `sacct` to return a tibble for easy manipulation in R.
