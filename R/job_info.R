@@ -7,7 +7,7 @@
 #' @param user A `character(1)` vector specifying the username of the jobs to
 #' query. Set NULL to return info about all users' jobs.
 #' @param partition A `character(1)` vector specifying the partition of the jobs
-#' to query. Set NULL to return info about jobs of all paritions.
+#' to query. Set NULL to return info about jobs of all partitions.
 #'
 #' @return A tibble with job information about currently running jobs.
 #' @export

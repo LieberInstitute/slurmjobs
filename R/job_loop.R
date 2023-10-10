@@ -31,9 +31,8 @@
 #'     name = "bsp2_test_array"
 #' )
 #'
-job_loop <- function(
-        loops, name, create_shell = FALSE, partition = "shared", memory = "10G",
-        cores = 1L, email = "ALL", logdir = "logs", task_num = NULL, tc = 20) {
+job_loop <- function(loops, name, create_shell = FALSE, partition = "shared", memory = "10G",
+    cores = 1L, email = "ALL", logdir = "logs", task_num = NULL, tc = 20) {
     ## Check that the loops are correctly defined
     if (!is.list(loops)) {
         stop("'loops' should be a named list.", call. = FALSE)

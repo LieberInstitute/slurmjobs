@@ -11,7 +11,7 @@ job_info(user = Sys.getenv("USER"), partition = "shared")
 query. Set NULL to return info about all users' jobs.}
 
 \item{partition}{A \code{character(1)} vector specifying the partition of the jobs
-to query. Set NULL to return info about jobs of all paritions.}
+to query. Set NULL to return info about jobs of all partitions.}
 }
 \value{
 A tibble with job information about currently running jobs.

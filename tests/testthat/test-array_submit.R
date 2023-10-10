@@ -41,7 +41,7 @@ run_test <- function(shell_creation_fun, ...) {
             final <- readLines(paste0(script_name, ".sh"))
         }
     )
-    
+
     return(list("original" = original, "final" = final))
 }
 
