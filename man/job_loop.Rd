@@ -11,10 +11,9 @@ job_loop(
   partition = "shared",
   memory = "10G",
   cores = 1L,
+  tc = 20,
   email = "ALL",
-  logdir = "logs",
-  task_num = NULL,
-  tc = 20
+  logdir = "logs"
 )
 }
 \arguments{
@@ -38,17 +37,14 @@ much a current job is utilizing using the \code{sstat} command.}
 \item{cores}{The number of cores to request. Note that the total memory
 your job will request is \code{cores} multiplied by \code{memory}.}
 
+\item{tc}{If \code{task_num} is specified, this option controls the number of
+concurrent tasks.}
+
 \item{email}{The email reporting option for the email address ("BEGIN",
 "END", "FAIL", or "ALL")}
 
 \item{logdir}{The directory for the log files relative to the current
 working directory.}
-
-\item{task_num}{The number of tasks for your job, which will make it into an
-array job. If \code{NULL} this is ignored.}
-
-\item{tc}{If \code{task_num} is specified, this option controls the number of
-concurrent tasks.}
 }
 \value{
 A character vector with the script contents. If \code{create_shell} was
@@ -56,27 +52,20 @@ specified then it also creates the actual script in the current
 working directory.
 }
 \description{
-This function builds a bash script that loops over a set of variables
-with pre-specified values to create an internal bash script that then
-gets submitted as a SLURM job.
+This function builds a bash script functioning as an array job that loops
+over a set of variables with pre-specified values.
 }
 \examples{
 
 job_loop(
     loops = list(region = c("DLPFC", "HIPPO"), feature = c("gene", "exon", "tx", "jxn")),
-    name = "bsp2_test"
-)
-
-job_loop(
-    loops = list(region = c("DLPFC", "HIPPO"), feature = c("gene", "exon", "tx", "jxn")),
-    cores = 5,
-    task_num = 10,
-    name = "bsp2_test_array"
+    name = "bsp2_test_array",
+    cores = 2
 )
 
 }
 \author{
-Leonardo Collado-Torres
-
 Nicholas J. Eagles
+
+Leonardo Collado-Torres
 }

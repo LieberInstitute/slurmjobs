@@ -24,8 +24,9 @@
 #'     cores = 2
 #' )
 #'
-job_loop <- function(loops, name, create_shell = FALSE, partition = "shared", memory = "10G",
-    cores = 1L, tc = 20, email = "ALL", logdir = "logs") {
+job_loop <- function(
+        loops, name, create_shell = FALSE, partition = "shared", memory = "10G",
+        cores = 1L, tc = 20, email = "ALL", logdir = "logs") {
     ## Check that the loops are correctly defined
     if (!is.list(loops)) {
         stop("'loops' should be a named list.", call. = FALSE)
@@ -74,10 +75,10 @@ job_loop <- function(loops, name, create_shell = FALSE, partition = "shared", me
     #   whose elements represent lines of bash code. This code creates an
     #   array (the contents of loops[[i]]) and subsets it appropriately
     #   given the array's task ID
-    make_bash_statements = function(i) {
+    make_bash_statements <- function(i) {
         #   Define a bash array containing all elements of this loop
-        all_variable = sprintf(
-            'all_%s=(%s)',
+        all_variable <- sprintf(
+            "all_%s=(%s)",
             names(loops)[i],
             paste(loops[[i]], collapse = " ")
         )
@@ -85,22 +86,22 @@ job_loop <- function(loops, name, create_shell = FALSE, partition = "shared", me
         #   Calculate the divisor and modulus, which determine the appropriate
         #   way to index the variable associated with this loop:
         #       index = ([SLURM_ARRAY_TASK_ID] // [divisor]) % [modulus]
-        temp = get_list_indexing(loops, i)
+        temp <- get_list_indexing(loops, i)
 
         #   The bash code for indexing this loop's variable given the task ID
-        this_variable = sprintf(
-            '%s=${all_%s[$(( $SLURM_ARRAY_TASK_ID / %s %% %s ))]}',
+        this_variable <- sprintf(
+            "%s=${all_%s[$(( $SLURM_ARRAY_TASK_ID / %s %% %s ))]}",
             names(loops)[i],
             names(loops)[i],
-            temp[['divisor']],
-            temp[['modulus']]
+            temp[["divisor"]],
+            temp[["modulus"]]
         )
 
         return(c(all_variable, this_variable, ""))
     }
 
     #   Most of the script's content is created via 'job_single'
-    script_core = job_single(
+    script_core <- job_single(
         name = name,
         partition = partition,
         memory = memory,
@@ -114,19 +115,19 @@ job_loop <- function(loops, name, create_shell = FALSE, partition = "shared", me
     ) |>
         #   Convert to a character vector with elements as lines of the file
         str_split("\\n")
-    
+
     #   Write to /dev/null, since we'll directly pipe outputs to a file
-    script_core = script_core[[1]] |>
-        str_replace('^(#SBATCH -[oe]) .*', '\\1 /dev/null')
-    
+    script_core <- script_core[[1]] |>
+        str_replace("^(#SBATCH -[oe]) .*", "\\1 /dev/null")
+
     #   Get the numbers of key lines. We'll have to insert different
     #   pieces into this original script at these points
-    set_e_line = grep('^set -e$', script_core)
-    version_line = grep(
-        '^## This script was made using slurmjobs version', script_core
+    set_e_line <- grep("^set -e$", script_core)
+    version_line <- grep(
+        "^## This script was made using slurmjobs version", script_core
     )
 
-    script_final = c(
+    script_final <- c(
         script_core[1:(set_e_line - 1)],
         #   Define the variables through which to loop, and subset based on the
         #   array task ID
@@ -136,7 +137,7 @@ job_loop <- function(loops, name, create_shell = FALSE, partition = "shared", me
         #   the array task ID
         "## Explicitly pipe script output to a log",
         sprintf(
-            'log_path=%s/%s_${%s}_${SLURM_ARRAY_TASK_ID}.txt',
+            "log_path=%s/%s_${%s}_${SLURM_ARRAY_TASK_ID}.txt",
             logdir,
             name,
             paste(names(loops), collapse = "}_${")

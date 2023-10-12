@@ -114,13 +114,13 @@ array_submit <- function(job_bash, task_ids = NULL, submit = FALSE, restore = TR
 
         #   For jobs created with 'job_loop', the actual log used will be on the
         #   line where 'log_path' is defined, not '/dev/null'
-        if (!is.na(max_log) && (max_log == '/dev/null')) {
-            max_log = job_original[grep("^log_path=", job_original)] |>
-                str_extract('^log_path=(.*)/', group = 1) |>
+        if (!is.na(max_log) && (max_log == "/dev/null")) {
+            max_log <- job_original[grep("^log_path=", job_original)] |>
+                str_extract("^log_path=(.*)/", group = 1) |>
                 list.files(
                     pattern = sprintf(
-                        '%s.*_%s\\.txt$',
-                        strsplit(job_bash, '\\.sh')[[1]],
+                        "%s.*_%s\\.txt$",
+                        strsplit(job_bash, "\\.sh")[[1]],
                         max_task
                     ),
                     full.names = TRUE
