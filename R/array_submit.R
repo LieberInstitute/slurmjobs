@@ -75,7 +75,7 @@ array_submit <- function(job_bash, task_ids = NULL, submit = FALSE, restore = TR
         #   explicitly
         err_string <- paste(
             "Please specify 'task_ids' explicitly, as the array does not appear to have",
-            "been generated with 'job_single()' or have been run completely",
+            "been generated with 'job_single()'/'job_loop()' or have been run completely",
             sep = "\\n"
         )
 
@@ -108,17 +108,35 @@ array_submit <- function(job_bash, task_ids = NULL, submit = FALSE, restore = TR
         #   Find the log associated with that highest task
         #-----------------------------------------------------------------------
 
-        max_logs <- job_original[grep("^#SBATCH -[oe] ", job_original)] |>
-            str_extract("-[oe] (.*)$", group = 1) |>
+        max_log <- job_original[grep("^#SBATCH -o ", job_original)] |>
+            str_extract("-o (.*)$", group = 1) |>
             str_replace("%a", max_task)
 
+        #   For jobs created with 'job_loop', the actual log used will be on the
+        #   line where 'log_path' is defined, not '/dev/null'
+        if (!is.na(max_log) && (max_log == '/dev/null')) {
+            max_log = job_original[grep("^log_path=", job_original)] |>
+                str_extract('^log_path=(.*)/', group = 1) |>
+                list.files(
+                    pattern = sprintf(
+                        '%s.*_%s\\.txt$',
+                        strsplit(job_bash, '\\.sh')[[1]],
+                        max_task
+                    ),
+                    full.names = TRUE
+                )
+        }
+
         if (verbose) {
-            message("Found these logs (should be 2 identical) for the highest array task:")
-            print(max_logs)
+            message(
+                sprintf(
+                    "Found the log path %s for the highest array task.", max_log
+                )
+            )
         }
 
         #   Halt if anything unexpected occurs when finding the log file
-        if (any(is.na(max_logs)) || (length(max_logs) != 2) || (max_logs[1] != max_logs[2])) {
+        if (is.na(max_log) || length(max_log) != 1) {
             stop(
                 paste(
                     "Failed to find the original log for the highest task in the array.",
@@ -134,8 +152,8 @@ array_submit <- function(job_bash, task_ids = NULL, submit = FALSE, restore = TR
 
         #   Read in the log for the highest array task to grab the job ID (which
         #   SLURM associates with the entire array)
-        if (file.exists(max_logs[1])) {
-            max_log <- readLines(max_logs[1])
+        if (file.exists(max_log)) {
+            max_log <- readLines(max_log)
         } else {
             stop(
                 paste(
