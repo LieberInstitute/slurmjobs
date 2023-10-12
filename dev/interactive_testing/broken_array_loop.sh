@@ -6,20 +6,20 @@
 #SBATCH -o /dev/null
 #SBATCH -e /dev/null
 #SBATCH --mail-type=ALL
-#SBATCH --array=1-30%20
+#SBATCH --array=1-24%20
 
 ## Define loops and appropriately subset each variable for the array task ID
 all_letter=(a b c)
-letter=${all_letter[$(( $SLURM_ARRAY_TASK_ID / 10 % 3 ))]}
+letter=${all_letter[$(( $SLURM_ARRAY_TASK_ID / 8 % 3 ))]}
 
 all_number=(1 2)
-number=${all_number[$(( $SLURM_ARRAY_TASK_ID / 5 % 2 ))]}
+number=${all_number[$(( $SLURM_ARRAY_TASK_ID / 4 % 2 ))]}
 
-all_combo=(one two three four five)
-combo=${all_combo[$(( $SLURM_ARRAY_TASK_ID / 1 % 5 ))]}
+all_combo=(one two three four)
+combo=${all_combo[$(( $SLURM_ARRAY_TASK_ID / 1 % 4 ))]}
 
 ## Explicitly pipe script output to a log
-log_path=logs/${letter}_${number}_${combo}_${SLURM_ARRAY_TASK_ID}.log
+log_path=logs/broken_array_loop_${letter}_${number}_${combo}_${SLURM_ARRAY_TASK_ID}.txt
 
 {
 set -e
@@ -43,14 +43,14 @@ module list
 ## Edit with your job command
 Rscript -e "options(width = 120); print('${letter}'); print('${number}'); print('${combo}'); sessioninfo::session_info()"
 
+echo "**** Job ends ****"
+date
+
 #   Make some tasks fail
-if [[ number -eq 1 ]]; then
+if [[ $number -eq 1 ]]; then
     echo "Failed task"
     exit 1
 fi
-
-echo "**** Job ends ****"
-date
 
 } > $log_path 2>&1
 
