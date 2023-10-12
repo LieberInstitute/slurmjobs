@@ -136,8 +136,9 @@ job_loop <- function(loops, name, create_shell = FALSE, partition = "shared", me
         #   the array task ID
         "## Explicitly pipe script output to a log",
         sprintf(
-            'log_path=%s/${%s}_${SLURM_ARRAY_TASK_ID}.log',
+            'log_path=%s/%s_${%s}_${SLURM_ARRAY_TASK_ID}.txt',
             logdir,
+            name,
             paste(names(loops), collapse = "}_${")
         ),
         "",
