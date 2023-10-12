@@ -85,22 +85,15 @@ job_loop <- function(loops, name, create_shell = FALSE, partition = "shared", me
         #   Calculate the divisor and modulus, which determine the appropriate
         #   way to index the variable associated with this loop:
         #       index = ([SLURM_ARRAY_TASK_ID] // [divisor]) % [modulus]
-        if (i == length(loops)) {
-            divisor = 1
-        } else {
-            divisor = prod(
-                sapply(loops, length)[(i + 1): length(loops)]
-            )
-        }
-        modulus = length(loops[[i]])
+        temp = get_list_indexing(loops, i)
 
         #   The bash code for indexing this loop's variable given the task ID
         this_variable = sprintf(
             '%s=${all_%s[$(( $SLURM_ARRAY_TASK_ID / %s %% %s ))]}',
             names(loops)[i],
             names(loops)[i],
-            divisor,
-            modulus
+            temp[['divisor']],
+            temp[['modulus']]
         )
 
         return(c(all_variable, this_variable, ""))
