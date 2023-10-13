@@ -1,3 +1,5 @@
+library(withr)
+
 script_name <- "my_array_job"
 
 #   Write a basic shell script with 'job_single()'
@@ -26,7 +28,7 @@ broken_job <- function() {
 #   then call 'array_submit' with the '...' arguments. Return the contents of
 #   the original and modified shell script (list(2) of character vectors)
 run_test <- function(shell_creation_fun, ...) {
-    with_wd(
+    with_dir(
         tempdir(),
         {
             shell_creation_fun()

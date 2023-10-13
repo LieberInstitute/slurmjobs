@@ -31,23 +31,20 @@
 #' ## Choose a script name
 #' job_name <- paste0("array_submit_example_", Sys.Date())
 #'
-#' ## Create an array job on the temporary directory
-#' with_wd(tempdir(), {
-#'     ## Create an array job script to use for this example
-#'     job_single(
-#'         name = job_name,
-#'         create_shell = TRUE,
-#'         task_num = 100
-#'     )
+#' ## Create an array job script to use for this example
+#' job_single(
+#'     name = job_name,
+#'     create_shell = TRUE,
+#'     task_num = 100
+#' )
 #'
-#'     ## Now we can submit the job for a set of task IDs (or omit 'task_ids'
-#'     ## to automatically grab those same failed task IDs)
-#'     array_submit(
-#'         job_bash = paste0(job_name, ".sh"),
-#'         task_ids = c(1, 6, 8:20, 67),
-#'         submit = FALSE
-#'     )
-#' })
+#' ## Now we can submit the job for a set of task IDs (or omit 'task_ids'
+#' ## to automatically grab those same failed task IDs)
+#' array_submit(
+#'     job_bash = paste0(job_name, ".sh"),
+#'     task_ids = c(1, 6, 8:20, 67),
+#'     submit = FALSE
+#' )
 #'
 array_submit <- function(job_bash, task_ids = NULL, submit = FALSE, restore = TRUE, verbose = FALSE) {
     ## Check that the script is in the working directory

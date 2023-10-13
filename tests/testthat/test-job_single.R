@@ -7,7 +7,7 @@ run_test <- function(delete = TRUE, ...) {
     if (delete) unlink(file.path(tempdir(), paste0(job_name, ".sh")))
 
     ## Create an array job on the temporary directory
-    with_wd(tempdir(), {
+    with_dir(tempdir(), {
         ## Create an array job script to use for this example
         job_single(
             name = job_name,
