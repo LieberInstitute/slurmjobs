@@ -44,17 +44,17 @@ job_info <- function(user = Sys.getenv("USER"), partition = "shared") {
         #   Only interested in running jobs
         filter(ST == "R") |>
         mutate(
-            #   Fix NAs that are actually of character type
-            ARRAY_TASK_ID = ifelse(ARRAY_TASK_ID == "N/A", NA, ARRAY_TASK_ID),
-            #   Some character columns should be factors
+            #   Fix NAs that are actually of character type, and make integers
+            ARRAY_TASK_ID = as.integer(
+                ifelse(ARRAY_TASK_ID == "N/A", NA, ARRAY_TASK_ID)
+            ),
+            #   Fix data types
             PARTITION = as.factor(PARTITION),
-            STATUS = as.factor(ST)
+            STATUS = as.factor(ST),
+            JOB_ID = as.integer(JOBID)
         ) |>
-        rename(
-            JOB_ID = JOBID,
-            REQUESTED_MEM_GB = MIN_MEMORY
-        ) |>
-        select(-ST)
+        rename(REQUESTED_MEM_GB = MIN_MEMORY) |>
+        select(-c(ST, JOBID))
     colnames(job_df) <- tolower(colnames(job_df))
 
     these_job_ids <- job_df |>
