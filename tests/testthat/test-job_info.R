@@ -7,10 +7,10 @@ test_that(
         #   Don't test on GHA, where SLURM isn't available
         skip_on_ci()
 
-        job_df = job_info(user = NULL, partition = NULL)
+        job_df <- job_info(user = NULL, partition = NULL)
 
         #   Memory should be defined for a user's jobs
-        any_mem_na = job_df |>
+        any_mem_na <- job_df |>
             filter(user == Sys.getenv("USER")) |>
             select(max_rss_gb, max_vmem_gb) |>
             is.na() |>
@@ -18,7 +18,7 @@ test_that(
         expect_equal(any_mem_na, FALSE)
 
         #   Most columns should never have NA values
-        any_other_na = job_df |>
+        any_other_na <- job_df |>
             select(
                 job_id, user, name, partition, cpus, requested_mem_gb, status
             ) |>
@@ -39,18 +39,18 @@ test_that(
         #   Don't test on GHA, where SLURM isn't available
         skip_on_ci()
 
-        job_df = job_info(user = NULL, partition = NULL)
+        job_df <- job_info(user = NULL, partition = NULL)
 
         #   Compare expected vs. actual data types for each expected column
-        expected_types = c(
-            job_id = 'numeric', max_rss_gb = 'numeric', max_vmem_gb = 'numeric',
-            user = 'character', array_task_id = 'integer', name = 'character',
-            partition = 'factor', cpus = 'integer',
-            requested_mem_gb = 'numeric', status = 'factor'
+        expected_types <- c(
+            job_id = "numeric", max_rss_gb = "numeric", max_vmem_gb = "numeric",
+            user = "character", array_task_id = "integer", name = "character",
+            partition = "factor", cpus = "integer",
+            requested_mem_gb = "numeric", status = "factor"
         )
-        expected_types = unname(expected_types[colnames(job_df)])
+        expected_types <- unname(expected_types[colnames(job_df)])
 
-        actual_types = job_df |>
+        actual_types <- job_df |>
             summarize_all(class) |>
             as.character()
 
@@ -64,7 +64,7 @@ test_that(
         #   Don't test on GHA, where SLURM isn't available
         skip_on_ci()
 
-        job_df = job_info(user = Sys.getenv("USER"), partition = "shared")
+        job_df <- job_info(user = Sys.getenv("USER"), partition = "shared")
         expect_equal(unique(job_df$user), Sys.getenv("USER"))
         expect_equal(unique(job_df$partition), factor("shared"))
     }
