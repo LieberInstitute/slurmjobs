@@ -45,7 +45,8 @@ partition_info <- function(partition = "shared", all_nodes = FALSE) {
     )
 
     part_df <- read.csv(text = system(command, intern = TRUE), sep = "|") |>
-        as_tibble()
+        as_tibble() |>
+        mutate(PARTITION = factor(PARTITION))
 
     #   Subset by partition if not null
     if (!is.null(partition)) {

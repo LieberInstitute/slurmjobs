@@ -32,7 +32,8 @@ job_info <- function(user = Sys.getenv("USER"), partition = "shared") {
         ),
         sep = "|"
     ) |>
-        as_tibble()
+        as_tibble() |>
+        mutate(PARTITION = factor(PARTITION))
 
     #   Filter to the requested user and partition. Passing NULL values to
     #   those variables signals to not subset/ filter.
