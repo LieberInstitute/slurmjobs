@@ -9,7 +9,7 @@ test_that(
 
         part_df <- partition_info(partition = NULL, all_nodes = FALSE)
 
-        #   No values should be NA 
+        #   No values should be NA
         expect_equal(any(is.na(part_df)), FALSE)
 
         #   There should be more than one partition in the testing environment
@@ -27,7 +27,7 @@ test_that(
         actual_types <- part_df |>
             summarize_all(class) |>
             as.character()
-        
+
         expect_equal(expected_types, actual_types)
     }
 )
@@ -40,12 +40,12 @@ test_that(
 
         part_df <- partition_info(partition = "shared", all_nodes = TRUE)
 
-        #   No values should be NA 
+        #   No values should be NA
         expect_equal(any(is.na(part_df)), FALSE)
 
         #   We specified just one partition, but there should be many levels to
         #   the factor
-        expect_equal(as.character(unique(part_df$partition)), 'shared')
+        expect_equal(as.character(unique(part_df$partition)), "shared")
         expect_equal(nlevels(part_df$partition) > 1, TRUE)
 
         #   The 'shared' partition has many compute nodes (on the local test
@@ -53,18 +53,18 @@ test_that(
         expect_equal(nrow(part_df) > 1, TRUE)
 
         #   Compare expected vs. actual data types for each expected column
-        expected_types = c(
-            partition = 'factor', node = 'character', free_mem_gb = 'numeric',
-            alloc_mem_gb = 'numeric', total_mem_gb = 'numeric',
-            state = 'factor', alloc_cpus = 'integer', inactive_cpus = 'integer',
-            other_cpus = 'integer', total_cpus = 'integer'
+        expected_types <- c(
+            partition = "factor", node = "character", free_mem_gb = "numeric",
+            alloc_mem_gb = "numeric", total_mem_gb = "numeric",
+            state = "factor", alloc_cpus = "integer", inactive_cpus = "integer",
+            other_cpus = "integer", total_cpus = "integer"
         )
         expected_types <- unname(expected_types[colnames(part_df)])
 
         actual_types <- part_df |>
             summarize_all(class) |>
             as.character()
-        
+
         expect_equal(expected_types, actual_types)
     }
 )
