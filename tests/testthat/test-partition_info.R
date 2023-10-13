@@ -43,8 +43,10 @@ test_that(
         #   No values should be NA 
         expect_equal(any(is.na(part_df)), FALSE)
 
-        #   We specified just one partition
-        expect_equal(unique(part_df$partition), 'shared')
+        #   We specified just one partition, but there should be many levels to
+        #   the factor
+        expect_equal(as.character(unique(part_df$partition)), 'shared')
+        expect_equal(nlevels(part_df$partition) > 1, TRUE)
 
         #   The 'shared' partition has many compute nodes (on the local test
         #   environment)

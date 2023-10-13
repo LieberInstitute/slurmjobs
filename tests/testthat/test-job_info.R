@@ -66,6 +66,10 @@ test_that(
 
         job_df <- job_info(user = Sys.getenv("USER"), partition = "shared")
         expect_equal(unique(job_df$user), Sys.getenv("USER"))
-        expect_equal(unique(job_df$partition), factor("shared"))
+        
+        #   We specified just one partition, but there should be many levels to
+        #   the factor
+        expect_equal(as.character(unique(job_df$partition)), 'shared')
+        expect_equal(nlevels(job_df$partition) > 1, TRUE)
     }
 )
