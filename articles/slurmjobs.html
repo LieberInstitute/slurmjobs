@@ -85,7 +85,7 @@ Biology, Johns Hopkins
 University<br><a class="author_email" href="mailto:#"></a><a href="mailto:lcolladotor@gmail.com" class="email">lcolladotor@gmail.com</a>
       </address>
                   
-            <h4 data-toc-skip class="date">12 October 2023</h4>
+            <h4 data-toc-skip class="date">13 October 2023</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/LieberInstitute/slurmjobs/blob/HEAD/vignettes/slurmjobs.Rmd" class="external-link"><code>vignettes/slurmjobs.Rmd</code></a></small>
       <div class="hidden name"><code>slurmjobs.Rmd</code></div>
@@ -206,7 +206,7 @@ name, and when the job starts and ends.</p>
 <span><span class="fu"><a href="../reference/job_single.html">job_single</a></span><span class="op">(</span></span>
 <span>    name <span class="op">=</span> <span class="st">"my_shell_script"</span>, memory <span class="op">=</span> <span class="st">"10G"</span>, cores <span class="op">=</span> <span class="fl">2</span>, create_shell <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; 2023-10-12 18:50:09.164475 creating the logs directory at:  logs</span></span>
+<span><span class="co">#&gt; 2023-10-13 15:37:39.387482 creating the logs directory at:  logs</span></span>
 <span><span class="co">#&gt; #!/bin/bash</span></span>
 <span><span class="co">#&gt; #SBATCH -p shared</span></span>
 <span><span class="co">#&gt; #SBATCH --mem-per-cpu=10G</span></span>
@@ -249,7 +249,7 @@ job– in this case, one with 10 tasks.</p>
 <span>    name <span class="op">=</span> <span class="st">"my_array_job"</span>, memory <span class="op">=</span> <span class="st">"5G"</span>, cores <span class="op">=</span> <span class="fl">1</span>, create_shell <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>    task_num <span class="op">=</span> <span class="fl">10</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; 2023-10-12 18:50:09.247479 creating the logs directory at:  logs</span></span>
+<span><span class="co">#&gt; 2023-10-13 15:37:39.473942 creating the logs directory at:  logs</span></span>
 <span><span class="co">#&gt; #!/bin/bash</span></span>
 <span><span class="co">#&gt; #SBATCH -p shared</span></span>
 <span><span class="co">#&gt; #SBATCH --mem-per-cpu=5G</span></span>
@@ -377,8 +377,8 @@ re-submit failed tasks.</p>
 <span>    name <span class="op">=</span> <span class="st">"my_array_job"</span>, memory <span class="op">=</span> <span class="st">"5G"</span>, cores <span class="op">=</span> <span class="fl">1</span>, create_shell <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>    task_num <span class="op">=</span> <span class="fl">10</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; 2023-10-12 18:50:09.408435 creating the logs directory at:  logs</span></span>
-<span><span class="co">#&gt; 2023-10-12 18:50:09.409813 creating the shell file my_array_job.sh</span></span>
+<span><span class="co">#&gt; 2023-10-13 15:37:39.639779 creating the logs directory at:  logs</span></span>
+<span><span class="co">#&gt; 2023-10-13 15:37:39.641263 creating the shell file my_array_job.sh</span></span>
 <span><span class="co">#&gt; To submit the job use: sbatch my_array_job.sh</span></span>
 <span></span>
 <span><span class="co">#   Suppose that tasks 3, 6, 7, and 8 failed</span></span>
@@ -604,9 +604,9 @@ Cheng, Chang, and Iannone, 2023)</li>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://yihui.org/knitr/" class="external-link">"knitr"</a></span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/knit.html" class="external-link">knit</a></span><span class="op">(</span><span class="st">"slurmjobs.Rmd"</span>, tangle <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <p>Date the vignette was generated.</p>
-<pre><code><span><span class="co">#&gt; [1] "2023-10-12 18:50:10 UTC"</span></span></code></pre>
+<pre><code><span><span class="co">#&gt; [1] "2023-10-13 15:37:40 UTC"</span></span></code></pre>
 <p>Wallclock time spent generating the vignette.</p>
-<pre><code><span><span class="co">#&gt; Time difference of 2.278 secs</span></span></code></pre>
+<pre><code><span><span class="co">#&gt; Time difference of 2.38 secs</span></span></code></pre>
 <p><code>R</code> session information.</p>
 <pre><code><span><span class="co">#&gt; <span style="color: #00BBBB; font-weight: bold;">─ Session info ───────────────────────────────────────────────────────────────────────────────────────────────────────</span></span></span>
 <span><span class="co">#&gt;  <span style="color: #555555; font-style: italic;">setting </span> <span style="color: #555555; font-style: italic;">value</span></span></span>
@@ -618,7 +618,7 @@ Cheng, Chang, and Iannone, 2023)</li>
 <span><span class="co">#&gt;  collate  en_US.UTF-8</span></span>
 <span><span class="co">#&gt;  ctype    en_US.UTF-8</span></span>
 <span><span class="co">#&gt;  tz       UTC</span></span>
-<span><span class="co">#&gt;  date     2023-10-12</span></span>
+<span><span class="co">#&gt;  date     2023-10-13</span></span>
 <span><span class="co">#&gt;  pandoc   3.1.1 @ /usr/local/bin/ (via rmarkdown)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB; font-weight: bold;">─ Packages ───────────────────────────────────────────────────────────────────────────────────────────────────────────</span></span></span>
@@ -665,7 +665,7 @@ Cheng, Chang, and Iannone, 2023)</li>
 <span><span class="co">#&gt;  rprojroot       2.0.3   <span style="color: #555555;">2022-04-02</span> <span style="color: #555555;">[2]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM (R 4.3.0)</span></span></span>
 <span><span class="co">#&gt;  sass            0.4.7   <span style="color: #555555;">2023-07-15</span> <span style="color: #555555;">[2]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM (R 4.3.0)</span></span></span>
 <span><span class="co">#&gt;  sessioninfo   * 1.2.2   <span style="color: #555555;">2021-12-06</span> <span style="color: #555555;">[2]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM (R 4.3.0)</span></span></span>
-<span><span class="co">#&gt;  slurmjobs     * 0.99.0  <span style="color: #555555;">2023-10-12</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">local</span></span></span>
+<span><span class="co">#&gt;  slurmjobs     * 0.99.0  <span style="color: #555555;">2023-10-13</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">local</span></span></span>
 <span><span class="co">#&gt;  stringi         1.7.12  <span style="color: #555555;">2023-01-11</span> <span style="color: #555555;">[2]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM (R 4.3.0)</span></span></span>
 <span><span class="co">#&gt;  stringr         1.5.0   <span style="color: #555555;">2022-12-02</span> <span style="color: #555555;">[2]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM (R 4.3.0)</span></span></span>
 <span><span class="co">#&gt;  systemfonts     1.0.5   <span style="color: #555555;">2023-10-09</span> <span style="color: #555555;">[2]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM (R 4.3.0)</span></span></span>
@@ -674,7 +674,7 @@ Cheng, Chang, and Iannone, 2023)</li>
 <span><span class="co">#&gt;  tidyselect      1.2.0   <span style="color: #555555;">2022-10-10</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM (R 4.3.0)</span></span></span>
 <span><span class="co">#&gt;  timechange      0.2.0   <span style="color: #555555;">2023-01-11</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM (R 4.3.0)</span></span></span>
 <span><span class="co">#&gt;  utf8            1.2.3   <span style="color: #555555;">2023-01-31</span> <span style="color: #555555;">[2]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM (R 4.3.0)</span></span></span>
-<span><span class="co">#&gt;  vctrs           0.6.3   <span style="color: #555555;">2023-06-14</span> <span style="color: #555555;">[2]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM (R 4.3.0)</span></span></span>
+<span><span class="co">#&gt;  vctrs           0.6.4   <span style="color: #555555;">2023-10-12</span> <span style="color: #555555;">[2]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM (R 4.3.0)</span></span></span>
 <span><span class="co">#&gt;  withr           2.5.1   <span style="color: #555555;">2023-09-26</span> <span style="color: #555555;">[2]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM (R 4.3.0)</span></span></span>
 <span><span class="co">#&gt;  xfun            0.40    <span style="color: #555555;">2023-08-09</span> <span style="color: #555555;">[2]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM (R 4.3.0)</span></span></span>
 <span><span class="co">#&gt;  xml2            1.3.5   <span style="color: #555555;">2023-07-06</span> <span style="color: #555555;">[2]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM (R 4.3.0)</span></span></span>
