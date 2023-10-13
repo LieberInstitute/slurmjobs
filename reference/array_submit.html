@@ -124,27 +124,23 @@ about how failed tasks were determined (applicable when <code>task_ids</code> is
 <span class="r-in"><span><span class="co">## Choose a script name</span></span></span>
 <span class="r-in"><span><span class="va">job_name</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"array_submit_example_"</span>, <span class="fu"><a href="https://rdrr.io/r/base/Sys.time.html" class="external-link">Sys.Date</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co">## Create an array job on the temporary directory</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="with_wd.html">with_wd</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="op">{</span></span></span>
-<span class="r-in"><span>    <span class="co">## Create an array job script to use for this example</span></span></span>
-<span class="r-in"><span>    <span class="fu"><a href="job_single.html">job_single</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>        name <span class="op">=</span> <span class="va">job_name</span>,</span></span>
-<span class="r-in"><span>        create_shell <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
-<span class="r-in"><span>        task_num <span class="op">=</span> <span class="fl">100</span></span></span>
-<span class="r-in"><span>    <span class="op">)</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span>    <span class="co">## Now we can submit the job for a set of task IDs (or omit 'task_ids'</span></span></span>
-<span class="r-in"><span>    <span class="co">## to automatically grab those same failed task IDs)</span></span></span>
-<span class="r-in"><span>    <span class="fu">array_submit</span><span class="op">(</span></span></span>
-<span class="r-in"><span>        job_bash <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">job_name</span>, <span class="st">".sh"</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>        task_ids <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">6</span>, <span class="fl">8</span><span class="op">:</span><span class="fl">20</span>, <span class="fl">67</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>        submit <span class="op">=</span> <span class="cn">FALSE</span></span></span>
-<span class="r-in"><span>    <span class="op">)</span></span></span>
-<span class="r-in"><span><span class="op">}</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 2023-10-13 15:45:28.066544 creating the logs directory at:  logs</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 2023-10-13 15:45:28.068387 creating the shell file array_submit_example_2023-10-13.sh</span>
+<span class="r-in"><span><span class="co">## Create an array job script to use for this example</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="job_single.html">job_single</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>    name <span class="op">=</span> <span class="va">job_name</span>,</span></span>
+<span class="r-in"><span>    create_shell <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
+<span class="r-in"><span>    task_num <span class="op">=</span> <span class="fl">100</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> 2023-10-13 16:04:39.237847 creating the logs directory at:  logs</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> 2023-10-13 16:04:39.23966 creating the shell file array_submit_example_2023-10-13.sh</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> To submit the job use: sbatch array_submit_example_2023-10-13.sh</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "array_submit_example_2023-10-13.sh"</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## Now we can submit the job for a set of task IDs (or omit 'task_ids'</span></span></span>
+<span class="r-in"><span><span class="co">## to automatically grab those same failed task IDs)</span></span></span>
+<span class="r-in"><span><span class="fu">array_submit</span><span class="op">(</span></span></span>
+<span class="r-in"><span>    job_bash <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">job_name</span>, <span class="st">".sh"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>    task_ids <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">6</span>, <span class="fl">8</span><span class="op">:</span><span class="fl">20</span>, <span class="fl">67</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>    submit <span class="op">=</span> <span class="cn">FALSE</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
