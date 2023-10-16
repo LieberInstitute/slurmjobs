@@ -64,8 +64,14 @@ job_loop(
 )
 
 }
+\seealso{
+Other shell-script creation and submission functions: 
+\code{\link{array_submit}()},
+\code{\link{job_single}()}
+}
 \author{
 Nicholas J. Eagles
 
 Leonardo Collado-Torres
 }
+\concept{shell-script creation and submission functions}

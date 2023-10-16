@@ -83,8 +83,14 @@ job_single("jhpce_job",
 job_single("jhpce_job_array", task_num = 20, create_logdir = FALSE)
 
 }
+\seealso{
+Other shell-script creation and submission functions: 
+\code{\link{array_submit}()},
+\code{\link{job_loop}()}
+}
 \author{
 Leonardo Collado-Torres
 
 Nicholas J. Eagles
 }
+\concept{shell-script creation and submission functions}
