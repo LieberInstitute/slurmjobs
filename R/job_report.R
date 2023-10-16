@@ -84,7 +84,7 @@ job_report <- function(job_id) {
                 ),
                 array_task_id
             ),
-            JobID = str_extract(JobIDRaw, "^[0-9]+"),
+            JobID = as.integer(str_extract(JobIDRaw, "^[0-9]+")),
             job_step = str_extract(JobIDRaw, "[0-9]+\\.?(.*)$", group = 1)
         )
 
@@ -140,7 +140,6 @@ job_report <- function(job_id) {
 
         #   Combine list of tibbles and merge with existing tibble
         job_df <- do.call(rbind, mem_df_list) |>
-            mutate(JobID = as.character(JobID)) |>
             #   Here we manually take whichever the non-NA value is for each
             #   memory-related column
             rename(max_rss = MaxRSS, max_vmem = MaxVMSize) |>
