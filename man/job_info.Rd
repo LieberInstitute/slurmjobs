@@ -31,6 +31,12 @@ if (system("which sbatch") == 0) {
     print(sprintf("I'm using \%s CPUs total right now.", sum(job_df$cpus)))
 }
 }
+\seealso{
+Other monitoring and informational functions: 
+\code{\link{job_report}()},
+\code{\link{partition_info}()}
+}
 \author{
 Nicholas J. Eagles
 }
+\concept{monitoring and informational functions}

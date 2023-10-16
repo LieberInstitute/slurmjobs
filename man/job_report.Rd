@@ -30,6 +30,12 @@ if (system("which sbatch") == 0) {
     print(job_df$max_vmem_gb)
 }
 }
+\seealso{
+Other monitoring and informational functions: 
+\code{\link{job_info}()},
+\code{\link{partition_info}()}
+}
 \author{
 Nicholas J. Eagles
 }
+\concept{monitoring and informational functions}

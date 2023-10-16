@@ -39,6 +39,8 @@
 #' @author Leonardo Collado-Torres
 #' @author Nicholas J. Eagles
 #' @import glue utils
+#' 
+#' @family shell-script creation and submission functions
 #'
 #' @examples
 #'

@@ -39,6 +39,12 @@ if (system("which sbatch") == 0) {
     )
 }
 }
+\seealso{
+Other monitoring and informational functions: 
+\code{\link{job_info}()},
+\code{\link{job_report}()}
+}
 \author{
 Nicholas J. Eagles
 }
+\concept{monitoring and informational functions}

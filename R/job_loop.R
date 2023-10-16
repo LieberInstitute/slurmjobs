@@ -15,6 +15,8 @@
 #' @author Nicholas J. Eagles
 #' @author Leonardo Collado-Torres
 #' @import purrr
+#' 
+#' @family shell-script creation and submission functions
 #'
 #' @examples
 #'
