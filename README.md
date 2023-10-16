@@ -31,21 +31,10 @@ versions.
 
 Get the latest stable `R` release from
 [CRAN](http://cran.r-project.org/). Then install `slurmjobs` from
-[Bioconductor](http://bioconductor.org/) using the following code:
-
-``` r
-if (!requireNamespace("BiocManager", quietly = TRUE)) {
-    install.packages("BiocManager")
-}
-
-BiocManager::install("slurmjobs")
-```
-
-And the development version from
 [GitHub](https://github.com/LieberInstitute/slurmjobs) with:
 
 ``` r
-BiocManager::install("LieberInstitute/slurmjobs")
+remotes::install_github("LieberInstitute/slurmjobs")
 ```
 
 ## Citation
