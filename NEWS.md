@@ -3,12 +3,9 @@
 NEW FEATURES
 
 * Added a `NEWS.md` file to track changes to the package.
+* Added core files (such as `DESCRIPTION`, `NAMESPACE`, etc) to make `slurmjobs` a Bioconductor-style package
 
 SIGNIFICANT USER-VISIBLE CHANGES
 
-* Your main changes to a function `foo()` or parameter `param`.
-
-BUG FIXES
-
-* Your bug fixes. See more details at
-<http://bioconductor.org/developers/package-guidelines/#news>.
+* Experimental `job_info()` function
+* Experimental `job_single()` function
