@@ -41,16 +41,16 @@ module load conda_R/4.3
 module list
 
 ## Edit with your job command
-Rscript -e "options(width = 120); print('${letter}'); print('${number}'); print('${combo}'); sessioninfo::session_info()"
-
-echo "**** Job ends ****"
-date
+Rscript broken_array_loop.R --letter ${letter} --number ${number} --combo ${combo}
 
 #   Make some tasks fail
 if [[ $number -eq 1 ]]; then
     echo "Failed task"
     exit 1
 fi
+
+echo "**** Job ends ****"
+date
 
 } > $log_path 2>&1
 
