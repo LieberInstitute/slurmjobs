@@ -51,12 +51,36 @@ job_loop <- function(
         }
     }
 
-    ## Build an example command
-    command <- paste0(
-        'Rscript -e "options(width = 120); ',
-        "print('${",
-        paste(names(loops), collapse = "}'); print('${"),
-        "}');", ' sessioninfo::session_info()"'
+    ## Build the command, which invokes an R script with at least one parameter
+    main_command = sprintf('Rscript %s.R', name)
+    all_args = paste(
+        sapply(
+            names(loops), function(x) sprintf('--%s ${%s}', x, x)
+        ),
+        collapse = " "
+    )
+    command <- paste(main_command, all_args)
+
+    ## The text for the corresponding R script
+    r_text = c(
+        'library(getopt)',
+        'library(sessioninfo)',
+        '',
+        '# Import command-line parameters',
+        'spec <- matrix(',
+        '    c(',
+        sprintf('        %s,', vector_as_code(names(loops))),
+        sprintf('        %s,', vector_as_code(get_short_flags(names(loops)))),
+        sprintf('        rep("1", %s),', length(loops)),
+        sprintf('        rep("character", %s),', length(loops)),
+        sprintf('        rep("Add variable description here", %s)', length(loops)),
+        '    ),',
+        '    ncol = 5',
+        ')',
+        'opt <- getopt(spec)',
+        '',
+        'print("Using the following parameters:")',
+        'print(opt)'
     )
 
     ## Build the core script
