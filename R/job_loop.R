@@ -8,9 +8,8 @@
 #' contents specify the options to loop through for each variable.
 #' @inheritParams job_single
 #'
-#' @return A character vector with the script contents. If `create_shell` was
-#' specified then it also creates the actual script in the current
-#' working directory.
+#' @return A length-2 list of character vectors containing the contents of the
+#' R and shell scripts
 #' @export
 #' @author Nicholas J. Eagles
 #' @author Leonardo Collado-Torres
@@ -189,7 +188,8 @@ job_loop <- function(
         message(paste("To submit the script pair, use: sbatch", sh_file))
         writeLines(r_text, con = paste0(name, ".R"))
         writeLines(script_final, con = sh_file)
-        return(invisible(script_final))
+
+        return(list(R = r_text, shell = script_final))
     }
 
     ## Done!
