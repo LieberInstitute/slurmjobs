@@ -13,7 +13,7 @@
 #' @export
 #' @author Nicholas J. Eagles
 #' @author Leonardo Collado-Torres
-#' @import purrr
+#' @import purrr utils
 #' 
 #' @family shell-script creation and submission functions
 #'
@@ -83,7 +83,13 @@ job_loop <- function(
         'print("Using the following parameters:")',
         'print(opt)',
         '',
-        'session_info()'
+        'session_info()',
+        '',
+        paste(
+            '## This script was made using slurmjobs version',
+            packageVersion("slurmjobs")
+        ),
+        '## available from http://research.libd.org/slurmjobs/'
     )
 
     ## Build the core script
@@ -191,7 +197,7 @@ job_loop <- function(
         writeLines(r_text, con = paste0(name, ".R"))
         writeLines(script_final, con = sh_file)
 
-        return(list(R = r_text, shell = script_final))
+        return(invisible(list(R = r_text, shell = script_final)))
     }
 
     ## Done!
