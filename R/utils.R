@@ -11,11 +11,11 @@ get_list_indexing <- function(this_list, index) {
     return(list("divisor" = divisor, "modulus" = modulus))
 }
 
-#   Given a character vector, return an equal-length character vector of
+#   Given a character vector 'loops', return an equal-length character vector of
 #   unique one-letter initials
 get_short_flags = function(loops) {
     #   Try just taking the first letter of the names
-    short_flags = substr(names(loops), 1, 1)
+    short_flags = substr(loops, 1, 1)
 
     #   Get unused letters
     remaining_letters = setdiff(letters, short_flags)
@@ -28,4 +28,10 @@ get_short_flags = function(loops) {
     short_flags[dup_flags] = remaining_letters[1:length(which(dup_flags))]
 
     return(short_flags)
+}
+
+#   Given a character vector 'vec', return a character(1) representing the line
+#   of code used to generate 'vec'
+vector_as_code = function(vec) {
+    return(sprintf('c("%s")', paste(vec, collapse = '", "')))
 }
