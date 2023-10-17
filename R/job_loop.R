@@ -81,7 +81,9 @@ job_loop <- function(
         'opt <- getopt(spec)',
         '',
         'print("Using the following parameters:")',
-        'print(opt)'
+        'print(opt)',
+        '',
+        'session_info()'
     )
 
     ## Build the core script
