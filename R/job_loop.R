@@ -43,11 +43,13 @@ job_loop <- function(
     ## Remove any spaces
     name <- gsub(" ", "_", name)
 
-    ## Check if the shell file exists already
+    ## Check if the shell or R script exists already
     if (create_shell) {
-        sh_file <- paste0(name, ".sh")
-        if (file.exists(sh_file)) {
-            stop("The file ", sh_file, " already exists!", call. = FALSE)
+        file_names = c(paste0(name, ".sh"), paste0(name, ".R"))
+        for (this_file in file_names) {
+            if (file.exists(this_file)) {
+                stop("The file ", this_file, " already exists!", call. = FALSE)
+            }
         }
     }
 
@@ -178,8 +180,14 @@ job_loop <- function(
 
     ## Write to a file?
     if (create_shell) {
-        message(paste(Sys.time(), "creating the shell file", sh_file))
-        message(paste("To submit the script, use: sbatch", sh_file))
+        message(
+            sprintf(
+                "%s Creating the shell file %s.sh and corresponding R script %s.R",
+                Sys.time(), name, name
+            )
+        )
+        message(paste("To submit the script pair, use: sbatch", sh_file))
+        writeLines(r_text, con = paste0(name, ".R"))
         writeLines(script_final, con = sh_file)
         return(invisible(script_final))
     }
