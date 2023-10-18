@@ -195,10 +195,8 @@ job_loop <- function(loops, name, create_shell = FALSE, partition = "shared", me
         message(sprintf("To submit the script pair, use: sbatch %s.sh", name))
         writeLines(r_text, con = paste0(name, ".R"))
         writeLines(script_final, con = paste0(name, ".sh"))
-
-        return(invisible(list(R = r_text, shell = script_final)))
     }
 
     ## Done!
-    return(script_final)
+    return(invisible(list(R = r_text, shell = script_final)))
 }
