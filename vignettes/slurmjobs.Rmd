@@ -138,17 +138,38 @@ specifying `task_num`, you specify `loops`, a named list of variables to loop th
 array job then gets created that can directly refer to the values of these variables, rather
 than referring to just the array's task ID.
 
-```{r 'loop'}
-job_loop(
+`job_loop()`, unlike `job_single()`, also creates an R script. The idea is that the shell
+script invokes the R script internally, with a particular combination of variables. The `getopt`
+package is then used to read in this combination from the command line, so that each variable
+can be accessed by name in R. Let's make that a bit more concrete.
+
+```{r 'loop_shell'}
+#   'job_loop' returns a list containing the contents of the to-be-created shell
+#   and R scripts. Let's take a look at the shell script first
+script_pair = job_loop(
     loops = list(region = c("DLPFC", "HIPPO"), feature = c("gene", "exon", "tx", "jxn")),
     name = "bsp2_test"
 )
+message(script_pair[['shell']])
 ```
+
+First, note the line `Rscript bsp2_test.R --region ${region} --feature ${feature}`. Every task
+of the array job passes a unique combination of `${region}` and `${feature}` to R.
 
 Notice also that logs from executing this shell script get named with each of the variables'
 values in addition to the array task ID. For example, the log for the first task would be
 `logs/DLPFC_gene_1.txt`. Also, the array specifies 8 tasks total (the product of the number
 of `region`s and `feature`s).
+
+Let's also look at the R script.
+
+```{r 'loop_r'}
+message(script_pair[['R']])
+```
+
+The code related to `getopt` at the top of the script reads in the unique combination of
+variable values into a list called `opt` here. For example, one task of the array job might
+yield values for `opt$region` and `opt$feature` to be `"DLPFC"` and `"gene"`, respectively.
 
 # Submitting and Resubmitting Jobs
 
