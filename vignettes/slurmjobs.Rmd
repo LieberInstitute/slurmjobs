@@ -150,7 +150,7 @@ script_pair <- job_loop(
     loops = list(region = c("DLPFC", "HIPPO"), feature = c("gene", "exon", "tx", "jxn")),
     name = "bsp2_test"
 )
-message(script_pair[["shell"]])
+cat(script_pair[["shell"]], sep = "\n")
 ```
 
 First, note the line `Rscript bsp2_test.R --region ${region} --feature ${feature}`. Every task
@@ -164,7 +164,7 @@ of `region`s and `feature`s).
 Let's also look at the R script.
 
 ```{r 'loop_r'}
-message(script_pair[["R"]])
+cat(script_pair[["R"]], sep = "\n")
 ```
 
 The code related to `getopt` at the top of the script reads in the unique combination of
