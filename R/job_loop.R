@@ -14,7 +14,7 @@
 #' @author Nicholas J. Eagles
 #' @author Leonardo Collado-Torres
 #' @import purrr utils
-#' 
+#'
 #' @family shell-script creation and submission functions
 #'
 #' @examples
@@ -25,9 +25,8 @@
 #'     cores = 2
 #' )
 #'
-job_loop <- function(
-        loops, name, create_shell = FALSE, partition = "shared", memory = "10G",
-        cores = 1L, tc = 20, email = "ALL", logdir = "logs") {
+job_loop <- function(loops, name, create_shell = FALSE, partition = "shared", memory = "10G",
+    cores = 1L, tc = 20, email = "ALL", logdir = "logs") {
     ## Check that the loops are correctly defined
     if (!is.list(loops)) {
         stop("'loops' should be a named list.", call. = FALSE)
@@ -44,7 +43,7 @@ job_loop <- function(
 
     ## Check if the shell or R script exists already
     if (create_shell) {
-        file_names = c(paste0(name, ".sh"), paste0(name, ".R"))
+        file_names <- c(paste0(name, ".sh"), paste0(name, ".R"))
         for (this_file in file_names) {
             if (file.exists(this_file)) {
                 stop("The file ", this_file, " already exists!", call. = FALSE)
@@ -53,43 +52,43 @@ job_loop <- function(
     }
 
     ## Build the command, which invokes an R script with at least one parameter
-    main_command = sprintf('Rscript %s.R', name)
-    all_args = paste(
+    main_command <- sprintf("Rscript %s.R", name)
+    all_args <- paste(
         sapply(
-            names(loops), function(x) sprintf('--%s ${%s}', x, x)
+            names(loops), function(x) sprintf("--%s ${%s}", x, x)
         ),
         collapse = " "
     )
     command <- paste(main_command, all_args)
 
     ## The text for the corresponding R script
-    r_text = c(
-        'library(getopt)',
-        'library(sessioninfo)',
-        '',
-        '# Import command-line parameters',
-        'spec <- matrix(',
-        '    c(',
-        sprintf('        %s,', vector_as_code(names(loops))),
-        sprintf('        %s,', vector_as_code(get_short_flags(names(loops)))),
+    r_text <- c(
+        "library(getopt)",
+        "library(sessioninfo)",
+        "",
+        "# Import command-line parameters",
+        "spec <- matrix(",
+        "    c(",
+        sprintf("        %s,", vector_as_code(names(loops))),
+        sprintf("        %s,", vector_as_code(get_short_flags(names(loops)))),
         sprintf('        rep("1", %s),', length(loops)),
         sprintf('        rep("character", %s),', length(loops)),
         sprintf('        rep("Add variable description here", %s)', length(loops)),
-        '    ),',
-        '    ncol = 5',
-        ')',
-        'opt <- getopt(spec)',
-        '',
+        "    ),",
+        "    ncol = 5",
+        ")",
+        "opt <- getopt(spec)",
+        "",
         'print("Using the following parameters:")',
-        'print(opt)',
-        '',
-        'session_info()',
-        '',
+        "print(opt)",
+        "",
+        "session_info()",
+        "",
         paste(
-            '## This script was made using slurmjobs version',
+            "## This script was made using slurmjobs version",
             packageVersion("slurmjobs")
         ),
-        '## available from http://research.libd.org/slurmjobs/'
+        "## available from http://research.libd.org/slurmjobs/"
     )
 
     ## Build the core script

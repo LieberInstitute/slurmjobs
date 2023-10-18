@@ -27,7 +27,7 @@
 #' @author Nicholas J. Eagles
 #'
 #' @family shell-script creation and submission functions
-#' 
+#'
 #' @examples
 #'
 #' ## Choose a script name

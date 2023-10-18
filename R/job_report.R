@@ -9,7 +9,7 @@
 #' @export
 #' @author Nicholas J. Eagles
 #' @import dplyr stringr utils
-#' 
+#'
 #' @family monitoring and informational functions
 #'
 #' @examples

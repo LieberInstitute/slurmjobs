@@ -14,7 +14,7 @@
 #' @export
 #' @author Nicholas J. Eagles
 #' @import dplyr utils
-#' 
+#'
 #' @family monitoring and informational functions
 #'
 #' @examples

@@ -47,9 +47,8 @@ concurrent tasks.}
 working directory.}
 }
 \value{
-A character vector with the script contents. If \code{create_shell} was
-specified then it also creates the actual script in the current
-working directory.
+A length-2 list of character vectors containing the contents of the
+R and shell scripts
 }
 \description{
 This function builds a bash script functioning as an array job that loops
