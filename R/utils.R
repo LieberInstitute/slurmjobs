@@ -18,13 +18,13 @@
 #'
 #' @examples
 #'
-#' array_task = 5 # suppose this is the fifth task in an array job
-#' index = 2      # will refer to the 'feature' element of 'loops' below
-#' loops = list(
+#' array_task <- 5 # suppose this is the fifth task in an array job
+#' index <- 2 # will refer to the 'feature' element of 'loops' below
+#' loops <- list(
 #'     region = c("DLPFC", "HIPPO"), feature = c("gene", "exon", "tx", "jxn")
 #' )
-#' indexing = get_list_indexing(loops, index)
-#' this_feature = this_list[[index]][[
+#' indexing <- get_list_indexing(loops, index)
+#' this_feature <- this_list[[index]][[
 #'     array_task %/% indexing$divisor %% indexing$modulus
 #' ]]
 #' sprintf(
@@ -63,13 +63,13 @@ get_list_indexing <- function(this_list, index) {
 #' @examples
 #'
 #' #    Simple example where initials are as expected: 'a', 'b', 'c'
-#' fruits = c('apple', 'banana', 'cherry')
-#' initials = get_short_flags(fruits)
+#' fruits <- c("apple", "banana", "cherry")
+#' initials <- get_short_flags(fruits)
 #' print(fruits)
-#' 
+#'
 #' #    Example with duplicates with some arbitrary initials: 'c', 'a', 'b', 'd'
-#' fruits = c('coconut', 'cherry', 'banana', 'berry')
-#' initials = get_short_flags(fruits)
+#' fruits <- c("coconut", "cherry", "banana", "berry")
+#' initials <- get_short_flags(fruits)
 #' print(fruits)
 #'
 get_short_flags <- function(vec) {
@@ -103,7 +103,7 @@ get_short_flags <- function(vec) {
 #'
 #' @examples
 #'
-#' fruits = c('apple', 'banana', 'cherry')
+#' fruits <- c("apple", "banana", "cherry")
 #' message(vector_as_code(fruits))
 #'
 vector_as_code <- function(vec) {

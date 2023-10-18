@@ -87,8 +87,8 @@ test_that(
 test_that(
     "get_short_flags",
     {
-        fruits = c('coconut', 'cherry', 'banana', 'berry')
-        expect_equal(get_short_flags(fruits), c('c', 'a', 'b', 'd'))
+        fruits <- c("coconut", "cherry", "banana", "berry")
+        expect_equal(get_short_flags(fruits), c("c", "a", "b", "d"))
 
         #   Should fail for length > 26
         expect_error(
@@ -101,8 +101,8 @@ test_that(
 test_that(
     "vector_as_code",
     {
-        fruits = c('coconut', 'cherry', 'banana', 'berry')
-        initials = vector_as_code(fruits)
+        fruits <- c("coconut", "cherry", "banana", "berry")
+        initials <- vector_as_code(fruits)
         expect_equal(
             vector_as_code(fruits),
             'c("coconut", "cherry", "banana", "berry")'
