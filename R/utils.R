@@ -1,3 +1,38 @@
+#' Subset a specific list index given a particular array task index
+#'
+#' Given \code{this_list} and its \code{index}, determine a "divisor" and
+#' "modulus" instructing how to subset the character vector at that index
+#' given a particular array task index. Downstream, selecting
+#' \code{this_list[[index]][[x]]} for each index yields a combination of values
+#' that is unique across array indices. Here \code{x = array_index / divisor % modulus}.
+#' This is a helper function for \code{job_loop}.
+#'
+#' @param this_list A \code{`list`} of character vectors
+#' @param index \code{integer(1)} specifying the index of \code{this_list} to be
+#' subsetted downstream of this function
+#'
+#' @return A length-2 named list of integer(1) vectors containing a divisor and
+#' modulus
+#'
+#' @author Nicholas J. Eagles
+#'
+#' @examples
+#'
+#' array_task = 5 # suppose this is the fifth task in an array job
+#' index = 2      # will refer to the 'feature' element of 'loops' below
+#' loops = list(
+#'     region = c("DLPFC", "HIPPO"), feature = c("gene", "exon", "tx", "jxn")
+#' )
+#' indexing = get_list_indexing(loops, index)
+#' this_feature = this_list[[index]][[
+#'     array_task %/% indexing$divisor %% indexing$modulus
+#' ]]
+#' sprintf(
+#'     'The %ith array task will have "%s" as its feature.',
+#'     array_task,
+#'     this_feature
+#' )
+#'
 get_list_indexing <- function(this_list, index) {
     if (index == length(this_list)) {
         divisor <- 1
