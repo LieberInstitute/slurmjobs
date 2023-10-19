@@ -38,9 +38,10 @@ partition_info <- function(partition = "shared", all_nodes = FALSE) {
         #   Grab info about CPUs and memory with 'sinfo'
         "sinfo -N -O 'PartitionName,NodeList:50,FreeMem,AllocMem,Memory,StateLong,CPUsState'",
         #   Properly delimit columns by "|"
-        "sed -E 's%[ /\t]+%|%g'",
+        "sed -E 's%[ \t]+%|%g'",
+        "sed -E 's%([0-9]+)/%\\1|%g'",
         #   Use better column names for CPU-related columns
-        "sed 's%CPUS(A|I|O|T)%ALLOC_CPUS|INACTIVE_CPUS|OTHER_CPUS|TOTAL_CPUS%'",
+        "sed 's%CPUS(A/I/O/T)%ALLOC_CPUS|INACTIVE_CPUS|OTHER_CPUS|TOTAL_CPUS%'",
         #   Remove trailing delimiter
         "sed 's%|$%%'",
         sep = " | "
@@ -48,7 +49,12 @@ partition_info <- function(partition = "shared", all_nodes = FALSE) {
 
     part_df <- read.csv(text = system(command, intern = TRUE), sep = "|") |>
         as_tibble() |>
-        mutate(PARTITION = factor(PARTITION))
+        mutate(
+            PARTITION = factor(PARTITION),
+            #   For nodes that are down, free memory is reported as "N/A", but
+            #   really no memory is free and therefore 0 is appropriate
+            FREE_MEM = as.integer(ifelse(FREE_MEM == "N/A", 0, FREE_MEM))
+        )
 
     #   Subset by partition if not null
     if (!is.null(partition)) {
