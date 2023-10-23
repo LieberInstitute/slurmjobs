@@ -50,7 +50,7 @@
 #'
 array_submit <- function(name, task_ids = NULL, submit = FALSE, restore = TRUE, verbose = FALSE) {
     ## Check existence and validity of the shell script
-    if ((basename(name) != name) || !file.exists(paste0(name, '.sh'))) {
+    if ((basename(name) != name) || !file.exists(paste0(name, ".sh"))) {
         stop(
             paste(
                 "'name' must give the name of a shell script in the current",
@@ -59,7 +59,7 @@ array_submit <- function(name, task_ids = NULL, submit = FALSE, restore = TRUE, 
         )
     }
 
-    job_original <- readLines(paste0(name, '.sh'))
+    job_original <- readLines(paste0(name, ".sh"))
 
     ############################################################################
     #   Infer failed task IDs if 'task_ids' is NULL
@@ -224,7 +224,7 @@ array_submit <- function(name, task_ids = NULL, submit = FALSE, restore = TRUE, 
         paste0("#SBATCH --array=", paste(task_ids, collapse = ","), "%\\1"),
         job_original
     )
-    writeLines(job_new, con = paste0(name, '.sh'))
+    writeLines(job_new, con = paste0(name, ".sh"))
 
     #   Invoke (sbatch) the modified script if requested
     if (submit) {
@@ -233,8 +233,8 @@ array_submit <- function(name, task_ids = NULL, submit = FALSE, restore = TRUE, 
     }
 
     # Restore the original script
-    if (restore) writeLines(job_original, con = paste0(name, '.sh'))
+    if (restore) writeLines(job_original, con = paste0(name, ".sh"))
 
     # Return the path
-    return(invisible(paste0(name, '.sh')))
+    return(invisible(paste0(name, ".sh")))
 }
