@@ -5,7 +5,7 @@
 \title{Submit an array job with a specified set of task IDs}
 \usage{
 array_submit(
-  job_bash,
+  name,
   task_ids = NULL,
   submit = FALSE,
   restore = TRUE,
@@ -13,8 +13,8 @@ array_submit(
 )
 }
 \arguments{
-\item{job_bash}{A \code{character(1)} vector with the name of a bash script
-in the current working directory.}
+\item{name}{A \code{character(1)} vector with the name of a bash script
+in the current working directory (excluding '.sh')}
 
 \item{task_ids}{An optional numeric vector specifying which (relative) task
 IDs to resubmit (e.g. c(1, 4, 6)). If NULL, the task IDs will be inferred
@@ -31,7 +31,7 @@ script to the original state.}
 about how failed tasks were determined (applicable when \code{task_ids} is NULL).}
 }
 \value{
-The path to \code{job_bash}.
+The absolute path to the shell script to create.
 }
 \description{
 Given a bash script that specifies the --array \code{sbatch} option (that is, an
@@ -57,7 +57,7 @@ job_single(
 ## Now we can submit the job for a set of task IDs (or omit 'task_ids'
 ## to automatically grab those same failed task IDs)
 array_submit(
-    job_bash = paste0(job_name, ".sh"),
+    name = job_name,
     task_ids = c(1, 6, 8:20, 67),
     submit = FALSE
 )

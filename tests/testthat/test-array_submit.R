@@ -36,7 +36,7 @@ run_test <- function(shell_creation_fun, ...) {
             original <- readLines(paste0(script_name, ".sh"))
 
             array_submit(
-                job_bash = paste0(script_name, ".sh"),
+                name = script_name,
                 ...
             )
 

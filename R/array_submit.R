@@ -8,8 +8,8 @@
 #' intended to help re-run failed tasks of a large array job that was previously
 #' submitted.
 #'
-#' @param job_bash A `character(1)` vector with the name of a bash script
-#' in the current working directory.
+#' @param name A `character(1)` vector with the name of a bash script
+#' in the current working directory (excluding '.sh')
 #' @param task_ids An optional numeric vector specifying which (relative) task
 #' IDs to resubmit (e.g. c(1, 4, 6)). If NULL, the task IDs will be inferred
 #' by scraping the log file for the job ID for the array job as originally
@@ -21,7 +21,7 @@
 #' @param verbose A `logical(1)` vector specifying whether to print details
 #' about how failed tasks were determined (applicable when `task_ids` is NULL).
 #'
-#' @return The path to `job_bash`.
+#' @return The absolute path to the shell script to create.
 #' @export
 #' @author Leonardo Collado-Torres
 #' @author Nicholas J. Eagles
@@ -43,22 +43,23 @@
 #' ## Now we can submit the job for a set of task IDs (or omit 'task_ids'
 #' ## to automatically grab those same failed task IDs)
 #' array_submit(
-#'     job_bash = paste0(job_name, ".sh"),
+#'     name = job_name,
 #'     task_ids = c(1, 6, 8:20, 67),
 #'     submit = FALSE
 #' )
 #'
-array_submit <- function(job_bash, task_ids = NULL, submit = FALSE, restore = TRUE, verbose = FALSE) {
-    ## Check that the script is in the working directory
-    if (basename(job_bash) != job_bash) {
+array_submit <- function(name, task_ids = NULL, submit = FALSE, restore = TRUE, verbose = FALSE) {
+    ## Check existence and validity of the shell script
+    if ((basename(name) != name) || !file.exists(paste0(name, '.sh'))) {
         stop(
-            "The 'job_bash' script has to exist in the current working directory,\n",
-            "since code may depend on relative paths.",
-            call. = FALSE
+            paste(
+                "'name' must give the name of a shell script in the current",
+                "working directory, without any extension."
+            )
         )
     }
 
-    job_original <- readLines(job_bash)
+    job_original <- readLines(name)
 
     ############################################################################
     #   Infer failed task IDs if 'task_ids' is NULL
@@ -89,7 +90,7 @@ array_submit <- function(job_bash, task_ids = NULL, submit = FALSE, restore = TR
         )
 
         if (verbose) {
-            message(sprintf("The highest task in %s was %s.", job_bash, max_task))
+            message(sprintf("The highest task in %s.sh was %s.", name, max_task))
         }
 
         #   Halt with an error if it couldn't be found
@@ -119,7 +120,7 @@ array_submit <- function(job_bash, task_ids = NULL, submit = FALSE, restore = TR
                 list.files(
                     pattern = sprintf(
                         "%s.*_%s\\.txt$",
-                        strsplit(job_bash, "\\.sh")[[1]],
+                        name,
                         max_task
                     ),
                     full.names = TRUE
@@ -223,17 +224,17 @@ array_submit <- function(job_bash, task_ids = NULL, submit = FALSE, restore = TR
         paste0("#SBATCH --array=", paste(task_ids, collapse = ","), "%\\1"),
         job_original
     )
-    writeLines(job_new, con = job_bash)
+    writeLines(job_new, con = paste0(name, '.sh'))
 
     #   Invoke (sbatch) the modified script if requested
     if (submit) {
         message(paste(Sys.time(), "Resubmitting the specified tasks."))
-        system(paste("sbatch", job_bash))
+        system(sprintf("sbatch %s.sh", name))
     }
 
     # Restore the original script
-    if (restore) writeLines(job_original, con = job_bash)
+    if (restore) writeLines(job_original, con = paste0(name, '.sh'))
 
     # Return the path
-    return(invisible(job_bash))
+    return(invisible(paste0(name, '.sh')))
 }

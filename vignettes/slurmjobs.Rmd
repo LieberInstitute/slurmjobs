@@ -190,7 +190,7 @@ job_single(
 )
 
 #   Suppose that tasks 3, 6, 7, and 8 failed
-array_submit("my_array_job.sh", task_ids = c(3, 6:8), submit = FALSE)
+array_submit(name = "my_array_job", task_ids = c(3, 6:8), submit = FALSE)
 ```
 
 While `task_ids` can be provided explicitly as above, the real convenience comes from the
@@ -202,7 +202,7 @@ tasks), `array_submit()` can automatically find the failed tasks by reading the 
 
 ```{r "array_submit_auto", eval = FALSE}
 #   Not run here, since we aren't on a SLURM cluster
-array_submit("my_array_job.sh", submit = FALSE)
+array_submit(name = "my_array_job", submit = FALSE)
 ```
 
 # Monitoring Running Jobs
