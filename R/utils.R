@@ -23,7 +23,7 @@
 #' loops <- list(
 #'     region = c("DLPFC", "HIPPO"), feature = c("gene", "exon", "tx", "jxn")
 #' )
-#' indexing <- get_list_indexing(loops, index)
+#' indexing <- slurmjobs:::get_list_indexing(loops, index)
 #' this_feature <- this_list[[index]][[
 #'     array_task %/% indexing$divisor %% indexing$modulus
 #' ]]
