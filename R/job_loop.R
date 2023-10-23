@@ -25,8 +25,9 @@
 #'     cores = 2
 #' )
 #'
-job_loop <- function(loops, name, create_shell = FALSE, partition = "shared", memory = "10G",
-    cores = 1L, tc = 20, email = "ALL", logdir = "logs") {
+job_loop <- function(
+        loops, name, create_shell = FALSE, partition = "shared", memory = "10G",
+        cores = 1L, tc = 20, email = "ALL", logdir = "logs") {
     ## Check that the loops are correctly defined
     if (!is.list(loops)) {
         stop("'loops' should be a named list.", call. = FALSE)
@@ -102,6 +103,7 @@ job_loop <- function(loops, name, create_shell = FALSE, partition = "shared", me
         command = command,
         #   The number of tasks is the product of lengths of each loop
         task_num = prod(sapply(loops, length)),
+        tc = tc,
         create_logdir = FALSE
     )
 
