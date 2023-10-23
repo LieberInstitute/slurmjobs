@@ -59,7 +59,7 @@ array_submit <- function(name, task_ids = NULL, submit = FALSE, restore = TRUE, 
         )
     }
 
-    job_original <- readLines(name)
+    job_original <- readLines(paste0(name, '.sh'))
 
     ############################################################################
     #   Infer failed task IDs if 'task_ids' is NULL
