@@ -20,7 +20,7 @@ of code used to generate 'vec'
 \examples{
 
 fruits <- c("apple", "banana", "cherry")
-message(vector_as_code(fruits))
+message(slurmjobs:::vector_as_code(fruits))
 
 }
 \author{

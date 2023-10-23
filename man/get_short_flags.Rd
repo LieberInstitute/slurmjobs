@@ -23,12 +23,12 @@ assigned in alphabetical order in the case of duplicates.
 
 #    Simple example where initials are as expected: 'a', 'b', 'c'
 fruits <- c("apple", "banana", "cherry")
-initials <- get_short_flags(fruits)
+initials <- slurmjobs:::get_short_flags(fruits)
 print(fruits)
 
 #    Example with duplicates with some arbitrary initials: 'c', 'a', 'b', 'd'
 fruits <- c("coconut", "cherry", "banana", "berry")
-initials <- get_short_flags(fruits)
+initials <- slurmjobs:::get_short_flags(fruits)
 print(fruits)
 
 }

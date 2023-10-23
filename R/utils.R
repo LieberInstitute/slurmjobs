@@ -24,7 +24,7 @@
 #'     region = c("DLPFC", "HIPPO"), feature = c("gene", "exon", "tx", "jxn")
 #' )
 #' indexing <- slurmjobs:::get_list_indexing(loops, index)
-#' this_feature <- this_list[[index]][[
+#' this_feature <- loops[[index]][[
 #'     array_task %/% indexing$divisor %% indexing$modulus
 #' ]]
 #' sprintf(
@@ -64,12 +64,12 @@ get_list_indexing <- function(this_list, index) {
 #'
 #' #    Simple example where initials are as expected: 'a', 'b', 'c'
 #' fruits <- c("apple", "banana", "cherry")
-#' initials <- get_short_flags(fruits)
+#' initials <- slurmjobs:::get_short_flags(fruits)
 #' print(fruits)
 #'
 #' #    Example with duplicates with some arbitrary initials: 'c', 'a', 'b', 'd'
 #' fruits <- c("coconut", "cherry", "banana", "berry")
-#' initials <- get_short_flags(fruits)
+#' initials <- slurmjobs:::get_short_flags(fruits)
 #' print(fruits)
 #'
 get_short_flags <- function(vec) {
@@ -104,7 +104,7 @@ get_short_flags <- function(vec) {
 #' @examples
 #'
 #' fruits <- c("apple", "banana", "cherry")
-#' message(vector_as_code(fruits))
+#' message(slurmjobs:::vector_as_code(fruits))
 #'
 vector_as_code <- function(vec) {
     return(sprintf('c("%s")', paste(vec, collapse = '", "')))

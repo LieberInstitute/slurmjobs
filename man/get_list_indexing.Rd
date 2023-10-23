@@ -32,7 +32,7 @@ loops <- list(
     region = c("DLPFC", "HIPPO"), feature = c("gene", "exon", "tx", "jxn")
 )
 indexing <- slurmjobs:::get_list_indexing(loops, index)
-this_feature <- this_list[[index]][[
+this_feature <- loops[[index]][[
     array_task \%/\% indexing$divisor \%\% indexing$modulus
 ]]
 sprintf(
