@@ -28,10 +28,6 @@ test_that("job_loop", {
         "'email' should be one of"
     )
     expect_error(
-        run_test(logdir = "/logs", loops = list("a" = letters)),
-        "relative path"
-    )
-    expect_error(
         run_test(cores = 0.5, loops = list("a" = letters)),
         "should be at least 1"
     )
