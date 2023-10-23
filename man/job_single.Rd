@@ -38,8 +38,8 @@ your job will request is \code{cores} multiplied by \code{memory}.}
 \item{email}{The email reporting option for the email address ("BEGIN",
 "END", "FAIL", or "ALL")}
 
-\item{logdir}{The directory for the log files relative to the current
-working directory.}
+\item{logdir}{The directory to contain the log, as an absolute or relative
+path.}
 
 \item{task_num}{The number of tasks for your job, which will make it into an
 array job. If \code{NULL} this is ignored.}

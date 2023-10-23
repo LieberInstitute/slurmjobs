@@ -21,8 +21,8 @@
 #' your job will request is `cores` multiplied by `memory`.
 #' @param email The email reporting option for the email address ("BEGIN",
 #' "END", "FAIL", or "ALL")
-#' @param logdir The directory for the log files relative to the current
-#' working directory.
+#' @param logdir The directory to contain the log, as an absolute or relative
+#' path.
 #' @param task_num The number of tasks for your job, which will make it into an
 #' array job. If `NULL` this is ignored.
 #' @param tc If `task_num` is specified, this option controls the number of
@@ -78,11 +78,6 @@ job_single <- function(name, create_shell = FALSE, partition = "shared", memory 
             paste(valid_email_opts, collapse = ", "),
             call. = FALSE
         )
-    }
-
-    ## Force the logs directory to be relative
-    if (grepl("^/|^\\\\", logdir)) {
-        stop("'logdir' has to be a relative path.")
     }
 
     ## Check the validity of core and memory requests

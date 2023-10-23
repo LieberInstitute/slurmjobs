@@ -18,7 +18,6 @@ run_test <- function(delete = TRUE, ...) {
 
 test_that("job_single", {
     expect_error(run_test(email = "hello"), "'email' should be one of")
-    expect_error(run_test(logdir = "/logs"), "relative path")
     expect_error(run_test(cores = 0.5), "should be at least 1")
     expect_error(run_test(memory = 10), "Could not parse memory request")
     expect_error(run_test(memory = "5GB"), "Could not parse memory request")

@@ -43,8 +43,8 @@ concurrent tasks.}
 \item{email}{The email reporting option for the email address ("BEGIN",
 "END", "FAIL", or "ALL")}
 
-\item{logdir}{The directory for the log files relative to the current
-working directory.}
+\item{logdir}{The directory to contain the log, as an absolute or relative
+path.}
 }
 \value{
 A length-2 list of character vectors containing the contents of the
