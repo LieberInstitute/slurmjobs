@@ -14,6 +14,8 @@ experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](h
 [![R-CMD-check-bioc](https://github.com/LieberInstitute/slurmjobs/workflows/R-CMD-check-bioc/badge.svg)](https://github.com/LieberInstitute/slurmjobs/actions/workflows/check-bioc.yml)
 [![Codecov test
 coverage](https://codecov.io/gh/LieberInstitute/slurmjobs/branch/devel/graph/badge.svg)](https://app.codecov.io/gh/LieberInstitute/slurmjobs?branch=devel)
+[![Lifecycle:
+stable](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://lifecycle.r-lib.org/articles/stages.html#stable)
 <!-- badges: end -->
 
 `slurmjobs` provides helper functions for interacting with

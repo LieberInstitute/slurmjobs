@@ -21,6 +21,7 @@ knitr::opts_chunk$set(
 [![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
 [![R-CMD-check-bioc](https://github.com/LieberInstitute/slurmjobs/workflows/R-CMD-check-bioc/badge.svg)](https://github.com/LieberInstitute/slurmjobs/actions/workflows/check-bioc.yml)
 [![Codecov test coverage](https://codecov.io/gh/LieberInstitute/slurmjobs/branch/devel/graph/badge.svg)](https://app.codecov.io/gh/LieberInstitute/slurmjobs?branch=devel)
+[![Lifecycle: stable](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://lifecycle.r-lib.org/articles/stages.html#stable)
 <!-- badges: end -->
 
 `slurmjobs` provides helper functions for interacting with [SLURM](https://slurm.schedmd.com/)-managed high-performance-computing environments from R. It includes functions for creating submittable jobs (including array jobs), monitoring partitions, and extracting info about running or complete jobs. For details, check out the [documentation site](http://research.libd.org/slurmjobs/).
