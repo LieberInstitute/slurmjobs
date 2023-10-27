@@ -19,7 +19,8 @@ test_that(
             cpus = "integer", requested_mem_gb = "numeric",
             max_rss_gb = "numeric", max_vmem_gb = "numeric",
             partition = "factor", array_task_id = "integer",
-            exit_code = "integer", status = "factor"
+            exit_code = "integer", status = "factor",
+            wallclock_time = "difftime"
         )
         expected_types <- unname(expected_types[colnames(job_df)])
 

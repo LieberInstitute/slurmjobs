@@ -21,7 +21,7 @@ test_that(
         any_other_na <- job_df |>
             select(
                 job_id, user, name, partition, cpus, requested_mem_gb, status,
-                elapsed_time
+                wallclock_time
             ) |>
             is.na() |>
             any()
@@ -48,7 +48,7 @@ test_that(
             user = "character", array_task_id = "integer", name = "character",
             partition = "factor", cpus = "integer",
             requested_mem_gb = "numeric", status = "factor",
-            elapsed_time = "difftime"
+            wallclock_time = "difftime"
         )
         expected_types <- unname(expected_types[colnames(job_df)])
 

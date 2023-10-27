@@ -55,7 +55,7 @@ job_info <- function(user = Sys.getenv("USER"), partition = "shared") {
             PARTITION = as.factor(PARTITION),
             STATUS = as.factor(ST),
             JOB_ID = as.integer(JOBID),
-            ELAPSED_TIME = parse_slurm_time(TIME)
+            WALLCLOCK_TIME = parse_slurm_time(TIME)
         ) |>
         rename(REQUESTED_MEM_GB = MIN_MEMORY) |>
         select(-c(ST, JOBID, TIME))

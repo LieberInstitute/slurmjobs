@@ -8,7 +8,7 @@
 #' @return A tibble with information about the requested job.
 #' @export
 #' @author Nicholas J. Eagles
-#' @import dplyr stringr utils
+#' @import dplyr stringr utils lubridate
 #'
 #' @family monitoring and informational functions
 #'
@@ -25,7 +25,7 @@ job_report <- function(job_id) {
     job_df <- read.csv(
         text = system(
             sprintf(
-                'sacct -j %s -P -o "JobID,JobIDRaw,User,JobName,Partition,AllocCPUS,ReqMem,State,MaxRSS,MaxVMSize,ExitCode" --units=G',
+                'sacct -j %s -P -o "JobID,JobIDRaw,User,JobName,Partition,AllocCPUS,ReqMem,State,MaxRSS,MaxVMSize,ExitCode,ElapsedRaw" --units=G',
                 job_id
             ),
             intern = TRUE
@@ -161,6 +161,9 @@ job_report <- function(job_id) {
             exit_code = as.integer(
                 str_extract(ExitCode, "^([0-9]+):", group = 1)
             ),
+            wallclock_time = ElapsedRaw |>
+                seconds() |>
+                as.difftime(),
             #   Some character columns should be factors
             Partition = as.factor(Partition),
             status = as.factor(State)
@@ -174,7 +177,7 @@ job_report <- function(job_id) {
             max_vmem_gb = MaxVMSize,
             max_rss_gb = MaxRSS,
         ) |>
-        select(-c(State, job_step, JobIDRaw, ExitCode))
+        select(-c(State, job_step, JobIDRaw, ExitCode, ElapsedRaw))
     colnames(job_df) <- tolower(colnames(job_df))
 
     #   Given a character vector containing an amount of memory (containing
