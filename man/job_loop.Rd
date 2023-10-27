@@ -31,8 +31,8 @@ shell file for the script.}
 partition. Check how busy a given partition is by running
 \code{squeue -p [partition]}.}
 
-\item{memory}{The amount of memory per core to request. You can check how
-much a current job is utilizing using the \code{sstat} command.}
+\item{memory}{character(1): the amount of memory in total to request, as a
+number and unit accepted by the '--mem' SLURM parameter (e.g. '10G')}
 
 \item{cores}{The number of cores to request. Note that the total memory
 your job will request is \code{cores} multiplied by \code{memory}.}

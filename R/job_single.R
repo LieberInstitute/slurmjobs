@@ -15,8 +15,8 @@
 #' @param partition A `character(1)` vector with the name of the SLURM
 #' partition. Check how busy a given partition is by running
 #' `squeue -p [partition]`.
-#' @param memory The amount of memory per core to request. You can check how
-#' much a current job is utilizing using the `sstat` command.
+#' @param memory character(1): the amount of memory in total to request, as a
+#' number and unit accepted by the '--mem' SLURM parameter (e.g. '10G')
 #' @param cores The number of cores to request. Note that the total memory
 #' your job will request is `cores` multiplied by `memory`.
 #' @param email The email reporting option for the email address ("BEGIN",
@@ -56,11 +56,10 @@
 #' ## An array job
 #' job_single("jhpce_job_array", task_num = 20, create_logdir = FALSE)
 #'
-job_single <- function(
-        name, create_shell = FALSE, partition = "shared", memory = "10G",
-        cores = 1L, email = "ALL", logdir = "logs", task_num = NULL, tc = 20,
-        command = 'Rscript -e "options(width = 120); sessioninfo::session_info()"',
-        create_logdir = TRUE) {
+job_single <- function(name, create_shell = FALSE, partition = "shared", memory = "10G",
+    cores = 1L, email = "ALL", logdir = "logs", task_num = NULL, tc = 20,
+    command = 'Rscript -e "options(width = 120); sessioninfo::session_info()"',
+    create_logdir = TRUE) {
     ## Remove any spaces
     name <- gsub(" ", "_", name)
 
@@ -124,7 +123,7 @@ job_single <- function(
     script <- glue::glue(
         '#!/bin/bash
 #SBATCH -p {partition}
-#SBATCH --mem-per-cpu={memory}
+#SBATCH --mem={memory}
 #SBATCH --job-name={name}
 #SBATCH -c {cores}
 #SBATCH -o {log_file}
