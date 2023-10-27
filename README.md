@@ -9,8 +9,6 @@
 issues](https://img.shields.io/github/issues/LieberInstitute/slurmjobs)](https://github.com/LieberInstitute/slurmjobs/issues)
 [![GitHub
 pulls](https://img.shields.io/github/issues-pr/LieberInstitute/slurmjobs)](https://github.com/LieberInstitute/slurmjobs/pulls)
-[![Lifecycle:
-experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
 [![R-CMD-check-bioc](https://github.com/LieberInstitute/slurmjobs/workflows/R-CMD-check-bioc/badge.svg)](https://github.com/LieberInstitute/slurmjobs/actions/workflows/check-bioc.yml)
 [![Codecov test
 coverage](https://codecov.io/gh/LieberInstitute/slurmjobs/branch/devel/graph/badge.svg)](https://app.codecov.io/gh/LieberInstitute/slurmjobs?branch=devel)
@@ -53,7 +51,7 @@ print(citation("slurmjobs"), bibtex = TRUE)
 #>   doi:10.18129/B9.bioc.slurmjobs
 #>   <https://doi.org/10.18129/B9.bioc.slurmjobs>,
 #>   https://github.com/LieberInstitute/slurmjobs/slurmjobs - R package
-#>   version 0.99.0, <http://www.bioconductor.org/packages/slurmjobs>.
+#>   version 1.0.0, <http://www.bioconductor.org/packages/slurmjobs>.
 #> 
 #> A BibTeX entry for LaTeX users is
 #> 
@@ -62,7 +60,7 @@ print(citation("slurmjobs"), bibtex = TRUE)
 #>     author = {{LieberInstitute}},
 #>     year = {2023},
 #>     url = {http://www.bioconductor.org/packages/slurmjobs},
-#>     note = {https://github.com/LieberInstitute/slurmjobs/slurmjobs - R package version 0.99.0},
+#>     note = {https://github.com/LieberInstitute/slurmjobs/slurmjobs - R package version 1.0.0},
 #>     doi = {10.18129/B9.bioc.slurmjobs},
 #>   }
 #> 
