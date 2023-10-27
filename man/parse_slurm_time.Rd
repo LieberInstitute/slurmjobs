@@ -8,7 +8,7 @@ parse_slurm_time(tim)
 }
 \arguments{
 \item{tim}{A \code{character()} representing time intervals as reported in
-fields like \code{Elapsed} from \code{squeue}, in \link{days}-\link{hours}:\link{mins}:\link{secs}}
+fields like \code{Elapsed} from \code{sacct}, in \link{days}-\link{hours}:\link{mins}:\link{secs}}
 }
 \value{
 A \code{difftime()} vector of time intervals

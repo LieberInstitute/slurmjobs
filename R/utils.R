@@ -116,7 +116,7 @@ vector_as_code <- function(vec) {
 #' of code used to generate 'vec'
 #'
 #' @param tim A \code{character()} representing time intervals as reported in
-#' fields like \code{Elapsed} from \code{squeue}, in [days]-[hours]:[mins]:[secs]
+#' fields like \code{Elapsed} from \code{sacct}, in [days]-[hours]:[mins]:[secs]
 #'
 #' @return A \code{difftime()} vector of time intervals
 #'

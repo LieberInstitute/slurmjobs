@@ -113,7 +113,7 @@ test_that(
 test_that(
     "parse_slurm_time",
     {
-        #   First, some typical cases using real output from the 'Elapsed'
+        #   First, some typical cases using real output from the '%M'
         #   field of 'squeue'. The first uses a length > 1 vector as input
         expect_equal(
             parse_slurm_time(c("0:00", "1:04:07")),
