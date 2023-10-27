@@ -29,7 +29,7 @@ job_info <- function(user = Sys.getenv("USER"), partition = "shared") {
     #   Read several key fields from squeue and parse into a tibble
     job_df <- read.csv(
         text = system(
-            'squeue --format="%u|%A|%K|%j|%P|%C|%m|%t"',
+            'squeue --format="%u|%A|%K|%j|%P|%C|%m|%t|%M"',
             intern = TRUE
         ),
         sep = "|"
@@ -54,10 +54,11 @@ job_info <- function(user = Sys.getenv("USER"), partition = "shared") {
             #   Fix data types
             PARTITION = as.factor(PARTITION),
             STATUS = as.factor(ST),
-            JOB_ID = as.integer(JOBID)
+            JOB_ID = as.integer(JOBID),
+            ELAPSED_TIME = parse_slurm_time(TIME)
         ) |>
         rename(REQUESTED_MEM_GB = MIN_MEMORY) |>
-        select(-c(ST, JOBID))
+        select(-c(ST, JOBID, TIME))
     colnames(job_df) <- tolower(colnames(job_df))
 
     these_job_ids <- job_df |>
