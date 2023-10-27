@@ -109,3 +109,29 @@ test_that(
         )
     }
 )
+
+test_that(
+    "parse_slurm_time",
+    {
+        #   First, some typical cases using real output from the 'Elapsed'
+        #   field of 'squeue'. The first uses a length > 1 vector as input
+        expect_equal(
+            parse_slurm_time(c("0:00", "1:04:07")),
+            as.difftime(c(seconds(0), hours(1) + minutes(4) + seconds(7)))
+        )
+        expect_equal(
+            parse_slurm_time("11:03:02"),
+            as.difftime(hours(11) + minutes(3) + seconds(2))
+        )
+        expect_equal(
+            parse_slurm_time("1-01:39:12"),
+            as.difftime(days(1) + hours(1) + minutes(39) + seconds(12))
+        )
+
+        #   A case with more than 365 days
+        expect_equal(
+            parse_slurm_time("4000-00:00:00"),
+            as.difftime(days(4000))
+        )
+    }
+)
