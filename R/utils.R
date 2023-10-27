@@ -109,3 +109,49 @@ get_short_flags <- function(vec) {
 vector_as_code <- function(vec) {
     return(sprintf('c("%s")', paste(vec, collapse = '", "')))
 }
+
+#' Parse time intervals reported by SLURM commands into \code{difftime}s
+#'
+#' Given a character vector 'vec', return a character(1) representing the line
+#' of code used to generate 'vec'
+#'
+#' @param tim A \code{character()} representing time intervals as reported in
+#' fields like \code{Elapsed} from \code{squeue}, in [days]-[hours]:[mins]:[secs]
+#'
+#' @return A \code{difftime()} vector of time intervals
+#'
+#' @import stringr lubridate
+#' @author Nicholas J. Eagles
+#'
+#' @examples
+#'
+#' slurm_times <- c("0:00", "1:04:07", "11:03:02", "1-01:39:12", "33-14:40:54")
+#' parse_slurm_time(slurm_times)
+#'
+parse_slurm_time <- function(tim) {
+    #   First, reformat time string 'tim' to be in format
+    #   [days]-[hours]:[mins]:[secs], with two digits for each quantity (other
+    #   than days, which can be arbitrarily many digits in theory)
+    base_time <- "0-00:00:00"
+    full_time <- paste0(
+        sapply(
+            tim,
+            function(x) substr(base_time, 1, nchar(base_time) - nchar(x))
+        ),
+        tim
+    )
+
+    #   Now, convert to 'difftime' objects. 'difftime' does not appear to
+    #   directly handle parsing an arbitrary number of days, so we manually
+    #   split the day and non-day components before adding together
+    num_days <- full_time |>
+        str_extract("^([0-9]+)-", group = 1) |>
+        days() |>
+        as.difftime()
+    num_not_days <- full_time |>
+        str_extract("^[0-9]+-(.*)$", group = 1) |>
+        as.difftime("%H:%M:%S")
+
+    #   Return the difftime
+    return(num_days + num_not_days)
+}

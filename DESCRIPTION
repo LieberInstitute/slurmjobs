@@ -31,7 +31,8 @@ Imports:
     glue,
     stringr,
     purrr,
-    utils
+    utils,
+    lubridate
 Depends: 
     R (>= 2.10)
 LazyData: true
