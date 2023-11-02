@@ -18,7 +18,7 @@ over a set of variables with pre-specified values."><!-- mathjax --><script src=
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">slurmjobs</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.99.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0.0</span>
       </span>
     </div>
 
@@ -96,8 +96,8 @@ partition. Check how busy a given partition is by running
 
 
 <dt>memory</dt>
-<dd><p>The amount of memory per core to request. You can check how
-much a current job is utilizing using the <code>sstat</code> command.</p></dd>
+<dd><p>character(1): the amount of memory in total to request, as a
+number and unit accepted by the '--mem' SLURM parameter (e.g. '10G')</p></dd>
 
 
 <dt>cores</dt>

@@ -55,6 +55,9 @@
     <loc>/reference/job_single.html</loc>
   </url>
   <url>
+    <loc>/reference/parse_slurm_time.html</loc>
+  </url>
+  <url>
     <loc>/reference/partition_df.html</loc>
   </url>
   <url>

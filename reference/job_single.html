@@ -20,7 +20,7 @@ https://hopstat.wordpress.com/2013/11/05/array-and-sequential-cluster-jobs/."><!
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">slurmjobs</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.99.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0.0</span>
       </span>
     </div>
 
@@ -96,8 +96,8 @@ partition. Check how busy a given partition is by running
 
 
 <dt>memory</dt>
-<dd><p>The amount of memory per core to request. You can check how
-much a current job is utilizing using the <code>sstat</code> command.</p></dd>
+<dd><p>character(1): the amount of memory in total to request, as a
+number and unit accepted by the '--mem' SLURM parameter (e.g. '10G')</p></dd>
 
 
 <dt>cores</dt>
@@ -167,7 +167,7 @@ the options using <code>scontrol alter</code>.</p>
 <span class="r-in"><span><span class="fu">job_single</span><span class="op">(</span><span class="st">"jhpce_job"</span>, create_logdir <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> #!/bin/bash</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> #SBATCH -p shared</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> #SBATCH --mem-per-cpu=10G</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> #SBATCH --mem=10G</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> #SBATCH --job-name=jhpce_job</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> #SBATCH -c 1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> #SBATCH -o logs/jhpce_job.txt</span>
@@ -198,7 +198,7 @@ the options using <code>scontrol alter</code>.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> echo "**** Job ends ****"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> date</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ## This script was made using slurmjobs version 0.99.0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ## This script was made using slurmjobs version 1.0.0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ## available from http://research.libd.org/slurmjobs/</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span></span></span>
@@ -209,7 +209,7 @@ the options using <code>scontrol alter</code>.</p>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> #!/bin/bash</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> #SBATCH -p imaginary</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> #SBATCH --mem-per-cpu=10G</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> #SBATCH --mem=10G</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> #SBATCH --job-name=jhpce_job</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> #SBATCH -c 10</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> #SBATCH -o logs/jhpce_job.txt</span>
@@ -240,7 +240,7 @@ the options using <code>scontrol alter</code>.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> echo "**** Job ends ****"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> date</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ## This script was made using slurmjobs version 0.99.0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ## This script was made using slurmjobs version 1.0.0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ## available from http://research.libd.org/slurmjobs/</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span></span></span>
@@ -248,7 +248,7 @@ the options using <code>scontrol alter</code>.</p>
 <span class="r-in"><span><span class="fu">job_single</span><span class="op">(</span><span class="st">"jhpce_job_array"</span>, task_num <span class="op">=</span> <span class="fl">20</span>, create_logdir <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> #!/bin/bash</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> #SBATCH -p shared</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> #SBATCH --mem-per-cpu=10G</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> #SBATCH --mem=10G</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> #SBATCH --job-name=jhpce_job_array</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> #SBATCH -c 1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> #SBATCH -o logs/jhpce_job_array.%a.txt</span>
@@ -280,7 +280,7 @@ the options using <code>scontrol alter</code>.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> echo "**** Job ends ****"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> date</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ## This script was made using slurmjobs version 0.99.0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ## This script was made using slurmjobs version 1.0.0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ## available from http://research.libd.org/slurmjobs/</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span></span></span>

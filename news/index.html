@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">slurmjobs</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.99.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0.0</span>
       </span>
     </div>
 
@@ -50,6 +50,19 @@
       <small>Source: <a href="https://github.com/LieberInstitute/slurmjobs/blob/HEAD/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="page-header" data-toc-text="1.0.0" id="slurmjobs-100">slurmjobs 1.0.0<a class="anchor" aria-label="anchor" href="#slurmjobs-100"></a></h2>
+<p>NEW FEATURES</p>
+<ul><li>Two additional monitoring functions: <code><a href="../reference/job_report.html">job_report()</a></code> and <code><a href="../reference/partition_info.html">partition_info()</a></code>
+</li>
+<li>Two new job-submission functions: <code><a href="../reference/array_submit.html">array_submit()</a></code> and <code><a href="../reference/job_loop.html">job_loop()</a></code>
+</li>
+<li>New data included as part of the package: <code>job_info_df</code> and <code>partition_df</code>. Example outputs of <code><a href="../reference/job_info.html">job_info()</a></code> and <code><a href="../reference/partition_info.html">partition_info()</a></code>
+</li>
+</ul><p>SIGNIFICANT USER-VISIBLE CHANGES</p>
+<ul><li>Memory for <code><a href="../reference/job_single.html">job_single()</a></code> and <code><a href="../reference/job_loop.html">job_loop()</a></code> is now specified in total (i.e. through <code>--mem</code>) instead of per core (i.e. through <code>--mem-per-cpu</code>)</li>
+<li>Complete vignette and documentation</li>
+</ul></div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.99.0" id="slurmjobs-0990">slurmjobs 0.99.0<a class="anchor" aria-label="anchor" href="#slurmjobs-0990"></a></h2>
 <p>NEW FEATURES</p>
