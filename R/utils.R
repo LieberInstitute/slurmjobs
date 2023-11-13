@@ -155,3 +155,28 @@ parse_slurm_time <- function(tim) {
     #   Return the difftime
     return(num_days + num_not_days)
 }
+
+parse_file_or_name = function(name, should_exist) {
+    #   Add '.sh' if not already included
+    if (!str_detect(name, '\\.(sh|R)$')) {
+        name = paste0(name, '.sh')
+    }
+
+    #   Check if the file exists
+    if (file.exists(name) != should_exist) {
+        if (should_exist) {
+            stop(paste(name, "does not exist"))
+        } else {
+            stop(paste(name, "already exists"))
+        }
+    }
+
+    #   Parent directory must exist
+    if (basename(name) != name) {
+        if (!dir.exists(dirname(name))) {
+            stop("Directory containing shell script must exist")
+        }
+    }
+
+    return(name)
+}
