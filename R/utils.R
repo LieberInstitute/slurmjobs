@@ -156,11 +156,41 @@ parse_slurm_time <- function(tim) {
     return(num_days + num_not_days)
 }
 
+#' Parse script name or path into shell script path
+#'
+#' Given \code{name}, the absolute or relative path to an R or shell script,
+#' with or without the file extension, return the path to the shell script.
+#' Verify the \code{name} is legitimate in terms of file existence or existence
+#' of the appropriate parent directory (if \code{name} is an absolute path).
+#'
+#' @param name A \code{character(1)} vector giving either the name or path
+#' (relative or absolute) to the shell or R script to create
+#' @param should_exist A \code{logical(1)} vector. If TRUE, the specified script
+#' must already exist; if FALSE, it must not exist
+#'
+#' @return A \code{character(1)} giving the absolute or relative path to the
+#' shell script
+#'
+#' @import stringr
+#' @author Nicholas J. Eagles
+#'
+#' @examples
+#'
+#' acceptable_names = c(
+#'     '/some/path/to/my_script.sh',
+#'     '/some/path/to/my_script.R',
+#'     '/some/path/to/my_script',
+#'     'my_script.sh',
+#'     'my_script.R',
+#'     'my_script'
+#' )
+#' returned_scripts = sapply(
+#'     acceptable_names, parse_file_or_name, should_exist = FALSE
+#' )
+#' print(returned_scripts)
 parse_file_or_name = function(name, should_exist) {
-    #   Add '.sh' if not already included
-    if (!str_detect(name, '\\.(sh|R)$')) {
-        name = paste0(name, '.sh')
-    }
+    #   Convert name, R, or shell script extension into shell script extension
+    paste0(strsplit(name, '\\.(sh|R)$')[[1]], '.sh')
 
     #   Check if the file exists
     if (file.exists(name) != should_exist) {
