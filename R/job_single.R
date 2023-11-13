@@ -8,8 +8,8 @@
 #' For a given SLURM job that is currently running you can alter
 #' the options using `scontrol alter`.
 #'
-#' @param name A `character(1)` vector with the name of the script. Any spaces
-#' will be replaced by underscores.
+#' @param name A `character(1)` vector giving either the name or path (relative
+#' or absolute) to the shell script to create.
 #' @param create_shell A `logical(1)` vector specifying whether to create a
 #' shell file for the script.
 #' @param partition A `character(1)` vector with the name of the SLURM
@@ -33,8 +33,7 @@
 #' job with `sbatch`, it will immediately fail.
 #'
 #' @return A character vector with the script contents. If `create_shell` was
-#' specified then it also creates the actual script in the current
-#' working directory.
+#' specified then it also creates the actual script.
 #' @export
 #' @author Leonardo Collado-Torres
 #' @author Nicholas J. Eagles
@@ -44,8 +43,9 @@
 #'
 #' @examples
 #'
-#' ## A regular job
+#' ## A regular job, specified by name or path
 #' job_single("jhpce_job", create_logdir = FALSE)
+#' job_single("~/jhpce_job.sh", create_logdir = FALSE)
 #'
 #' ## A regular job with 10 cores on the 'imaginary' partition
 #' job_single("jhpce_job",
@@ -60,16 +60,10 @@ job_single <- function(name, create_shell = FALSE, partition = "shared", memory 
     cores = 1L, email = "ALL", logdir = "logs", task_num = NULL, tc = 20,
     command = 'Rscript -e "options(width = 120); sessioninfo::session_info()"',
     create_logdir = TRUE) {
-    ## Remove any spaces
-    name <- gsub(" ", "_", name)
-
-    ## Check if the shell file exists already
-    if (create_shell) {
-        sh_file <- paste0(name, ".sh")
-        if (file.exists(sh_file)) {
-            stop("The file ", sh_file, " already exists!", call. = FALSE)
-        }
-    }
+    #   Grab the path to the shell script, and the shell script's name,
+    #   respectively
+    sh_file = parse_file_or_name(name, should_exist = FALSE)
+    name = strsplit(basename(sh_file), '\\.sh$')[[1]]
 
     ## Check the email options
     valid_email_opts <- c("BEGIN", "END", "FAIL", "ALL")

@@ -8,8 +8,8 @@
 #' intended to help re-run failed tasks of a large array job that was previously
 #' submitted.
 #'
-#' @param name A `character(1)` vector with the name of a bash script
-#' in the current working directory (excluding '.sh')
+#' @param name A `character(1)` vector giving either the name or path (relative
+#' or absolute) to the shell or R script to create.
 #' @param task_ids An optional numeric vector specifying which (relative) task
 #' IDs to resubmit (e.g. c(1, 4, 6)). If NULL, the task IDs will be inferred
 #' by scraping the log file for the job ID for the array job as originally
@@ -49,17 +49,12 @@
 #' )
 #'
 array_submit <- function(name, task_ids = NULL, submit = FALSE, restore = TRUE, verbose = FALSE) {
-    ## Check existence and validity of the shell script
-    if ((basename(name) != name) || !file.exists(paste0(name, ".sh"))) {
-        stop(
-            paste(
-                "'name' must give the name of a shell script in the current",
-                "working directory, without any extension."
-            )
-        )
-    }
+    #   Grab the path to the shell script, and the shell script's name,
+    #   respectively
+    sh_file = parse_file_or_name(name, should_exist = FALSE)
+    name = strsplit(basename(sh_file), '\\.sh$')[[1]]
 
-    job_original <- readLines(paste0(name, ".sh"))
+    job_original <- readLines(sh_file)
 
     ############################################################################
     #   Infer failed task IDs if 'task_ids' is NULL
