@@ -62,7 +62,7 @@ job_single <- function(name, create_shell = FALSE, partition = "shared", memory 
     create_logdir = TRUE) {
     #   Grab the path to the shell script, and the shell script's name,
     #   respectively
-    sh_file = parse_file_or_name(name, should_exist = FALSE)
+    sh_file = parse_file_or_name(name, should_exist = FALSE, r_ok = FALSE)
     name = strsplit(basename(sh_file), '\\.sh$')[[1]]
 
     ## Check the email options

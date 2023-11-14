@@ -188,7 +188,12 @@ parse_slurm_time <- function(tim) {
 #'     acceptable_names, parse_file_or_name, should_exist = FALSE
 #' )
 #' print(returned_scripts)
-parse_file_or_name = function(name, should_exist) {
+parse_file_or_name = function(name, should_exist, r_ok) {
+    #   Error if R script is passed when not 'r_ok'
+    if (!r_ok && string_detect(name, '\\.R$')) {
+        stop("Expected a name or path to a shell script, not an R script")
+    }
+
     #   Convert name, R, or shell script extension into shell script extension
     paste0(strsplit(name, '\\.(sh|R)$')[[1]], '.sh')
 
