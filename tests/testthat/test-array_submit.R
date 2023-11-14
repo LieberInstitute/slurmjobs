@@ -97,3 +97,14 @@ test_that(
         )
     }
 )
+
+test_that(
+    "array_submit_full_path",
+    {
+        #   Effectively just testing that a full script path doesn't break
+        #   array_submit
+        script_name <- file.path(tempdir(), "my_array_job")
+        temp <- run_test(basic_job, submit = FALSE, task_ids = 1:3, restore = TRUE)
+        expect_equal(temp$original, temp$final)
+    }
+)
