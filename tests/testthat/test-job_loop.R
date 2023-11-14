@@ -44,6 +44,6 @@ test_that("job_loop", {
         run_test(
             delete = FALSE, loops = list("b" = letters), create_shell = TRUE
         ),
-        "already exists!"
+        "already exists"
     )
 })
