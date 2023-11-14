@@ -25,16 +25,17 @@ of the appropriate parent directory (if \code{name} is an absolute path).
 }
 \examples{
 
-acceptable_names = c(
-    '/some/path/to/my_script.sh',
-    '/some/path/to/my_script.R',
-    '/some/path/to/my_script',
-    'my_script.sh',
-    'my_script.R',
-    'my_script'
+acceptable_names <- c(
+    "/some/path/to/my_script.sh",
+    "/some/path/to/my_script.R",
+    "/some/path/to/my_script",
+    "my_script.sh",
+    "my_script.R",
+    "my_script"
 )
-returned_scripts = sapply(
-    acceptable_names, parse_file_or_name, should_exist = FALSE
+returned_scripts <- sapply(
+    acceptable_names, parse_file_or_name,
+    should_exist = FALSE
 )
 print(returned_scripts)
 }

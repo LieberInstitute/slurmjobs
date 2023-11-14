@@ -135,3 +135,60 @@ test_that(
         )
     }
 )
+
+test_that(
+    "parse_file_or_name",
+    {
+        #   Non-existent parent directory
+        expect_error(
+            parse_file_or_name(
+                "/asdasda/a.sh",
+                should_exist = FALSE, r_ok = FALSE
+            ),
+            "Directory containing shell script must exist"
+        )
+
+        #   Test 'should_exist' = TRUE
+        expect_error(
+            parse_file_or_name(
+                file.path(tempdir(), "asdas"),
+                should_exist = TRUE, r_ok = FALSE
+            ),
+            "does not exist"
+        )
+
+        #   Test 'should_exist' = FALSE
+        writeLines("something", "a.sh")
+        expect_error(
+            parse_file_or_name(
+                "a.sh",
+                should_exist = FALSE, r_ok = FALSE
+            ),
+            "already exists"
+        )
+
+        #   Test 'r_ok' = FALSE
+        expect_error(
+            parse_file_or_name(
+                file.path(tempdir(), "a.R"),
+                should_exist = FALSE, r_ok = FALSE
+            ),
+            "Expected a name or path to a shell script, not an R script"
+        )
+
+        #   Test 'r_ok' = TRUE
+        expect_equal(
+            parse_file_or_name(
+                file.path(tempdir(), "a.R"),
+                should_exist = FALSE, r_ok = TRUE
+            ),
+            file.path(tempdir(), "a.sh")
+        )
+
+        #   Also try just a name
+        expect_equal(
+            parse_file_or_name("b", should_exist = FALSE, r_ok = FALSE),
+            "b.sh"
+        )
+    }
+)
