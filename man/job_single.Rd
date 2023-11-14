@@ -19,8 +19,8 @@ job_single(
 )
 }
 \arguments{
-\item{name}{A \code{character(1)} vector with the name of the script. Any spaces
-will be replaced by underscores.}
+\item{name}{A \code{character(1)} vector giving either the name or path (relative
+or absolute) to the shell script to create.}
 
 \item{create_shell}{A \code{logical(1)} vector specifying whether to create a
 shell file for the script.}
@@ -55,8 +55,7 @@ job with \code{sbatch}, it will immediately fail.}
 }
 \value{
 A character vector with the script contents. If \code{create_shell} was
-specified then it also creates the actual script in the current
-working directory.
+specified then it also creates the actual script.
 }
 \description{
 This function builds a template for a Simple Linux Utility for Resource
@@ -70,8 +69,9 @@ the options using \verb{scontrol alter}.
 }
 \examples{
 
-## A regular job
+## A regular job, specified by name or path
 job_single("jhpce_job", create_logdir = FALSE)
+job_single("~/jhpce_job.sh", create_logdir = FALSE)
 
 ## A regular job with 10 cores on the 'imaginary' partition
 job_single("jhpce_job",

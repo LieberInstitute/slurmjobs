@@ -13,8 +13,8 @@ array_submit(
 )
 }
 \arguments{
-\item{name}{A \code{character(1)} vector with the name of a bash script
-in the current working directory (excluding '.sh')}
+\item{name}{A \code{character(1)} vector giving either the name or path (relative
+or absolute) to the shell or R script to create.}
 
 \item{task_ids}{An optional numeric vector specifying which (relative) task
 IDs to resubmit (e.g. c(1, 4, 6)). If NULL, the task IDs will be inferred

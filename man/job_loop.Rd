@@ -21,8 +21,8 @@ job_loop(
 The names of \code{loops} specify the variables used for the loops and the
 contents specify the options to loop through for each variable.}
 
-\item{name}{A \code{character(1)} vector with the name of the script. Any spaces
-will be replaced by underscores.}
+\item{name}{A \code{character(1)} vector giving either the name or path (relative
+or absolute) to the shell script to create.}
 
 \item{create_shell}{A \code{logical(1)} vector specifying whether to create a
 shell file for the script.}

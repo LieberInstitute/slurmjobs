@@ -51,8 +51,8 @@
 array_submit <- function(name, task_ids = NULL, submit = FALSE, restore = TRUE, verbose = FALSE) {
     #   Grab the path to the shell script, and the shell script's name,
     #   respectively
-    sh_file = parse_file_or_name(name, should_exist = FALSE, r_ok = TRUE)
-    name = strsplit(basename(sh_file), '\\.sh$')[[1]]
+    sh_file <- parse_file_or_name(name, should_exist = FALSE, r_ok = TRUE)
+    name <- strsplit(basename(sh_file), "\\.sh$")[[1]]
 
     job_original <- readLines(sh_file)
 

@@ -25,8 +25,9 @@
 #'     cores = 2
 #' )
 #'
-job_loop <- function(loops, name, create_shell = FALSE, partition = "shared", memory = "10G",
-    cores = 1L, tc = 20, email = "ALL", logdir = "logs") {
+job_loop <- function(
+        loops, name, create_shell = FALSE, partition = "shared", memory = "10G",
+        cores = 1L, tc = 20, email = "ALL", logdir = "logs") {
     ## Check that the loops are correctly defined
     if (!is.list(loops)) {
         stop("'loops' should be a named list.", call. = FALSE)
@@ -40,8 +41,8 @@ job_loop <- function(loops, name, create_shell = FALSE, partition = "shared", me
 
     #   Grab the path to the shell script, and the shell script's name,
     #   respectively
-    sh_file = parse_file_or_name(name, should_exist = FALSE, r_ok = TRUE)
-    name = strsplit(basename(sh_file), '\\.sh$')[[1]]
+    sh_file <- parse_file_or_name(name, should_exist = FALSE, r_ok = TRUE)
+    name <- strsplit(basename(sh_file), "\\.sh$")[[1]]
 
     ## Build the command, which invokes an R script with at least one parameter
     main_command <- sprintf("Rscript %s.R", name)
