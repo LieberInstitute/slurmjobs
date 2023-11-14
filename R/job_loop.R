@@ -38,18 +38,10 @@ job_loop <- function(loops, name, create_shell = FALSE, partition = "shared", me
         stop("All elements of 'loops' should be character vectors.", call. = FALSE)
     }
 
-    ## Remove any spaces
-    name <- gsub(" ", "_", name)
-
-    ## Check if the shell or R script exists already
-    if (create_shell) {
-        file_names <- c(paste0(name, ".sh"), paste0(name, ".R"))
-        for (this_file in file_names) {
-            if (file.exists(this_file)) {
-                stop("The file ", this_file, " already exists!", call. = FALSE)
-            }
-        }
-    }
+    #   Grab the path to the shell script, and the shell script's name,
+    #   respectively
+    sh_file = parse_file_or_name(name, should_exist = FALSE, r_ok = TRUE)
+    name = strsplit(basename(sh_file), '\\.sh$')[[1]]
 
     ## Build the command, which invokes an R script with at least one parameter
     main_command <- sprintf("Rscript %s.R", name)
