@@ -12,6 +12,8 @@ parse_file_or_name(name, should_exist, r_ok)
 
 \item{should_exist}{A \code{logical(1)} vector. If TRUE, the specified script
 must already exist; if FALSE, it must not exist}
+
+\item{r_ok}{A \code{logical(1)} vector. If TRUE, \code{name} may end in '.R'}
 }
 \value{
 A \code{character(1)} giving the absolute or relative path to the
@@ -34,7 +36,7 @@ acceptable_names <- c(
     "my_script"
 )
 returned_scripts <- sapply(
-    acceptable_names, parse_file_or_name,
+    acceptable_names, slurmjobs:::parse_file_or_name,
     should_exist = FALSE
 )
 print(returned_scripts)

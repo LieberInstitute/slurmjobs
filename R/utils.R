@@ -167,6 +167,7 @@ parse_slurm_time <- function(tim) {
 #' (relative or absolute) to the shell or R script to create
 #' @param should_exist A \code{logical(1)} vector. If TRUE, the specified script
 #' must already exist; if FALSE, it must not exist
+#' @param r_ok A \code{logical(1)} vector. If TRUE, \code{name} may end in '.R'
 #'
 #' @return A \code{character(1)} giving the absolute or relative path to the
 #' shell script
@@ -185,7 +186,7 @@ parse_slurm_time <- function(tim) {
 #'     "my_script"
 #' )
 #' returned_scripts <- sapply(
-#'     acceptable_names, parse_file_or_name,
+#'     acceptable_names, slurmjobs:::parse_file_or_name,
 #'     should_exist = FALSE
 #' )
 #' print(returned_scripts)
