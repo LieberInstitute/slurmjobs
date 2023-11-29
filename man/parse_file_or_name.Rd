@@ -37,7 +37,7 @@ acceptable_names <- c(
 )
 returned_scripts <- sapply(
     acceptable_names, slurmjobs:::parse_file_or_name,
-    should_exist = FALSE
+    should_exist = FALSE, r_ok = TRUE
 )
 print(returned_scripts)
 }
