@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">slurmjobs</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1.0</span>
       </span>
     </div>
 
@@ -50,6 +50,14 @@
       <small>Source: <a href="https://github.com/LieberInstitute/slurmjobs/blob/HEAD/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="page-header" data-toc-text="1.1.0" id="slurmjobs-110">slurmjobs 1.1.0<a class="anchor" aria-label="anchor" href="#slurmjobs-110"></a></h2>
+<p>NEW FEATURES</p>
+<ul><li>
+<code><a href="../reference/job_single.html">job_single()</a></code>, <code><a href="../reference/job_loop.html">job_loop()</a></code>, and <code><a href="../reference/array_submit.html">array_submit()</a></code> now may accept a name, relative path, or absolute path as the <code>name</code> argument. This means the working directory is no longer relevant in successfully calling these functions</li>
+<li>
+<code><a href="../reference/job_info.html">job_info()</a></code> and <code><a href="../reference/job_report.html">job_report()</a></code> now also return a <code>wallclock_time</code> column, giving the elapsed wallclock time of jobs as <code>difftime</code>s</li>
+</ul></div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="1.0.0" id="slurmjobs-100">slurmjobs 1.0.0<a class="anchor" aria-label="anchor" href="#slurmjobs-100"></a></h2>
 <p>NEW FEATURES</p>

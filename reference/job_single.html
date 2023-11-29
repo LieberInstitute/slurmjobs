@@ -20,7 +20,7 @@ https://hopstat.wordpress.com/2013/11/05/array-and-sequential-cluster-jobs/."><!
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">slurmjobs</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1.0</span>
       </span>
     </div>
 
@@ -80,8 +80,8 @@ John Muschelli to learn more about array jobs:
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>name</dt>
-<dd><p>A <code>character(1)</code> vector with the name of the script. Any spaces
-will be replaced by underscores.</p></dd>
+<dd><p>A <code>character(1)</code> vector giving either the name or path (relative
+or absolute) to the shell script to create.</p></dd>
 
 
 <dt>create_shell</dt>
@@ -140,8 +140,7 @@ job with <code>sbatch</code>, it will immediately fail.</p></dd>
     
 
 <p>A character vector with the script contents. If <code>create_shell</code> was
-specified then it also creates the actual script in the current
-working directory.</p>
+specified then it also creates the actual script.</p>
     </div>
     <div id="details">
     <h2>Details</h2>
@@ -163,7 +162,7 @@ the options using <code>scontrol alter</code>.</p>
     <div id="ref-examples">
     <h2>Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co">## A regular job</span></span></span>
+<span class="r-in"><span><span class="co">## A regular job, specified by name or path</span></span></span>
 <span class="r-in"><span><span class="fu">job_single</span><span class="op">(</span><span class="st">"jhpce_job"</span>, create_logdir <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> #!/bin/bash</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> #SBATCH -p shared</span>
@@ -198,7 +197,44 @@ the options using <code>scontrol alter</code>.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> echo "**** Job ends ****"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> date</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ## This script was made using slurmjobs version 1.0.0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ## This script was made using slurmjobs version 1.1.0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ## available from http://research.libd.org/slurmjobs/</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-in"><span><span class="fu">job_single</span><span class="op">(</span><span class="st">"~/jhpce_job.sh"</span>, create_logdir <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> #!/bin/bash</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> #SBATCH -p shared</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> #SBATCH --mem=10G</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> #SBATCH --job-name=jhpce_job</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> #SBATCH -c 1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> #SBATCH -o logs/jhpce_job.txt</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> #SBATCH -e logs/jhpce_job.txt</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> #SBATCH --mail-type=ALL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> set -e</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> echo "**** Job starts ****"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> date</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> echo "**** JHPCE info ****"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> echo "User: ${USER}"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> echo "Job id: ${SLURM_JOB_ID}"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> echo "Job name: ${SLURM_JOB_NAME}"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> echo "Node name: ${SLURMD_NODENAME}"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> echo "Task id: ${SLURM_ARRAY_TASK_ID}"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ## Load the R module</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> module load conda_R/4.3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ## List current modules for reproducibility</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> module list</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ## Edit with your job command</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Rscript -e "options(width = 120); sessioninfo::session_info()"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> echo "**** Job ends ****"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> date</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ## This script was made using slurmjobs version 1.1.0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ## available from http://research.libd.org/slurmjobs/</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span></span></span>
@@ -240,7 +276,7 @@ the options using <code>scontrol alter</code>.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> echo "**** Job ends ****"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> date</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ## This script was made using slurmjobs version 1.0.0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ## This script was made using slurmjobs version 1.1.0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ## available from http://research.libd.org/slurmjobs/</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span></span></span>
@@ -280,7 +316,7 @@ the options using <code>scontrol alter</code>.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> echo "**** Job ends ****"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> date</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ## This script was made using slurmjobs version 1.0.0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ## This script was made using slurmjobs version 1.1.0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ## available from http://research.libd.org/slurmjobs/</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span></span></span>
