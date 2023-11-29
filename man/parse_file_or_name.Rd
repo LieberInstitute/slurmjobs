@@ -28,9 +28,11 @@ of the appropriate parent directory (if \code{name} is an absolute path).
 \examples{
 
 acceptable_names <- c(
-    "/some/path/to/my_script.sh",
-    "/some/path/to/my_script.R",
-    "/some/path/to/my_script",
+    # Absolute paths/ names may be used
+    file.path(getwd(), "/some/path/to/my_script.sh"),
+    file.path(getwd(), "/some/path/to/my_script.R"),
+    file.path(getwd(), "/some/path/to/my_script"),
+    # Relative paths/ names are also acceptable
     "my_script.sh",
     "my_script.R",
     "my_script"
