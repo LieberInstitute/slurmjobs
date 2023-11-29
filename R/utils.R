@@ -179,9 +179,9 @@ parse_slurm_time <- function(tim) {
 #'
 #' acceptable_names <- c(
 #'     # Absolute paths/ names may be used
-#'     file.path(getwd(), "/some/path/to/my_script.sh"),
-#'     file.path(getwd(), "/some/path/to/my_script.R"),
-#'     file.path(getwd(), "/some/path/to/my_script"),
+#'     file.path(getwd(), "my_script.sh"),
+#'     file.path(getwd(), "my_script.R"),
+#'     file.path(getwd(), "my_script"),
 #'     # Relative paths/ names are also acceptable
 #'     "my_script.sh",
 #'     "my_script.R",
