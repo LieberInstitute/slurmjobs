@@ -1,3 +1,5 @@
+# slurmjobs 1.2.0
+
 # slurmjobs 1.1.0
 
 NEW FEATURES
