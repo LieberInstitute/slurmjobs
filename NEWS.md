@@ -1,5 +1,7 @@
 # slurmjobs 1.2.0
 
+* `job_single()` and `job_loop()` accept a new parameter, `time_limit`, which default to 1 day
+
 # slurmjobs 1.1.0
 
 NEW FEATURES
