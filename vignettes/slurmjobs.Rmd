@@ -109,7 +109,7 @@ running R code, you'll likely find yourself writing many "wrapper" shell scripts
 submitted via `sbatch` to the job scheduler. This process requires precise SLURM-specific
 syntax and a large amount of repetition. `job_single` aims to reduce required configuration
 from the user to just a handful of options that tend to vary most often between shell scripts
-(e.g. memory, number of CPUs), and automate the rest of the shell-script-creation process.
+(e.g. memory, number of CPUs, time limit), and automate the rest of the shell-script-creation process.
 
 Shell scripts created by `job_single` log key reproducibility information, such as the user,
 job ID, job name, node name, and when the job starts and ends.
