@@ -97,6 +97,13 @@ job_single <- function(name, create_shell = FALSE, partition = "shared", memory 
         ""
     }
 
+    #   Check for valid-looking time specification. Some invalid edge cases
+    #   currently break the overly simple regex (e.g. '00-00:00', '1-25:61:61'),
+    #   but these are unlikely to be specified by accident
+    if (!grepl('^([0-9]+-)?[0-9]{1,2}(:[0-9]{1,2}){0,2}$', time_limit)) {
+        stop("Invalid 'time_limit' specification. See https://slurm.schedmd.com/sbatch.html for accepted time formats.")
+    }
+
     ## Create the logs directory
     if (create_logdir) {
         message(paste(Sys.time(), "creating the logs directory at: ", logdir))
