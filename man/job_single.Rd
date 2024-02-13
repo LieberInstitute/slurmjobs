@@ -10,6 +10,7 @@ job_single(
   partition = "shared",
   memory = "10G",
   cores = 1L,
+  time_limit = "1-00:00:00",
   email = "ALL",
   logdir = "logs",
   task_num = NULL,
@@ -34,6 +35,10 @@ number and unit accepted by the '--mem' SLURM parameter (e.g. '10G')}
 
 \item{cores}{The number of cores to request. Note that the total memory
 your job will request is \code{cores} multiplied by \code{memory}.}
+
+\item{time_limit}{character(1): time limit specified in a format accepted by
+the \code{--time} parameter to \code{sbatch} (e.g. "4:00:00"). Defaults to 1
+day, following the JHPCE default (https://jhpce.jhu.edu/knowledge-base/setting-a-time-limit-for-your-slurm-job-on-jhpce/).}
 
 \item{email}{The email reporting option for the email address ("BEGIN",
 "END", "FAIL", or "ALL")}
