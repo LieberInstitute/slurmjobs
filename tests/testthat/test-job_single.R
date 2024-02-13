@@ -23,12 +23,12 @@ test_that("job_single", {
     expect_error(run_test(memory = "5GB"), "Could not parse memory request")
 
     #   Checking several invalid time limits
-    for (limit in c('nonsense', '2-9000:30', '30:00-2', '7:7:7:7:7')) {
+    for (limit in c("nonsense", "2-9000:30", "30:00-2", "7:7:7:7:7")) {
         expect_error(run_test(time_limit = limit), "^Invalid 'time_limit'")
     }
 
     #   Checking several valid time limits
-    for (limit in c('04:30', '2-03:30:40', '55', '1-12')) {
+    for (limit in c("04:30", "2-03:30:40", "55", "1-12")) {
         expect_no_error(run_test(time_limit = limit))
     }
 

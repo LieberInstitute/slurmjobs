@@ -47,24 +47,24 @@ Please run this yourself to check for any updates on how to cite
 print(citation("slurmjobs"), bibtex = TRUE)
 #> To cite package 'slurmjobs' in publications use:
 #> 
-#>   LieberInstitute (2023). _slurmjobs: Helper Functions for SLURM Jobs_.
+#>   LieberInstitute (2024). _slurmjobs: Helper Functions for SLURM Jobs_.
 #>   doi:10.18129/B9.bioc.slurmjobs
 #>   <https://doi.org/10.18129/B9.bioc.slurmjobs>,
 #>   https://github.com/LieberInstitute/slurmjobs/slurmjobs - R package
-#>   version 1.0.0, <http://www.bioconductor.org/packages/slurmjobs>.
+#>   version 1.1.0, <http://www.bioconductor.org/packages/slurmjobs>.
 #> 
 #> A BibTeX entry for LaTeX users is
 #> 
 #>   @Manual{,
 #>     title = {slurmjobs: Helper Functions for SLURM Jobs},
 #>     author = {{LieberInstitute}},
-#>     year = {2023},
+#>     year = {2024},
 #>     url = {http://www.bioconductor.org/packages/slurmjobs},
-#>     note = {https://github.com/LieberInstitute/slurmjobs/slurmjobs - R package version 1.0.0},
+#>     note = {https://github.com/LieberInstitute/slurmjobs/slurmjobs - R package version 1.1.0},
 #>     doi = {10.18129/B9.bioc.slurmjobs},
 #>   }
 #> 
-#>   LieberInstitute (2023). "slurmjobs: Helper Functions for SLURM Jobs."
+#>   LieberInstitute (2024). "slurmjobs: Helper Functions for SLURM Jobs."
 #>   _bioRxiv_. doi:10.1101/TODO <https://doi.org/10.1101/TODO>,
 #>   <https://www.biorxiv.org/content/10.1101/TODO>.
 #> 
@@ -73,7 +73,7 @@ print(citation("slurmjobs"), bibtex = TRUE)
 #>   @Article{,
 #>     title = {slurmjobs: Helper Functions for SLURM Jobs},
 #>     author = {{LieberInstitute}},
-#>     year = {2023},
+#>     year = {2024},
 #>     journal = {bioRxiv},
 #>     doi = {10.1101/TODO},
 #>     url = {https://www.biorxiv.org/content/10.1101/TODO},
