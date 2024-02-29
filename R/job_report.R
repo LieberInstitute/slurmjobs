@@ -110,12 +110,23 @@ job_report <- function(job_id) {
     #   'batch' job step, but all other info we care about is in the ordinary
     #   job step, called '' here. For interactive jobs, memory info appears to
     #   be in the '0' job step. Only applies for completed jobs!
-    job_df[
-        (job_df$job_step == "") & (job_df$State %in% c("COMPLETED", "FAILED")),
-        c("MaxRSS", "MaxVMSize")
-    ] <- job_df[
-        job_df$job_step %in% c("batch", "0"),
-        c("MaxRSS", "MaxVMSize")
+
+    #   Ensure memory is reported by 'sstat' once for all completed jobs
+    completed_rows <- (job_df$job_step == "") &
+        grepl("^(COMPLETED$|FAILED$|CANCELLED)", job_df$State)
+    rows_with_mem <- job_df$job_step %in% c("batch", "0")
+
+    if (length(which(completed_rows)) != length(which(rows_with_mem))) {
+        error_message <- paste(
+            "Mismatch between number of finished jobs and number of jobs with memory reported",
+            "by 'sstat'. Probably a 'slurmjobs' bug!"
+        )
+        stop(error_message)
+    }
+
+    #   Put memory info in the rows with "" 'job_step'
+    job_df[completed_rows, c("MaxRSS", "MaxVMSize")] <- job_df[
+        rows_with_mem, c("MaxRSS", "MaxVMSize")
     ]
 
     #   For currently running jobs, 'sacct' doesn't report memory info. Use
