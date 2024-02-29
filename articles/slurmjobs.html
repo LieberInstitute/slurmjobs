@@ -34,7 +34,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">slurmjobs</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.2.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.2.1</span>
       </span>
     </div>
 
@@ -85,7 +85,7 @@ Biology, Johns Hopkins
 University<br><a class="author_email" href="mailto:#"></a><a href="mailto:lcolladotor@gmail.com" class="email">lcolladotor@gmail.com</a>
       </address>
                   
-            <h4 data-toc-skip class="date">13 February 2024</h4>
+            <h4 data-toc-skip class="date">29 February 2024</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/LieberInstitute/slurmjobs/blob/HEAD/vignettes/slurmjobs.Rmd" class="external-link"><code>vignettes/slurmjobs.Rmd</code></a></small>
       <div class="hidden name"><code>slurmjobs.Rmd</code></div>
@@ -161,7 +161,7 @@ to cite the package and the overall approach. Thank you!</p>
 <span><span class="co">#&gt;   doi:10.18129/B9.bioc.slurmjobs</span></span>
 <span><span class="co">#&gt;   &lt;https://doi.org/10.18129/B9.bioc.slurmjobs&gt;,</span></span>
 <span><span class="co">#&gt;   https://github.com/LieberInstitute/slurmjobs/slurmjobs - R package</span></span>
-<span><span class="co">#&gt;   version 1.2.0, &lt;http://www.bioconductor.org/packages/slurmjobs&gt;.</span></span>
+<span><span class="co">#&gt;   version 1.2.1, &lt;http://www.bioconductor.org/packages/slurmjobs&gt;.</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;   LieberInstitute (2024). "slurmjobs: Helper Functions for SLURM Jobs."</span></span>
 <span><span class="co">#&gt;   _bioRxiv_. doi:10.1101/TODO &lt;https://doi.org/10.1101/TODO&gt;,</span></span>
@@ -207,7 +207,7 @@ name, and when the job starts and ends.</p>
 <span><span class="fu"><a href="../reference/job_single.html">job_single</a></span><span class="op">(</span></span>
 <span>    name <span class="op">=</span> <span class="st">"my_shell_script"</span>, memory <span class="op">=</span> <span class="st">"10G"</span>, cores <span class="op">=</span> <span class="fl">2</span>, create_shell <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; 2024-02-13 19:32:29.803498 creating the logs directory at:  logs</span></span>
+<span><span class="co">#&gt; 2024-02-29 18:26:15.709725 creating the logs directory at:  logs</span></span>
 <span><span class="co">#&gt; #!/bin/bash</span></span>
 <span><span class="co">#&gt; #SBATCH -p shared</span></span>
 <span><span class="co">#&gt; #SBATCH --mem=10G</span></span>
@@ -242,7 +242,7 @@ name, and when the job starts and ends.</p>
 <span><span class="co">#&gt; echo "**** Job ends ****"</span></span>
 <span><span class="co">#&gt; date</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; ## This script was made using slurmjobs version 1.2.0</span></span>
+<span><span class="co">#&gt; ## This script was made using slurmjobs version 1.2.1</span></span>
 <span><span class="co">#&gt; ## available from http://research.libd.org/slurmjobs/</span></span></code></pre></div>
 <p>Similarly, we can specify <code>task_num</code> to create an array
 job– in this case, one with 10 tasks.</p>
@@ -251,7 +251,7 @@ job– in this case, one with 10 tasks.</p>
 <span>    name <span class="op">=</span> <span class="st">"my_array_job"</span>, memory <span class="op">=</span> <span class="st">"5G"</span>, cores <span class="op">=</span> <span class="fl">1</span>, create_shell <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>    task_num <span class="op">=</span> <span class="fl">10</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; 2024-02-13 19:32:29.872678 creating the logs directory at:  logs</span></span>
+<span><span class="co">#&gt; 2024-02-29 18:26:15.780543 creating the logs directory at:  logs</span></span>
 <span><span class="co">#&gt; #!/bin/bash</span></span>
 <span><span class="co">#&gt; #SBATCH -p shared</span></span>
 <span><span class="co">#&gt; #SBATCH --mem=5G</span></span>
@@ -287,7 +287,7 @@ job– in this case, one with 10 tasks.</p>
 <span><span class="co">#&gt; echo "**** Job ends ****"</span></span>
 <span><span class="co">#&gt; date</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; ## This script was made using slurmjobs version 1.2.0</span></span>
+<span><span class="co">#&gt; ## This script was made using slurmjobs version 1.2.1</span></span>
 <span><span class="co">#&gt; ## available from http://research.libd.org/slurmjobs/</span></span></code></pre></div>
 <p>Another function, <code><a href="../reference/job_loop.html">job_loop()</a></code>, can be used to create more
 complex array jobs as compared with <code><a href="../reference/job_single.html">job_single()</a></code>. It’s
@@ -359,7 +359,7 @@ R. Let’s make that a bit more concrete.</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; } &gt; $log_path 2&gt;&amp;1</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; ## This script was made using slurmjobs version 1.2.0</span></span>
+<span><span class="co">#&gt; ## This script was made using slurmjobs version 1.2.1</span></span>
 <span><span class="co">#&gt; ## available from http://research.libd.org/slurmjobs/</span></span></code></pre></div>
 <p>First, note the line
 <code>Rscript bsp2_test.R --region ${region} --feature ${feature}</code>.
@@ -395,7 +395,7 @@ total (the product of the number of <code>region</code>s and
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; session_info()</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; ## This script was made using slurmjobs version 1.2.0</span></span>
+<span><span class="co">#&gt; ## This script was made using slurmjobs version 1.2.1</span></span>
 <span><span class="co">#&gt; ## available from http://research.libd.org/slurmjobs/</span></span></code></pre></div>
 <p>The code related to <code>getopt</code> at the top of the script
 reads in the unique combination of variable values into a list called
@@ -424,8 +424,8 @@ re-submit failed tasks.</p>
 <span>    name <span class="op">=</span> <span class="st">"my_array_job"</span>, memory <span class="op">=</span> <span class="st">"5G"</span>, cores <span class="op">=</span> <span class="fl">1</span>, create_shell <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>    task_num <span class="op">=</span> <span class="fl">10</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; 2024-02-13 19:32:30.074038 creating the logs directory at:  logs</span></span>
-<span><span class="co">#&gt; 2024-02-13 19:32:30.075125 creating the shell file my_array_job.sh</span></span>
+<span><span class="co">#&gt; 2024-02-29 18:26:15.986825 creating the logs directory at:  logs</span></span>
+<span><span class="co">#&gt; 2024-02-29 18:26:15.988014 creating the shell file my_array_job.sh</span></span>
 <span><span class="co">#&gt; To submit the job use: sbatch my_array_job.sh</span></span>
 <span></span>
 <span><span class="co">#   Suppose that tasks 3, 6, 7, and 8 failed</span></span>
@@ -653,9 +653,9 @@ Cheng, Chang, and Iannone, 2023)</li>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://yihui.org/knitr/" class="external-link">"knitr"</a></span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/knit.html" class="external-link">knit</a></span><span class="op">(</span><span class="st">"slurmjobs.Rmd"</span>, tangle <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <p>Date the vignette was generated.</p>
-<pre><code><span><span class="co">#&gt; [1] "2024-02-13 19:32:30 UTC"</span></span></code></pre>
+<pre><code><span><span class="co">#&gt; [1] "2024-02-29 18:26:16 UTC"</span></span></code></pre>
 <p>Wallclock time spent generating the vignette.</p>
-<pre><code><span><span class="co">#&gt; Time difference of 1.893 secs</span></span></code></pre>
+<pre><code><span><span class="co">#&gt; Time difference of 1.965 secs</span></span></code></pre>
 <p><code>R</code> session information.</p>
 <pre><code><span><span class="co">#&gt; <span style="color: #00BBBB; font-weight: bold;">─ Session info ───────────────────────────────────────────────────────────────────────────────────────────────────────</span></span></span>
 <span><span class="co">#&gt;  <span style="color: #555555; font-style: italic;">setting </span> <span style="color: #555555; font-style: italic;">value</span></span></span>
@@ -667,7 +667,7 @@ Cheng, Chang, and Iannone, 2023)</li>
 <span><span class="co">#&gt;  collate  en_US.UTF-8</span></span>
 <span><span class="co">#&gt;  ctype    en_US.UTF-8</span></span>
 <span><span class="co">#&gt;  tz       UTC</span></span>
-<span><span class="co">#&gt;  date     2024-02-13</span></span>
+<span><span class="co">#&gt;  date     2024-02-29</span></span>
 <span><span class="co">#&gt;  pandoc   3.1.1 @ /usr/local/bin/ (via rmarkdown)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB; font-weight: bold;">─ Packages ───────────────────────────────────────────────────────────────────────────────────────────────────────────</span></span></span>
@@ -713,7 +713,7 @@ Cheng, Chang, and Iannone, 2023)</li>
 <span><span class="co">#&gt;  rmarkdown       2.25    <span style="color: #555555;">2023-09-18</span> <span style="color: #555555;">[2]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM (R 4.3.0)</span></span></span>
 <span><span class="co">#&gt;  sass            0.4.8   <span style="color: #555555;">2023-12-06</span> <span style="color: #555555;">[2]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM (R 4.3.0)</span></span></span>
 <span><span class="co">#&gt;  sessioninfo   * 1.2.2   <span style="color: #555555;">2021-12-06</span> <span style="color: #555555;">[2]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM (R 4.3.0)</span></span></span>
-<span><span class="co">#&gt;  slurmjobs     * 1.2.0   <span style="color: #555555;">2024-02-13</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">local</span></span></span>
+<span><span class="co">#&gt;  slurmjobs     * 1.2.1   <span style="color: #555555;">2024-02-29</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">local</span></span></span>
 <span><span class="co">#&gt;  stringi         1.8.3   <span style="color: #555555;">2023-12-11</span> <span style="color: #555555;">[2]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM (R 4.3.0)</span></span></span>
 <span><span class="co">#&gt;  stringr         1.5.1   <span style="color: #555555;">2023-11-14</span> <span style="color: #555555;">[2]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM (R 4.3.0)</span></span></span>
 <span><span class="co">#&gt;  systemfonts     1.0.5   <span style="color: #555555;">2023-10-09</span> <span style="color: #555555;">[2]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM (R 4.3.0)</span></span></span>
@@ -752,7 +752,7 @@ for R</em>. R package version 2.25. 2023. URL:
 <p>
 <a id="bib-lieberinstitute2024slurmjobs"></a><a href="#cite-lieberinstitute2024slurmjobs">[2]</a><cite>
 LieberInstitute. <em>slurmjobs: Helper Functions for SLURM Jobs</em>. <a href="https://github.com/LieberInstitute/slurmjobs/slurmjobs" class="external-link uri">https://github.com/LieberInstitute/slurmjobs/slurmjobs</a> -
-R package version 1.2.0. 2024. DOI:
+R package version 1.2.1. 2024. DOI:
 <a href="https://doi.org/10.18129/B9.bioc.slurmjobs" class="external-link">10.18129/B9.bioc.slurmjobs</a>.
 URL:
 <a href="http://www.bioconductor.org/packages/slurmjobs" class="external-link">http://www.bioconductor.org/packages/slurmjobs</a>.</cite>
