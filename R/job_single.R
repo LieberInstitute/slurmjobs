@@ -59,11 +59,10 @@
 #' ## An array job
 #' job_single("jhpce_job_array", task_num = 20, create_logdir = FALSE)
 #'
-job_single <- function(
-        name, create_shell = FALSE, partition = "shared", memory = "10G",
-        cores = 1L, time_limit = "1-00:00:00", email = "ALL", logdir = "logs", task_num = NULL, tc = 20,
-        command = 'Rscript -e "options(width = 120); sessioninfo::session_info()"',
-        create_logdir = TRUE) {
+job_single <- function(name, create_shell = FALSE, partition = "shared", memory = "10G",
+    cores = 1L, time_limit = "1-00:00:00", email = "ALL", logdir = "logs", task_num = NULL, tc = 20,
+    command = 'Rscript -e "options(width = 120); sessioninfo::session_info()"',
+    create_logdir = TRUE) {
     #   Grab the path to the shell script, and the shell script's name,
     #   respectively
     sh_file <- parse_file_or_name(name, should_exist = FALSE, r_ok = FALSE)
