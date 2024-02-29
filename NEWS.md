@@ -1,5 +1,9 @@
 # slurmjobs 1.2.1
 
+BUG FIXES
+
+* Recognize cancelled jobs as completed, allowing `job_report()` to continue without errors when attempting to retrieve memory info for finished jobs
+
 # slurmjobs 1.2.0
 
 * `job_single()` and `job_loop()` accept a new parameter, `time_limit`, which default to 1 day
