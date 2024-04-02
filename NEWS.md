@@ -1,5 +1,7 @@
 # slurmjobs 1.2.2
 
+* Use the `HOSTNAME` instead of `SLURMD_NODENAME` environment variable to determine host running a SLURM job
+
 # slurmjobs 1.2.1
 
 BUG FIXES
