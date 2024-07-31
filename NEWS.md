@@ -1,5 +1,9 @@
 # slurmjobs 1.2.3
 
+BUG FIXES
+
+* Fix submission of jobs, modification of the appropriate shell script, and finding of log files when using `array_submit()` with an absolute path to the `name` parameter
+
 # slurmjobs 1.2.2
 
 * Use the `HOSTNAME` instead of `SLURMD_NODENAME` environment variable to determine host running a SLURM job
