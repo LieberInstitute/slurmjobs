@@ -223,17 +223,20 @@ array_submit <- function(name, task_ids = NULL, submit = FALSE, restore = TRUE, 
         paste0("#SBATCH --array=", paste(task_ids, collapse = ","), "%\\1"),
         job_original
     )
-    writeLines(job_new, con = paste0(name, ".sh"))
+    writeLines(job_new, con = sh_file)
 
     #   Invoke (sbatch) the modified script if requested
     if (submit) {
         message(paste(Sys.time(), "Resubmitting the specified tasks."))
-        system(sprintf("sbatch %s.sh", name))
+
+        #   Some paths in the shell script are relative and we therefore must
+        #   submit the script from the original directory
+        system(sprintf("cd %s; sbatch %s.sh", dirname(sh_file), name))
     }
 
     # Restore the original script
-    if (restore) writeLines(job_original, con = paste0(name, ".sh"))
+    if (restore) writeLines(job_original, con = sh_file)
 
     # Return the path
-    return(invisible(paste0(name, ".sh")))
+    return(invisible(sh_file))
 }
