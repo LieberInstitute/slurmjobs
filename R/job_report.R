@@ -113,7 +113,7 @@ job_report <- function(job_id) {
 
     #   Ensure memory is reported by 'sstat' once for all completed jobs
     completed_rows <- (job_df$job_step == "") &
-        grepl("^(COMPLETED$|FAILED$|CANCELLED)", job_df$State)
+        grepl("^(COMPLETED|FAILED|CANCELLED|OUT_OF_MEMORY)$", job_df$State)
     rows_with_mem <- job_df$job_step %in% c("batch", "0")
 
     if (length(which(completed_rows)) != length(which(rows_with_mem))) {
