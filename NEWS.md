@@ -1,5 +1,9 @@
 # slurmjobs 1.2.4
 
+BUG FIXES
+
+* Recognize/ handle `OUT_OF_MEMORY` job status, fixing a fatal error in `job_report()`
+
 # slurmjobs 1.2.3
 
 BUG FIXES
