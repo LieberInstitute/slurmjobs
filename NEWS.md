@@ -1,3 +1,5 @@
+# slurmjobs 1.2.4
+
 # slurmjobs 1.2.3
 
 BUG FIXES
