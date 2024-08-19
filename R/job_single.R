@@ -21,7 +21,7 @@
 #' your job will request is `cores` multiplied by `memory`.
 #' @param time_limit character(1): time limit specified in a format accepted by
 #' the \code{--time} parameter to \code{sbatch} (e.g. "4:00:00"). Defaults to 1
-#' day, following the JHPCE default (<https://jhpce.jhu.edu/knowledge-base/setting-a-time-limit-for-your-slurm-job-on-jhpce/>).
+#' day, following the JHPCE default (<https://jhpce.jhu.edu/slurm/time-limits/>).
 #' @param email The email reporting option for the email address ("BEGIN",
 #' "END", "FAIL", or "ALL")
 #' @param logdir The directory to contain the log, as an absolute or relative
