@@ -1,5 +1,9 @@
 # slurmjobs 1.2.5
 
+BUG FIXES
+
+* Fix currently running jobs crashing `job_report()`
+
 # slurmjobs 1.2.4
 
 BUG FIXES
