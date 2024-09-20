@@ -109,23 +109,24 @@ job_report <- function(job_id) {
     #   For batch jobs, memory-related information is only reported in the
     #   'batch' job step, but all other info we care about is in the ordinary
     #   job step, called '' here. For interactive jobs, memory info appears to
-    #   be in the '0' job step. Only applies for completed jobs!
+    #   be in the '0' job step. Only applies for non-pending jobs! Running jobs
+    #   will have NA values here, but they'll be overwritten later
 
-    #   Ensure memory is reported by 'sstat' once for all completed jobs
-    completed_rows <- (job_df$job_step == "") &
-        grepl("^(COMPLETED|FAILED|CANCELLED|OUT_OF_MEMORY)$", job_df$State)
+    #   Ensure memory is reported by 'sstat' once for all non-pending jobs
+    non_pd_rows <- (job_df$job_step == "") &
+        !grepl("^PENDING$", job_df$State)
     rows_with_mem <- job_df$job_step %in% c("batch", "0")
 
-    if (length(which(completed_rows)) != length(which(rows_with_mem))) {
+    if (length(which(non_pd_rows)) != length(which(rows_with_mem))) {
         error_message <- paste(
-            "Mismatch between number of finished jobs and number of jobs with memory reported",
-            "by 'sstat'. Probably a 'slurmjobs' bug!"
+            "Mismatch between number of non-pending jobs and number of jobs with memory",
+            "reported by 'sstat'. Probably a 'slurmjobs' bug!"
         )
         stop(error_message)
     }
 
     #   Put memory info in the rows with "" 'job_step'
-    job_df[completed_rows, c("MaxRSS", "MaxVMSize")] <- job_df[
+    job_df[non_pd_rows, c("MaxRSS", "MaxVMSize")] <- job_df[
         rows_with_mem, c("MaxRSS", "MaxVMSize")
     ]
 
