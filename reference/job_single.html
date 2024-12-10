@@ -6,7 +6,7 @@ https://hopstat.wordpress.com/2013/11/05/array-and-sequential-cluster-jobs/."><!
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 <![endif]--></head><body data-spy="scroll" data-target="#toc">
-    
+
 
     <div class="container template-reference-topic">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -37,20 +37,20 @@ https://hopstat.wordpress.com/2013/11/05/array-and-sequential-cluster-jobs/."><!
       </ul><ul class="nav navbar-nav navbar-right"><li>
   <a href="https://github.com/LieberInstitute/slurmjobs/" class="external-link">
     <span class="fab fa-github fa-lg"></span>
-     
+
   </a>
 </li>
       </ul></div><!--/.nav-collapse -->
   </div><!--/.container -->
 </div><!--/.navbar -->
 
-      
+
 
       </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Build a SLURM job bash script</h1>
-    <small class="dont-index">Source: <a href="https://github.com/LieberInstitute/slurmjobs/blob/HEAD/R/job_single.R" class="external-link"><code>R/job_single.R</code></a></small>
+    <small class="dont-index">Source: <a href="https://github.com/LieberInstitute/slurmjobs/blob/devel/R/job_single.R" class="external-link"><code>R/job_single.R</code></a></small>
     <div class="hidden name"><code>job_single.Rd</code></div>
     </div>
 
@@ -80,63 +80,65 @@ John Muschelli to learn more about array jobs:
 
     <div id="arguments">
     <h2>Arguments</h2>
-    <dl><dt>name</dt>
+
+
+<dl><dt id="arg-name">name<a class="anchor" aria-label="anchor" href="#arg-name"></a></dt>
 <dd><p>A <code>character(1)</code> vector giving either the name or path (relative
 or absolute) to the shell script to create.</p></dd>
 
 
-<dt>create_shell</dt>
+<dt id="arg-create-shell">create_shell<a class="anchor" aria-label="anchor" href="#arg-create-shell"></a></dt>
 <dd><p>A <code>logical(1)</code> vector specifying whether to create a
 shell file for the script.</p></dd>
 
 
-<dt>partition</dt>
+<dt id="arg-partition">partition<a class="anchor" aria-label="anchor" href="#arg-partition"></a></dt>
 <dd><p>A <code>character(1)</code> vector with the name of the SLURM
 partition. Check how busy a given partition is by running
 <code>squeue -p [partition]</code>.</p></dd>
 
 
-<dt>memory</dt>
+<dt id="arg-memory">memory<a class="anchor" aria-label="anchor" href="#arg-memory"></a></dt>
 <dd><p>character(1): the amount of memory in total to request, as a
-number and unit accepted by the '--mem' SLURM parameter (e.g. '10G')</p></dd>
+number and unit accepted by the '–mem' SLURM parameter (e.g. '10G')</p></dd>
 
 
-<dt>cores</dt>
+<dt id="arg-cores">cores<a class="anchor" aria-label="anchor" href="#arg-cores"></a></dt>
 <dd><p>The number of cores to request. Note that the total memory
 your job will request is <code>cores</code> multiplied by <code>memory</code>.</p></dd>
 
 
-<dt>time_limit</dt>
+<dt id="arg-time-limit">time_limit<a class="anchor" aria-label="anchor" href="#arg-time-limit"></a></dt>
 <dd><p>character(1): time limit specified in a format accepted by
 the <code>--time</code> parameter to <code>sbatch</code> (e.g. "4:00:00"). Defaults to 1
 day, following the JHPCE default (<a href="https://jhpce.jhu.edu/slurm/time-limits/" class="external-link">https://jhpce.jhu.edu/slurm/time-limits/</a>).</p></dd>
 
 
-<dt>email</dt>
+<dt id="arg-email">email<a class="anchor" aria-label="anchor" href="#arg-email"></a></dt>
 <dd><p>The email reporting option for the email address ("BEGIN",
 "END", "FAIL", or "ALL")</p></dd>
 
 
-<dt>logdir</dt>
+<dt id="arg-logdir">logdir<a class="anchor" aria-label="anchor" href="#arg-logdir"></a></dt>
 <dd><p>The directory to contain the log, as an absolute or relative
 path.</p></dd>
 
 
-<dt>task_num</dt>
+<dt id="arg-task-num">task_num<a class="anchor" aria-label="anchor" href="#arg-task-num"></a></dt>
 <dd><p>The number of tasks for your job, which will make it into an
 array job. If <code>NULL</code> this is ignored.</p></dd>
 
 
-<dt>tc</dt>
+<dt id="arg-tc">tc<a class="anchor" aria-label="anchor" href="#arg-tc"></a></dt>
 <dd><p>If <code>task_num</code> is specified, this option controls the number of
 concurrent tasks.</p></dd>
 
 
-<dt>command</dt>
+<dt id="arg-command">command<a class="anchor" aria-label="anchor" href="#arg-command"></a></dt>
 <dd><p>An example command to start your script.</p></dd>
 
 
-<dt>create_logdir</dt>
+<dt id="arg-create-logdir">create_logdir<a class="anchor" aria-label="anchor" href="#arg-create-logdir"></a></dt>
 <dd><p>A <code>logical(1)</code> vector specifying whether to create the
 <code>logdir</code> directory. Note that if <code>logdir</code> doesn't exist and you submit your
 job with <code>sbatch</code>, it will immediately fail.</p></dd>
@@ -144,9 +146,7 @@ job with <code>sbatch</code>, it will immediately fail.</p></dd>
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    
-
-<p>A character vector with the script contents. If <code>create_shell</code> was
+    <p>A character vector with the script contents. If <code>create_shell</code> was
 specified then it also creates the actual script.</p>
     </div>
     <div id="details">
@@ -156,7 +156,7 @@ the options using <code>scontrol alter</code>.</p>
     </div>
     <div id="see-also">
     <h2>See also</h2>
-    <div class="dont-index"><p>Other shell-script creation and submission functions: 
+    <div class="dont-index"><p>Other shell-script creation and submission functions:
 <code><a href="array_submit.html">array_submit</a>()</code>,
 <code><a href="job_loop.html">job_loop</a>()</code></p></div>
     </div>
@@ -345,15 +345,15 @@ the options using <code>scontrol alter</code>.</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.9.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
 </div>
 
       </footer></div>
 
-  
 
 
-  
+
+
 
   </body></html>
 
