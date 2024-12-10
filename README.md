@@ -9,7 +9,7 @@
 issues](https://img.shields.io/github/issues/LieberInstitute/slurmjobs)](https://github.com/LieberInstitute/slurmjobs/issues)
 [![GitHub
 pulls](https://img.shields.io/github/issues-pr/LieberInstitute/slurmjobs)](https://github.com/LieberInstitute/slurmjobs/pulls)
-[![R-CMD-check-bioc](https://github.com/LieberInstitute/slurmjobs/workflows/R-CMD-check-bioc/badge.svg)](https://github.com/LieberInstitute/slurmjobs/actions/workflows/check-bioc.yml)
+[![R-CMD-check-bioc](https://github.com/LieberInstitute/slurmjobs/actions/workflows/check-bioc.yml/badge.svg)](https://github.com/LieberInstitute/slurmjobs/actions/workflows/check-bioc.yml)
 [![Codecov test
 coverage](https://codecov.io/gh/LieberInstitute/slurmjobs/branch/devel/graph/badge.svg)](https://app.codecov.io/gh/LieberInstitute/slurmjobs?branch=devel)
 [![Lifecycle:
