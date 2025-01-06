@@ -15,7 +15,8 @@
 #' modulus
 #'
 #' @author Nicholas J. Eagles
-#'
+#' @keywords internal
+#' 
 #' @examples
 #'
 #' array_task <- 5 # suppose this is the fifth task in an array job
@@ -59,7 +60,8 @@ get_list_indexing <- function(this_list, index) {
 #' one-letter initials
 #'
 #' @author Nicholas J. Eagles
-#'
+#' @keywords internal
+#' 
 #' @examples
 #'
 #' #    Simple example where initials are as expected: 'a', 'b', 'c'
@@ -100,7 +102,8 @@ get_short_flags <- function(vec) {
 #' \code{vec}
 #'
 #' @author Nicholas J. Eagles
-#'
+#' @keywords internal
+#' 
 #' @examples
 #'
 #' fruits <- c("apple", "banana", "cherry")
@@ -122,6 +125,7 @@ vector_as_code <- function(vec) {
 #'
 #' @import stringr lubridate
 #' @author Nicholas J. Eagles
+#' @keywords internal
 #'
 #' @examples
 #'
@@ -174,6 +178,7 @@ parse_slurm_time <- function(tim) {
 #'
 #' @import stringr
 #' @author Nicholas J. Eagles
+#' @keywords internal
 #'
 #' @examples
 #'

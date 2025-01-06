@@ -26,3 +26,4 @@ slurmjobs:::parse_slurm_time(slurm_times)
 \author{
 Nicholas J. Eagles
 }
+\keyword{internal}
