@@ -68,20 +68,38 @@ renumber <- function(base_dir, pre_before, pre_after) {
             writeLines(shell_content, con = shell_before)
         }
 
-        #   Rename scripts
+        #   Rename scripts but append temporary suffix to avoid repeated
+        #   renaming
         files_before <- all_files[
-            grep(paste0("^", pre_before[i]), basename(all_files))
+            grepl(paste0("^", pre_before[i]), basename(all_files)) &
+            !grepl("temp_slurmjobs$", all_files)
         ]
         files_after <- file.path(
             base_dir,
-            sub(
-                paste0("^", pre_before[i]),
-                pre_after[i],
-                basename(files_before)
+            paste0(
+                sub(
+                    paste0("^", pre_before[i]),
+                    pre_after[i],
+                    basename(files_before)
+                ),
+                "temp_slurmjobs"
             )
         )
         file.rename(files_before, files_after)
     }
+
+    #   Remove temporary suffix from script names
+    all_files = list.files(base_dir, full.names = TRUE)
+    files_before = all_files[
+        grepl(
+            sprintf(
+                "^(%s).*temp_slurmjobs$", paste(pre_after, collapse = "|")
+            ),
+            basename(all_files)
+        )
+    ]
+    files_after = sub("temp_slurmjobs$", "", files_before)
+    file.rename(files_before, files_after)
 
     return(invisible(NULL))
 }
