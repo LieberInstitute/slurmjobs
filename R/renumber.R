@@ -15,13 +15,13 @@
 #' in `base_dir`.
 #'
 #' @importFrom stringr str_extract
-#' 
+#'
 #' @return NULL
 #' @export
 #' @author Nicholas J. Eagles
 #'
 #' @examples
-renumber = function(base_dir, pre_before, pre_after) {
+renumber <- function(base_dir, pre_before, pre_after) {
     if (!dir.exists(base_dir)) {
         stop("'base_dir' must exist.")
     }
@@ -30,10 +30,10 @@ renumber = function(base_dir, pre_before, pre_after) {
     }
 
     #   Check the all the prefices in 'pre_before' match a file in 'base_dir'
-    all_files = list.files(base_dir, full.names = TRUE)
-    matches = sapply(
+    all_files <- list.files(base_dir, full.names = TRUE)
+    matches <- sapply(
         pre_before,
-        function(x) length(grep(paste0('^', x), basename(all_files)))
+        function(x) length(grep(paste0("^", x), basename(all_files)))
     )
     if (!all(matches > 0)) {
         stop("At least one prefix in 'pre_before' did not match a file in 'base_dir'.")
@@ -42,8 +42,8 @@ renumber = function(base_dir, pre_before, pre_after) {
     for (i in seq_len(length(pre_before))) {
         #   Edit the content of the shell script if it exists, and find and
         #   update log names
-        shell_before = all_files[
-            grep(sprintf('^%s.*\\.sh$', pre_before[i]), basename(all_files))
+        shell_before <- all_files[
+            grep(sprintf("^%s.*\\.sh$", pre_before[i]), basename(all_files))
         ]
         if (length(shell_before) > 1) {
             stop(
@@ -55,33 +55,33 @@ renumber = function(base_dir, pre_before, pre_after) {
 
             #   Re-write the shell script in place, replacing references to the
             #   old script name
-            full_pre_before = stringr::str_extract(
+            full_pre_before <- stringr::str_extract(
                 basename(shell_before),
-                sprintf('(^%s.*)\\.sh$', pre_before[i]),
+                sprintf("(^%s.*)\\.sh$", pre_before[i]),
                 group = 1
             )
-            full_pre_after = sub(
-                paste0('^', pre_before[i]), pre_after[i], full_pre_before
+            full_pre_after <- sub(
+                paste0("^", pre_before[i]), pre_after[i], full_pre_before
             )
-            shell_content = readLines(shell_before)
-            shell_content = gsub(full_pre_before, full_pre_after, shell_content)
+            shell_content <- readLines(shell_before)
+            shell_content <- gsub(full_pre_before, full_pre_after, shell_content)
             writeLines(shell_content, con = shell_before)
         }
 
         #   Rename scripts
-        files_before = all_files[
-            grep(paste0('^', pre_before[i]), basename(all_files))
+        files_before <- all_files[
+            grep(paste0("^", pre_before[i]), basename(all_files))
         ]
-        files_after = file.path(
+        files_after <- file.path(
             base_dir,
             sub(
-                paste0('^', pre_before[i]),
+                paste0("^", pre_before[i]),
                 pre_after[i],
                 basename(files_before)
             )
         )
         file.rename(files_before, files_after)
     }
-    
+
     return(invisible(NULL))
 }

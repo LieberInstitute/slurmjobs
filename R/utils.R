@@ -16,7 +16,7 @@
 #'
 #' @author Nicholas J. Eagles
 #' @keywords internal
-#' 
+#'
 #' @examples
 #'
 #' array_task <- 5 # suppose this is the fifth task in an array job
@@ -61,7 +61,7 @@ get_list_indexing <- function(this_list, index) {
 #'
 #' @author Nicholas J. Eagles
 #' @keywords internal
-#' 
+#'
 #' @examples
 #'
 #' #    Simple example where initials are as expected: 'a', 'b', 'c'
@@ -103,7 +103,7 @@ get_short_flags <- function(vec) {
 #'
 #' @author Nicholas J. Eagles
 #' @keywords internal
-#' 
+#'
 #' @examples
 #'
 #' fruits <- c("apple", "banana", "cherry")
