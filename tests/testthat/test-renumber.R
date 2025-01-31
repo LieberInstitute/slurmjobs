@@ -1,27 +1,39 @@
 test_that(
     "renumber",
     {
-        base_dir = tempdir()
+        #   Create a temporary directory that's guaranteed to be empty
+        base_dir = file.path(tempdir(), 'temp_slurmjobs')
+        dir.create(base_dir)
 
         #   Create a set of scripts, some of which will be renumbered
+
+        #   Legitimate scripts to renumber
         job_single(
             file.path(base_dir, '01_first.sh'), create_logdir = FALSE,
             create_shell = TRUE, command = 'Rscript 01_first.R'
         )
-        writeLines('# some code', con = file.path(base_dir, '01_first.py'))
-        writeLines(
-            '# some code', con = file.path(base_dir, 'something_01_first.sh')
-        )
+        writeLines('# some code', con = file.path(base_dir, '01_first.R'))
         job_single(
             file.path(base_dir, '02_second.sh'), create_logdir = FALSE,
             create_shell = TRUE, command = 'python 02_second.py'
+        )
+
+        #   Scripts with tricky names that should not be renumbered
+        writeLines(
+            '# some code',
+            con = file.path(base_dir, 'something_01_first.sh')
+        )
+        writeLines(
+            '# some code',
+            con = file.path(base_dir, 'something_02_first.shtemp_slurmjobs')
         )
 
         renumber(base_dir, c('01', '02'), c('02', '03'))
 
         #   Check that the files have been properly renamed
         expected_files = c(
-            '02_first.sh', '02_first.py', 'something_01_first.sh', '03_second.sh'
+            '02_first.sh', '02_first.R', '03_second.sh',
+            'something_01_first.sh', 'something_02_first.shtemp_slurmjobs'
         )
         expect_equal(setequal(list.files(base_dir), expected_files), TRUE)
 
