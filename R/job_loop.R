@@ -87,21 +87,6 @@ job_loop <- function(
         "## available from http://research.libd.org/slurmjobs/"
     )
 
-    ## Build the core script
-    script <- job_single(
-        name = name,
-        partition = partition,
-        memory = memory,
-        cores = cores,
-        email = email,
-        logdir = logdir,
-        command = command,
-        #   The number of tasks is the product of lengths of each loop
-        task_num = prod(sapply(loops, length)),
-        tc = tc,
-        create_logdir = FALSE
-    )
-
     #   Given integer(1) 'i', an index of 'loops', return a character vector
     #   whose elements represent lines of bash code. This code creates an
     #   array (the contents of loops[[i]]) and subsets it appropriately
@@ -133,7 +118,7 @@ job_loop <- function(
 
     #   Most of the script's content is created via 'job_single'
     script_core <- job_single(
-        name = name,
+        name = sh_file,
         partition = partition,
         memory = memory,
         cores = cores,
