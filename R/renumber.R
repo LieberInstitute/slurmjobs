@@ -51,10 +51,8 @@ renumber <- function(base_dir, pre_before, pre_after) {
                 pre_before[i], "'."
             )
         } else if (length(shell_before) == 1) {
-            #   TODO: find and update log names
+            shell_content <- readLines(shell_before)
 
-            #   Re-write the shell script in place, replacing references to the
-            #   old script name
             full_pre_before <- stringr::str_extract(
                 basename(shell_before),
                 sprintf("(^%s.*)\\.sh$", pre_before[i]),
@@ -63,7 +61,36 @@ renumber <- function(base_dir, pre_before, pre_after) {
             full_pre_after <- sub(
                 paste0("^", pre_before[i]), pre_after[i], full_pre_before
             )
-            shell_content <- readLines(shell_before)
+
+            #   For 'job_loop', use the path in the line starting with 'log_path='.
+            #   Otherwise use the log in the line starting with '#SBATCH -o'.
+            last_occurence <- rev(grep("^(#SBATCH -o |log_path=)", shell_content))[1]
+            log_dir <- shell_content[last_occurence] |>
+                #   Extract just the path
+                str_replace("^(#SBATCH -o |log_path=)", "") |>
+                dirname()
+
+            #   If the log is specified with a relative path, make sure it's
+            #   relative to the directory containing the shell script
+            if (!grepl("^/", log_dir)) {
+                log_dir <- file.path(dirname(shell_before), log_dir) |>
+                    normalizePath()
+            }
+
+            #   Rename logs
+            logs_before = list.files(
+                log_dir,
+                pattern = sprintf("^%s.*\\.(txt|log)$", full_pre_before),
+                full.names = TRUE
+            )
+            logs_after = file.path(
+                log_dir,
+                sub(full_pre_before, full_pre_after, basename(logs_before))
+            )
+            file.rename(logs_before, logs_after)
+
+            #   Re-write the shell script in place, replacing references to the
+            #   old script name
             shell_content <- gsub(full_pre_before, full_pre_after, shell_content)
             writeLines(shell_content, con = shell_before)
         }
