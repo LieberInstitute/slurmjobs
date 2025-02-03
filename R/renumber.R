@@ -77,7 +77,7 @@ renumber <- function(base_dir, pre_before, pre_after) {
                     normalizePath()
             }
 
-            #   Rename logs
+            #   Rename logs, if any exist
             logs_before = list.files(
                 log_dir,
                 pattern = sprintf("^%s.*\\.(txt|log)$", full_pre_before),
@@ -87,7 +87,9 @@ renumber <- function(base_dir, pre_before, pre_after) {
                 log_dir,
                 sub(full_pre_before, full_pre_after, basename(logs_before))
             )
-            file.rename(logs_before, logs_after)
+            if (length(logs_before) > 0) {
+                file.rename(logs_before, logs_after)
+            }
 
             #   Re-write the shell script in place, replacing references to the
             #   old script name

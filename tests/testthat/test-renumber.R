@@ -18,8 +18,8 @@ test_that(
             create_shell = TRUE, command = 'python 02_second.py'
         )
         job_loop(
-            file.path(base_dir, '03_third.sh'), create_logdir = FALSE,
-            create_shell = TRUE, loops = list(a = c('a', 'b'), b = c('c', 'd')),
+            file.path(base_dir, '03_third.sh'), create_shell = TRUE,
+            loops = list(a = c('a', 'b'), b = c('c', 'd')),
             logdir = "logs"
         )
 
@@ -34,6 +34,7 @@ test_that(
         )
 
         #   Logs to renumber (skipping a couple intentionally)
+        dir.create(file.path(base_dir, 'logs'))
         all_log_base_names = c(
             '02_second.txt', '03_third_a_c.txt',
             '03_third_a_d.txt', '03_third_b_d.txt'
@@ -50,18 +51,15 @@ test_that(
         #   Check that the scripts have been properly renamed
         expected_files = c(
             '02_first.sh', '02_first.R', '03_second.sh',
-            'something_01_first.sh', 'something_02_first.shtemp_slurmjobs'
+            '01_third.R', '01_third.sh', 'something_01_first.sh',
+            'something_02_first.shtemp_slurmjobs', 'logs'
         )
         expect_equal(setequal(list.files(base_dir), expected_files), TRUE)
 
         #   Check that the logs have been properly renamed
-        expected_files = file.path(
-            base_dir,
-            'logs',
-            c(
-                '03_second.txt', '01_third_a_c.txt',
-                '01_third_a_d.txt', '01_third_b_d.txt'
-            )
+        expected_files = c(
+            '03_second.txt', '01_third_a_c.txt', '01_third_a_d.txt',
+            '01_third_b_d.txt'
         )
         expect_equal(
             setequal(list.files(file.path(base_dir, 'logs')), expected_files),
@@ -80,6 +78,6 @@ test_that(
 
         content = readLines(file.path(base_dir, '01_third.sh'))
         expect_equal(any(grepl('^(02_third|03_third)', content)), FALSE)
-        expect_equal(length(which(content == 'python 01_third.py')), 1)
+        expect_equal(length(grep('^Rscript 01_third\\.R', content)), 1)
     }
 )
