@@ -304,6 +304,113 @@ print(
 )
 ```
 
+# Re-Ordering Scripts
+
+## Background
+
+As a data scientist in the [R/Bioconductor-powered Team Data Science](https://lcolladotor.github.io/bioc_team_ds/index.html),
+I [organize my scripts](https://lcolladotor.github.io/bioc_team_ds/organizing-your-work.html#organization-since-2021)
+such that there is an explicit order within a given directory (e.g.
+`01_first_script.R`, `02_second_script.R`, etc). This approach helps with
+readability and clarity, but the reality is that the order of scripts can
+easily change as new information is gathered from EDA, or analysis goals shift.
+A particularly annoying case arises when you have a series of say, 7 scripts,
+and you wish to insert a step between the 3rd and 4th scripts, which would
+involve renaming 4 scripts to preserve the `01` through `07` prefices. In the
+Team Data Science, we also typically generate one or more logs associated with each
+script, and shell scripts generally contain references to the name of the R script
+to submit with `sbatch` to the SLURM scheduler. In total, renaming scripts can
+be quite a process.
+
+The `renumber()` function was developed to address situations like this. It
+renames scripts based on a set of prefices, updates references to the old script
+names with each shell script, and even renames any existing logs associated with
+each script. To demonstrate its function, we'll generate some scripts and
+associated logs, then renumber them.
+
+## Create Simulated Data
+
+```{r "numbered_scripts"}
+#   Create a temporary directory that's guaranteed to be empty
+base_dir <- file.path(tempdir(), "slurmjobs_scripts")
+dir.create(base_dir)
+
+#   Create a shell script that submits a corresponding R script
+job_single(
+    file.path(base_dir, "01_should_be_second.sh"),
+    logdir = "logs", create_logdir = TRUE,
+    create_shell = TRUE, command = "Rscript 01_should_be_second.R"
+)
+writeLines("# some code", con = file.path(base_dir, "01_should_be_second.R"))
+
+#   Create an array originally designed to be submitted second
+job_loop(
+    file.path(base_dir, "02_should_be_first.sh"),
+    create_shell = TRUE, logdir = "logs"
+    loops = list(
+        gene = c("gene_1", "gene_2"), method = c("method_1", "method_2")
+    ) 
+)
+```
+
+Next, generate some corresponding logs. Note that `renumber()` can handle
+missing logs, so we'll intentionally generate only some of the logs to
+demonstrate this.
+
+```{r "numbered_logs"}
+all_log_base_names <- c(
+    "01_should_be_second.txt", "02_should_be_first_gene_1_method_1_1.txt",
+    "02_should_be_first_gene_2_method_1_2.txt"
+)
+for (base_name in all_log_base_names) {
+    writeLines(
+        "# some log text",
+        con = file.path(base_dir, "logs", base_name)
+    )
+}
+```
+
+In summary, we have two shell scripts and three corresponding logs whose names
+indicate a confusing ordering.
+
+```{r "numbered_scripts_before"}
+list.files(base_dir)
+```
+
+```{r "numbered_logs_before"}
+list.files(file.path(base_dir, 'logs'))
+```
+
+## Re-Order
+
+Suppose we wish to simply swap the order of the first and second script. We must
+provide the directory containing the scripts, the beginning prefices to change,
+finally the replacement prefices.
+
+```{r "renumber"}
+#   Re-order scripts (and logs)
+renumber(base_dir, c("01", "02"), c("02", "01"))
+```
+
+We can see the names of the scripts and logs have been correctly updated.
+
+```{r "numbered_scripts_after"}
+list.files(base_dir)
+```
+
+```{r "numbered_logs_after"}
+list.files(file.path(base_dir, 'logs'))
+```
+
+Reading the first script in, we can also see that references to the old script
+name have been updated. For example, the log path and Rscript command were
+updated.
+
+```{r "content_after"}
+#   Read in the first shell script
+readLines(file.path(base_dir, "01_should_be_first.sh"))
+```
+
 # Reproducibility
 
 The `r Biocpkg("slurmjobs")` package `r Citep(bib[["slurmjobs"]])` was made possible thanks to:
