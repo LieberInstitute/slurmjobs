@@ -21,12 +21,12 @@
 #'
 #' job_loop(
 #'     loops = list(region = c("DLPFC", "HIPPO"), feature = c("gene", "exon", "tx", "jxn")),
-#'     name = "bsp2_test_array",
+#'     name = "bsp2_test_array", create_logdir = FALSE
 #'     cores = 2
 #' )
 #'
 job_loop <- function(loops, name, create_shell = FALSE, partition = "shared", memory = "10G",
-    cores = 1L, tc = 20, email = "ALL", logdir = "logs") {
+    cores = 1L, tc = 20, email = "ALL", logdir = "logs", create_logdir = TRUE) {
     ## Check that the loops are correctly defined
     if (!is.list(loops)) {
         stop("'loops' should be a named list.", call. = FALSE)
@@ -126,7 +126,7 @@ job_loop <- function(loops, name, create_shell = FALSE, partition = "shared", me
         command = command,
         #   The number of tasks is the product of lengths of each loop
         task_num = prod(sapply(loops, length)),
-        create_logdir = FALSE
+        create_logdir = create_logdir
     ) |>
         #   Convert to a character vector with elements as lines of the file
         str_split("\\n")

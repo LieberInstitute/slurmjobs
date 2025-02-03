@@ -23,7 +23,7 @@ test_that(
             file.path(base_dir, "03_third.sh"),
             create_shell = TRUE,
             loops = list(a = c("a", "b"), b = c("c", "d")),
-            logdir = "logs"
+            logdir = file.path(base_dir, "logs")
         )
 
         #   Scripts with tricky names that should not be renumbered
@@ -37,7 +37,6 @@ test_that(
         )
 
         #   Logs to renumber (skipping a couple intentionally)
-        dir.create(file.path(base_dir, "logs"))
         all_log_base_names <- c(
             "02_second.txt", "03_third_a_c.txt",
             "03_third_a_d.txt", "03_third_b_d.txt"

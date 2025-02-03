@@ -11,6 +11,7 @@ run_test <- function(delete = TRUE, ...) {
         ## Create an array job script to use for this example
         job_loop(
             name = job_name,
+            create_logdir = FALSE,
             ...
         )
     })

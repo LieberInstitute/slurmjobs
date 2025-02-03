@@ -148,7 +148,7 @@ can be accessed by name in R. Let's make that a bit more concrete.
 #   and R scripts. Let's take a look at the shell script first
 script_pair <- job_loop(
     loops = list(region = c("DLPFC", "HIPPO"), feature = c("gene", "exon", "tx", "jxn")),
-    name = "bsp2_test"
+    name = "bsp2_test", create_logdir = FALSE
 )
 cat(script_pair[["shell"]], sep = "\n")
 ```
@@ -347,6 +347,7 @@ writeLines("# some code", con = file.path(base_dir, "01_should_be_second.R"))
 job_loop(
     file.path(base_dir, "02_should_be_first.sh"),
     create_shell = TRUE, logdir = file.path(base_dir, "logs"),
+    create_logdir = FALSE,
     loops = list(
         gene = c("gene_1", "gene_2"), method = c("method_1", "method_2")
     ) 
