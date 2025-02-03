@@ -338,7 +338,7 @@ dir.create(base_dir)
 #   Create a shell script that submits a corresponding R script
 job_single(
     file.path(base_dir, "01_should_be_second.sh"),
-    logdir = "logs", create_logdir = TRUE,
+    logdir = file.path(base_dir, "logs"), create_logdir = TRUE,
     create_shell = TRUE, command = "Rscript 01_should_be_second.R"
 )
 writeLines("# some code", con = file.path(base_dir, "01_should_be_second.R"))
@@ -346,7 +346,7 @@ writeLines("# some code", con = file.path(base_dir, "01_should_be_second.R"))
 #   Create an array originally designed to be submitted second
 job_loop(
     file.path(base_dir, "02_should_be_first.sh"),
-    create_shell = TRUE, logdir = "logs",
+    create_shell = TRUE, logdir = file.path(base_dir, "logs")
     loops = list(
         gene = c("gene_1", "gene_2"), method = c("method_1", "method_2")
     ) 
