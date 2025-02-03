@@ -14,7 +14,8 @@ job_loop(
   tc = 20,
   email = "ALL",
   logdir = "logs",
-  create_logdir = TRUE
+  create_logdir = TRUE,
+  create_script = create_shell
 )
 }
 \arguments{
@@ -50,6 +51,9 @@ path.}
 \item{create_logdir}{A \code{logical(1)} vector specifying whether to create the
 \code{logdir} directory. Note that if \code{logdir} doesn't exist and you submit your
 job with \code{sbatch}, it will immediately fail.}
+
+\item{create_script}{A \code{logical(1)} indicating whether to create the R
+script.}
 }
 \value{
 A length-2 list of character vectors containing the contents of the
@@ -63,7 +67,7 @@ over a set of variables with pre-specified values.
 
 job_loop(
     loops = list(region = c("DLPFC", "HIPPO"), feature = c("gene", "exon", "tx", "jxn")),
-    name = "bsp2_test_array", create_logdir = FALSE
+    name = "bsp2_test_array", create_logdir = FALSE,
     cores = 2
 )
 
