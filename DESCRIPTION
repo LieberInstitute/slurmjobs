@@ -1,6 +1,6 @@
 Package: slurmjobs
 Title: Helper Functions for SLURM jobs
-Version: 1.2.5
+Version: 1.3.0
 Date: 2024-09-20
 Authors@R: 
     person("Nicholas J.", "Eagles", email = "nickeagles77@gmail.com", role = c("aut", "cre"),
