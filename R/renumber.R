@@ -33,7 +33,7 @@
 #' #   Create an array originally designed to be submitted second
 #' job_loop(
 #'     file.path(base_dir, "02_should_be_first.sh"),
-#'     create_shell = TRUE, logdir = "logs"
+#'     create_shell = TRUE, logdir = "logs",
 #'     loops = list(
 #'         gene = c("gene_1", "gene_2"), method = c("method_1", "method_2")
 #'     ) 
