@@ -118,7 +118,7 @@ job_loop <- function(
 
     #   Most of the script's content is created via 'job_single'
     script_core <- job_single(
-        name = sh_file,
+        name = name,
         partition = partition,
         memory = memory,
         cores = cores,
@@ -174,9 +174,9 @@ job_loop <- function(
                 Sys.time(), name, name
             )
         )
-        message(sprintf("To submit the script pair, use: sbatch %s.sh", name))
-        writeLines(r_text, con = paste0(name, ".R"))
-        writeLines(script_final, con = paste0(name, ".sh"))
+        message(sprintf("To submit the script pair, use: sbatch %s", sh_file))
+        writeLines(r_text, con = sub("\\.sh$", ".R", sh_file))
+        writeLines(script_final, con = sh_file)
     }
 
     ## Done!
