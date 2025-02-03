@@ -4,10 +4,13 @@ job_name <- paste0("job_loop_test_", Sys.Date())
 
 run_test <- function(delete = TRUE, ...) {
     ## Delete it in case it exists
-    if (delete) unlink(file.path(tempdir(), paste0(job_name, ".sh")))
+    if (delete) {
+        unlink(file.path(tempdir(), paste0(job_name, ".sh")))
+        unlink(file.path(tempdir(), paste0(job_name, ".R")))
+    }
 
     ## Create an array job on the temporary directory
-    with_dir(tempdir(), {
+    withr::with_dir(tempdir(), {
         ## Create an array job script to use for this example
         job_loop(
             name = job_name,
@@ -41,10 +44,15 @@ test_that("job_loop", {
         "Could not parse memory request"
     )
     run_test(create_shell = TRUE, loops = list("a" = letters))
+    expect_equal(file.exists(file.path(tempdir(), paste0(job_name, ".sh"))), TRUE)
+    expect_equal(file.exists(file.path(tempdir(), paste0(job_name, ".R"))), TRUE)
     expect_error(
         run_test(
             delete = FALSE, loops = list("b" = letters), create_shell = TRUE
         ),
         "already exists"
     )
+    run_test(create_shell = TRUE, create_script = FALSE, loops = list("a" = letters))
+    expect_equal(file.exists(file.path(tempdir(), paste0(job_name, ".sh"))), TRUE)
+    expect_equal(file.exists(file.path(tempdir(), paste0(job_name, ".R"))), FALSE)
 })
