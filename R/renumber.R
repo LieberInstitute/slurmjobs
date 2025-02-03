@@ -78,12 +78,12 @@ renumber <- function(base_dir, pre_before, pre_after) {
             }
 
             #   Rename logs, if any exist
-            logs_before = list.files(
+            logs_before <- list.files(
                 log_dir,
                 pattern = sprintf("^%s.*\\.(txt|log)$", full_pre_before),
                 full.names = TRUE
             )
-            logs_after = file.path(
+            logs_after <- file.path(
                 log_dir,
                 sub(full_pre_before, full_pre_after, basename(logs_before))
             )
@@ -101,7 +101,7 @@ renumber <- function(base_dir, pre_before, pre_after) {
         #   renaming
         files_before <- all_files[
             grepl(paste0("^", pre_before[i]), basename(all_files)) &
-            !grepl("temp_slurmjobs$", all_files)
+                !grepl("temp_slurmjobs$", all_files)
         ]
         files_after <- file.path(
             base_dir,
@@ -118,8 +118,8 @@ renumber <- function(base_dir, pre_before, pre_after) {
     }
 
     #   Remove temporary suffix from script names
-    all_files = list.files(base_dir, full.names = TRUE)
-    files_before = all_files[
+    all_files <- list.files(base_dir, full.names = TRUE)
+    files_before <- all_files[
         grepl(
             sprintf(
                 "^(%s).*temp_slurmjobs$", paste(pre_after, collapse = "|")
@@ -127,7 +127,7 @@ renumber <- function(base_dir, pre_before, pre_after) {
             basename(all_files)
         )
     ]
-    files_after = sub("temp_slurmjobs$", "", files_before)
+    files_after <- sub("temp_slurmjobs$", "", files_before)
     file.rename(files_before, files_after)
 
     return(invisible(NULL))
