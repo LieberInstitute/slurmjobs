@@ -14,13 +14,36 @@
 #' @param pre_after A `character()` vector of replacement prefices among scripts
 #' in `base_dir`.
 #'
-#' @importFrom stringr str_extract
-#'
 #' @return NULL
 #' @export
 #' @author Nicholas J. Eagles
 #'
 #' @examples
+#' base_dir <- file.path(tempdir(), "slurmjobs_scripts")
+#' dir.create(base_dir)
+#' 
+#' #   Create a shell script that submits a corresponding R script
+#' job_single(
+#'     file.path(base_dir, "01_should_be_second.sh"),
+#'     logdir = "logs", create_logdir = TRUE,
+#'     create_shell = TRUE, command = "Rscript 01_should_be_second.R"
+#' )
+#' writeLines("# some code", con = file.path(base_dir, "01_should_be_second.R"))
+#' 
+#' #   Create an array originally designed to be submitted second
+#' job_loop(
+#'     file.path(base_dir, "02_should_be_first.sh"),
+#'     create_shell = TRUE, logdir = "logs"
+#'     loops = list(
+#'         gene = c("gene_1", "gene_2"), method = c("method_1", "method_2")
+#'     ) 
+#' )
+#'
+#' #   Swap the order of the scripts
+#' renumber(base_dir, c("01", "02"), c("02", "01"))
+#' 
+#' #   Check that the scripts have been properly renamed
+#' list.files(base_dir)
 renumber <- function(base_dir, pre_before, pre_after) {
     if (!dir.exists(base_dir)) {
         stop("'base_dir' must exist.")
