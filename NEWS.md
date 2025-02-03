@@ -1,5 +1,13 @@
 # slurmjobs 1.3.0
 
+NEW FEATURES
+
+* New function `renumber()` renames a set of scripts along with their associated logs and content
+
+BUG FIXES
+
+* `job_loop()` now respects absolute paths to the scripts to create
+
 # slurmjobs 1.2.5
 
 BUG FIXES
