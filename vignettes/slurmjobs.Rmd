@@ -412,6 +412,36 @@ updated.
 readLines(file.path(base_dir, "01_should_be_first.sh"))
 ```
 
+## Other Uses
+
+Despite being developed for a somewhat specific use case, `renumber()` can be
+applied to other renaming tasks. It can rename a set of directories, and
+prefices need not be numbers.
+
+Let's first create some directories as an example.
+
+```{r "create_dirs"}
+#   Create a base directory where we could have plots
+base_dir = file.path(tempdir(), "plots")
+dir.create(base_dir)
+
+#   Create some directories under 'plots'
+dir.create(file.path(base_dir, "first_visualization"))
+dir.create(file.path(base_dir, "then_QC"))
+dir.create(file.path(base_dir, "finally_analysis"))
+
+#   We now have three plotting directories
+list.files(base_dir)
+```
+
+Let's rename them and check the result.
+
+```{r "renumber_dirs"}
+#   Re-order directories and check their new names
+renumber(base_dir, c("first", "then", "finally"), c("3rd", "1st", "2nd"))
+list.files(base_dir)
+```
+
 # Reproducibility
 
 The `r Biocpkg("slurmjobs")` package `r Citep(bib[["slurmjobs"]])` was made possible thanks to:
