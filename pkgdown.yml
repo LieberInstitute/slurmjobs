@@ -1,6 +1,6 @@
 pandoc: '3.6'
-pkgdown: 2.1.1
+pkgdown: 2.1.3
 pkgdown_sha: ~
 articles:
   slurmjobs: slurmjobs.html
-last_built: 2025-02-04T17:57Z
+last_built: 2025-08-29T14:21Z
