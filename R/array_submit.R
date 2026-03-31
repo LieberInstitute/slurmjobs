@@ -105,22 +105,22 @@ array_submit <- function(name, task_ids = NULL, submit = FALSE, restore = TRUE, 
 
         #   For 'job_loop', use the path in the line starting with 'log_path='.
         #   Otherwise use the log in the line starting with '#SBATCH -o'.
-        last_occurence = rev(grep("^(#SBATCH -o |log_path=)", job_original))[1]
-        max_log = job_original[last_occurence] |>
+        last_occurence <- rev(grep("^(#SBATCH -o |log_path=)", job_original))[1]
+        max_log <- job_original[last_occurence] |>
             #   Extract just the path
             str_replace("^(#SBATCH -o |log_path=)", "") |>
             #   Set the path for the highest task
             str_replace("%a|\\$\\{SLURM_ARRAY_TASK_ID\\}", max_task)
-        
+
         #   If the log is specified with a relative path, make sure it's
         #   relative to the directory containing the shell script
-        if (!grepl('^/', max_log)) {
-            max_log = file.path(dirname(sh_file), max_log)
+        if (!grepl("^/", max_log)) {
+            max_log <- file.path(dirname(sh_file), max_log)
         }
 
         #   Find the precise path of the log in a way that's compatible with
         #   both 'job_single' and 'job_loop'
-        max_log = list.files(
+        max_log <- list.files(
             dirname(max_log),
             pattern = sprintf("^%s.*_%s\\.txt$", name, max_task),
             full.names = TRUE

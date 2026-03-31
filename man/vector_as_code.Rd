@@ -26,3 +26,4 @@ message(slurmjobs:::vector_as_code(fruits))
 \author{
 Nicholas J. Eagles
 }
+\keyword{internal}

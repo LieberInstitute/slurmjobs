@@ -6,6 +6,8 @@
 #' @param loops A named `list` where each of the elements are character vectors.
 #' The names of `loops` specify the variables used for the loops and the
 #' contents specify the options to loop through for each variable.
+#' @param create_script A `logical(1)` indicating whether to create the R
+#' script.
 #' @inheritParams job_single
 #'
 #' @return A length-2 list of character vectors containing the contents of the
@@ -21,12 +23,12 @@
 #'
 #' job_loop(
 #'     loops = list(region = c("DLPFC", "HIPPO"), feature = c("gene", "exon", "tx", "jxn")),
-#'     name = "bsp2_test_array",
+#'     name = "bsp2_test_array", create_logdir = FALSE,
 #'     cores = 2
 #' )
 #'
 job_loop <- function(loops, name, create_shell = FALSE, partition = "shared", memory = "10G",
-    cores = 1L, tc = 20, email = "ALL", logdir = "logs") {
+    cores = 1L, tc = 20, email = "ALL", logdir = "logs", create_logdir = TRUE, create_script = create_shell) {
     ## Check that the loops are correctly defined
     if (!is.list(loops)) {
         stop("'loops' should be a named list.", call. = FALSE)
@@ -71,8 +73,11 @@ job_loop <- function(loops, name, create_shell = FALSE, partition = "shared", me
         ")",
         "opt <- getopt(spec)",
         "",
-        'print("Using the following parameters:")',
+        'message("Using the following parameters:")',
         "print(opt)",
+        "",
+        'message("Memory usage:")',
+        "gc()",
         "",
         "session_info()",
         "",
@@ -81,21 +86,6 @@ job_loop <- function(loops, name, create_shell = FALSE, partition = "shared", me
             packageVersion("slurmjobs")
         ),
         "## available from http://research.libd.org/slurmjobs/"
-    )
-
-    ## Build the core script
-    script <- job_single(
-        name = name,
-        partition = partition,
-        memory = memory,
-        cores = cores,
-        email = email,
-        logdir = logdir,
-        command = command,
-        #   The number of tasks is the product of lengths of each loop
-        task_num = prod(sapply(loops, length)),
-        tc = tc,
-        create_logdir = FALSE
     )
 
     #   Given integer(1) 'i', an index of 'loops', return a character vector
@@ -138,7 +128,7 @@ job_loop <- function(loops, name, create_shell = FALSE, partition = "shared", me
         command = command,
         #   The number of tasks is the product of lengths of each loop
         task_num = prod(sapply(loops, length)),
-        create_logdir = FALSE
+        create_logdir = create_logdir
     ) |>
         #   Convert to a character vector with elements as lines of the file
         str_split("\\n")
@@ -177,17 +167,37 @@ job_loop <- function(loops, name, create_shell = FALSE, partition = "shared", me
         script_core[version_line:length(script_core)]
     )
 
-    ## Write to a file?
-    if (create_shell) {
+    ## Write each component to file?
+    if (create_shell && create_script) {
         message(
             sprintf(
                 "%s Creating the shell file %s.sh and corresponding R script %s.R",
                 Sys.time(), name, name
             )
         )
-        message(sprintf("To submit the script pair, use: sbatch %s.sh", name))
-        writeLines(r_text, con = paste0(name, ".R"))
-        writeLines(script_final, con = paste0(name, ".sh"))
+        message(sprintf("To submit the script pair, use: sbatch %s", sh_file))
+        writeLines(r_text, con = sub("\\.sh$", ".R", sh_file))
+        writeLines(script_final, con = sh_file)
+    } else {
+        if (create_shell) {
+            message(
+                sprintf(
+                    "%s Creating the shell file %s.sh",
+                    Sys.time(), name
+                )
+            )
+            message(sprintf("To submit the script pair, use: sbatch %s", sh_file))
+            writeLines(script_final, con = sh_file)
+        }
+        if (create_script) {
+            message(
+                sprintf(
+                    "%s Creating the R script %s.R",
+                    Sys.time(), name
+                )
+            )
+            writeLines(r_text, con = sub("\\.sh$", ".R", sh_file))
+        }
     }
 
     ## Done!

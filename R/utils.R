@@ -15,6 +15,7 @@
 #' modulus
 #'
 #' @author Nicholas J. Eagles
+#' @keywords internal
 #'
 #' @examples
 #'
@@ -59,6 +60,7 @@ get_list_indexing <- function(this_list, index) {
 #' one-letter initials
 #'
 #' @author Nicholas J. Eagles
+#' @keywords internal
 #'
 #' @examples
 #'
@@ -100,6 +102,7 @@ get_short_flags <- function(vec) {
 #' \code{vec}
 #'
 #' @author Nicholas J. Eagles
+#' @keywords internal
 #'
 #' @examples
 #'
@@ -122,6 +125,7 @@ vector_as_code <- function(vec) {
 #'
 #' @import stringr lubridate
 #' @author Nicholas J. Eagles
+#' @keywords internal
 #'
 #' @examples
 #'
@@ -174,6 +178,7 @@ parse_slurm_time <- function(tim) {
 #'
 #' @import stringr
 #' @author Nicholas J. Eagles
+#' @keywords internal
 #'
 #' @examples
 #'
