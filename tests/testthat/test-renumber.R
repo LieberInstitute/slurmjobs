@@ -3,6 +3,7 @@ test_that(
     {
         #   Create a temporary directory that's guaranteed to be empty
         base_dir <- file.path(tempdir(), "temp_slurmjobs")
+        unlink(base_dir, recursive = TRUE)
         dir.create(base_dir)
 
         #   Create a set of scripts, some of which will be renumbered
@@ -81,5 +82,36 @@ test_that(
         content <- readLines(file.path(base_dir, "01_third.sh"))
         expect_equal(any(grepl("^(02_third|03_third)", content)), FALSE)
         expect_equal(length(grep("^Rscript 01_third\\.R", content)), 1)
+
+        #   Check proper functioning of the 'plots_and_processed' parameter
+        #   (when TRUE-- the other tests implicitly check FALSE)
+        dir.create(file.path(base_dir, "code"))
+        for (dir_type in c("processed-data", "plots")) {
+            dir.create(file.path(base_dir, dir_type))
+            dir.create(file.path(base_dir, dir_type, "01_second"))
+            dir.create(file.path(base_dir, dir_type, "02_first"))
+        }
+        writeLines(
+            "# some code",
+            con = file.path(base_dir, "code", "01_second.R")
+        )
+        writeLines(
+            "# some code",
+            con = file.path(base_dir, "code", "02_first.R")
+        )
+        renumber(
+            file.path(base_dir, "code"), c("01", "02"), c("02", "01"),
+            plots_and_processed = TRUE
+        )
+        for (dir_type in c("processed-data", "plots")) {
+             expect_identical(
+                sort(list.files(file.path(base_dir, dir_type))),
+                c("01_first", "02_second")
+            )
+        }
+        expect_identical(
+            sort(list.files(file.path(base_dir, "code"))),
+            c("01_first.R", "02_second.R")
+        )
     }
 )
