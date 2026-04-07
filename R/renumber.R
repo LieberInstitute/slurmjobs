@@ -13,6 +13,8 @@
 #' in `base_dir`.
 #' @param pre_after A `character()` vector of replacement prefices among scripts
 #' in `base_dir`.
+#' @param plots_and_processed A `logical(1)` indicating whether to also re-order
+#' the corresponding `plots` and `processed-data` directories, if they exist.
 #'
 #' @return NULL
 #' @export
@@ -46,7 +48,7 @@
 #' 
 #' #   Check that the scripts have been properly renamed
 #' list.files(base_dir)
-renumber <- function(base_dir, pre_before, pre_after) {
+renumber <- function(base_dir, pre_before, pre_after, plots_and_processed = FALSE) {
     if (!dir.exists(base_dir)) {
         stop("'base_dir' must exist.")
     }
@@ -154,6 +156,49 @@ renumber <- function(base_dir, pre_before, pre_after) {
     ]
     files_after <- sub("temp_slurmjobs$", "", files_before)
     file.rename(files_before, files_after)
+
+    #   For code directories, also renumber the corresponding 'processed-data'
+    #   and 'plots' directories, if they exist
+    if (plots_and_processed) {
+        #   Split the path into components (OS-independent via fs)
+        path_parts <- fs::path_split(base_dir)[[1]]
+        path_prefix <- path_parts[1]
+        path_parts <- path_parts[2:length(path_parts)]
+
+        #   Find the index of the 'code' component (use the last occurrence in
+        #   case 'code' appears multiple times in the path)
+        code_index <- rev(which(path_parts == "code"))[1]
+
+        if (!is.na(code_index)) {
+            #   The sub-path below 'code' is the same for sibling directories,
+            #   if it exists
+            if (code_index == length(path_parts)) {
+                sub_path <- character(0)
+            } else {
+                sub_path <- path_parts[seq(code_index + 1, length(path_parts))]
+            }
+
+            for (sibling in c("processed-data", "plots")) {
+                sibling_parts <- c(
+                    path_parts[seq_len(code_index - 1)],
+                    sibling,
+                    sub_path
+                )
+                sibling_dir <- paste0(
+                    path_prefix, do.call(file.path, as.list(sibling_parts))
+                )
+
+                if (dir.exists(sibling_dir)) {
+                    renumber(
+                        sibling_dir,
+                        pre_before,
+                        pre_after,
+                        plots_and_processed = FALSE
+                    )
+                }
+            }
+        }
+    }
 
     return(invisible(NULL))
 }
