@@ -18,6 +18,8 @@
 #' @export
 #' @author Nicholas J. Eagles
 #'
+#' @importFrom fs is_absolute_path
+#' 
 #' @examples
 #' base_dir <- file.path(tempdir(), "slurmjobs_scripts")
 #' dir.create(base_dir)
@@ -95,7 +97,7 @@ renumber <- function(base_dir, pre_before, pre_after) {
 
             #   If the log is specified with a relative path, make sure it's
             #   relative to the directory containing the shell script
-            if (!grepl("^/", log_dir)) {
+            if (!fs::is_absolute_path(log_dir)) {
                 log_dir <- file.path(dirname(shell_before), log_dir) |>
                     normalizePath()
             }
