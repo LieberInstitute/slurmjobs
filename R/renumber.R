@@ -15,7 +15,10 @@
 #' in `base_dir`.
 #' @param plots_and_processed A `logical(1)` indicating whether to also re-order
 #' the corresponding `plots` and `processed-data` directories, if they exist.
-#'
+#' @param expect_matches A `logical(1)` indicating whether to expect that all
+#' prefices in `pre_before` will match a file in `base_dir`, throwing an error if
+#' not.
+#' 
 #' @return NULL
 #' @export
 #' @author Nicholas J. Eagles
@@ -48,7 +51,10 @@
 #' 
 #' #   Check that the scripts have been properly renamed
 #' list.files(base_dir)
-renumber <- function(base_dir, pre_before, pre_after, plots_and_processed = FALSE) {
+renumber <- function(
+        base_dir, pre_before, pre_after, plots_and_processed = FALSE,
+        expect_matches = TRUE
+    ) {
     if (!dir.exists(base_dir)) {
         stop("'base_dir' must exist.")
     }
@@ -62,89 +68,51 @@ renumber <- function(base_dir, pre_before, pre_after, plots_and_processed = FALS
         pre_before,
         function(x) length(grep(paste0("^", x), basename(all_files)))
     )
-    if (!all(matches > 0)) {
-        stop("At least one prefix in 'pre_before' did not match a file in 'base_dir'.")
-    }
-
-    for (i in seq_len(length(pre_before))) {
-        #   Edit the content of the shell script if it exists, and find and
-        #   update log names
-        shell_before <- all_files[
-            grep(sprintf("^%s.*\\.sh$", pre_before[i]), basename(all_files))
-        ]
-        if (length(shell_before) > 1) {
-            stop(
-                "Expected no more than one shell script with prefix '",
-                pre_before[i], "'."
-            )
-        } else if (length(shell_before) == 1) {
-            shell_content <- readLines(shell_before)
-
-            full_pre_before <- stringr::str_extract(
-                basename(shell_before),
-                sprintf("(^%s.*)\\.sh$", pre_before[i]),
-                group = 1
-            )
-            full_pre_after <- sub(
-                paste0("^", pre_before[i]), pre_after[i], full_pre_before
-            )
-
-            #   For 'job_loop', use the path in the line starting with 'log_path='.
-            #   Otherwise use the log in the line starting with '#SBATCH -o'.
-            last_occurence <- rev(grep("^(#SBATCH -o |log_path=)", shell_content))[1]
-            log_dir <- shell_content[last_occurence] |>
-                #   Extract just the path
-                str_replace("^(#SBATCH -o |log_path=)", "") |>
-                dirname()
-
-            #   If the log is specified with a relative path, make sure it's
-            #   relative to the directory containing the shell script
-            if (!fs::is_absolute_path(log_dir)) {
-                log_dir <- file.path(dirname(shell_before), log_dir) |>
-                    normalizePath()
-            }
-
-            #   Rename logs, if any exist
-            logs_before <- list.files(
-                log_dir,
-                pattern = sprintf("^%s.*\\.(txt|log)$", full_pre_before),
-                full.names = TRUE
-            )
-            logs_after <- file.path(
-                log_dir,
-                sub(full_pre_before, full_pre_after, basename(logs_before))
-            )
-            if (length(logs_before) > 0) {
-                file.rename(logs_before, logs_after)
-            }
-
-            #   Re-write the shell script in place, replacing references to the
-            #   old script name
-            shell_content <- gsub(full_pre_before, full_pre_after, shell_content)
-            writeLines(shell_content, con = shell_before)
-        }
-
-        #   Rename scripts but append temporary suffix to avoid repeated
-        #   renaming
-        files_before <- all_files[
-            grepl(paste0("^", pre_before[i]), basename(all_files)) &
-                !grepl("temp_slurmjobs$", all_files)
-        ]
-        files_after <- file.path(
-            base_dir,
-            paste0(
-                sub(
-                    paste0("^", pre_before[i]),
-                    pre_after[i],
-                    basename(files_before)
-                ),
-                "temp_slurmjobs"
-            )
+    if (expect_matches && !all(matches > 0)) {
+        stop(
+            "At least one prefix in 'pre_before' did not match a file in 'base_dir'. Consider setting 'expect_matches = FALSE' to ignore missing prefixes."
         )
-        file.rename(files_before, files_after)
     }
 
-    #   Remove temporary suffix from script names
+    all_log_dirs = c()
+    for (i in seq_len(length(pre_before))) {
+        temp = .renumber_process_file(
+            base_dir = base_dir,
+            file_regex = "\\.(R|py)",
+            this_pre_before = pre_before[i],
+            this_pre_after = pre_after[i],
+            all_files = all_files,
+            is_shell = FALSE,
+            edit_content = TRUE,
+            expected_one_file = TRUE
+        )
+
+        temp = .renumber_process_file(
+            base_dir = base_dir,
+            file_regex = "\\.sh",
+            this_pre_before = pre_before[i],
+            this_pre_after = pre_after[i],
+            all_files = all_files,
+            is_shell = TRUE,
+            edit_content = TRUE,
+            expected_one_file = TRUE
+        )
+        all_log_dirs = c(all_log_dirs, temp)
+
+        temp = .renumber_process_file(
+            base_dir = base_dir,
+            file_regex = "(\\.(R|py|sh)|temp_slurmjobs)",
+            this_pre_before = pre_before[i],
+            this_pre_after = pre_after[i],
+            all_files = all_files,
+            is_shell = FALSE,
+            edit_content = FALSE,
+            expected_one_file = FALSE,
+            negate_pattern = TRUE
+        )
+    }
+
+    #   Remove temporary suffix from (non-log) file names
     all_files <- list.files(base_dir, full.names = TRUE)
     files_before <- all_files[
         grepl(
@@ -156,6 +124,24 @@ renumber <- function(base_dir, pre_before, pre_after, plots_and_processed = FALS
     ]
     files_after <- sub("temp_slurmjobs$", "", files_before)
     file.rename(files_before, files_after)
+
+    #   Remove temporary suffix from log file names. This is slightly imprecise,
+    #   as in theory there can be a mismatch of prefix and log_dir, such that
+    #   a log file with the wrong prefix, also ending in 'temp_slurmjobs', could
+    #   be renamed. Ignore this highly unlikely case for now
+    for (log_dir in all_log_dirs) {
+        all_files <- list.files(log_dir, full.names = TRUE)
+        files_before <- all_files[
+            grepl(
+                sprintf(
+                    "^(%s).*temp_slurmjobs$", paste(pre_after, collapse = "|")
+                ),
+                basename(all_files)
+            )
+        ]
+        files_after <- sub("temp_slurmjobs$", "", files_before)
+        file.rename(files_before, files_after)
+    }
 
     #   For code directories, also renumber the corresponding 'processed-data'
     #   and 'plots' directories, if they exist
@@ -193,7 +179,8 @@ renumber <- function(base_dir, pre_before, pre_after, plots_and_processed = FALS
                         sibling_dir,
                         pre_before,
                         pre_after,
-                        plots_and_processed = FALSE
+                        plots_and_processed = FALSE,
+                        expect_matches = FALSE
                     )
                 }
             }
@@ -201,4 +188,104 @@ renumber <- function(base_dir, pre_before, pre_after, plots_and_processed = FALS
     }
 
     return(invisible(NULL))
+}
+
+#' Helper function to rename a single file pattern
+#' 
+#' This is employed by `renumber()` to individually and separately handle R
+#' scripts, shell scripts, and logs
+#' 
+#' @author Nicholas J. Eagles
+#' @keywords internal
+.renumber_process_file = function(
+        base_dir, file_regex, this_pre_before, this_pre_after, all_files,
+        is_shell, edit_content, expected_one_file, negate_pattern = FALSE
+    ) {
+    second_condition = grepl(sprintf("%s$", file_regex), basename(all_files))
+    if (negate_pattern) {
+        second_condition = !second_condition
+    }
+    file_before <- all_files[
+        grepl(sprintf("^%s", this_pre_before), basename(all_files)) &
+        second_condition
+    ]
+
+    if (expected_one_file) {
+        if (length(file_before) > 1) {
+            stop(
+                "Expected at most one file with prefix '", this_pre_before,
+                "'. Found ", length(file_before), "."
+            )
+        }
+    }
+
+    if (length(file_before) == 0) {
+        return(invisible(NULL))
+    }
+
+    full_pre_before <- stringr::str_extract(
+        basename(file_before),
+        sprintf("(^%s.*)%s$", this_pre_before, file_regex), group = 1
+    )
+    full_pre_after <- sub(
+        paste0("^", this_pre_before), this_pre_after, full_pre_before
+    )
+    
+    log_dir = c()
+    if (edit_content) {
+        file_content = readLines(file_before)
+
+        if (is_shell) {
+            #   For 'job_loop', use the path in the line starting with
+            #   'log_path='. Otherwise use the log in the line starting with
+            #   '#SBATCH -o'.
+            last_occurence <- rev(
+                grep("^(#SBATCH -o |log_path=)", file_content)
+            )[1]
+            log_dir <- file_content[last_occurence] |>
+                #   Extract just the path
+                str_replace("^(#SBATCH -o |log_path=)", "") |>
+                dirname()
+
+            #   If the log is specified with a relative path, make sure it's
+            #   relative to the directory containing the shell script
+            if (!fs::is_absolute_path(log_dir)) {
+                log_dir <- file.path(dirname(file_before), log_dir) |>
+                    normalizePath()
+            }
+
+            #   Use recursion to rename logs, where they exist
+            .renumber_process_file(
+                base_dir = log_dir,
+                file_regex = "\\.(txt|log)",
+                this_pre_before = this_pre_before,
+                this_pre_after = this_pre_after,
+                all_files = list.files(log_dir, full.names = TRUE),
+                is_shell = FALSE,
+                edit_content = FALSE,
+                expected_one_file = FALSE
+            )
+        }
+
+        #   Re-write the file in place, replacing references to the
+        #   old prefix
+        file_content <- gsub(full_pre_before, full_pre_after, file_content)
+        writeLines(file_content, con = file_before)
+    }
+
+    #   Rename scripts but append temporary suffix to avoid repeated
+    #   renaming
+    file_after <- file.path(
+        base_dir,
+        paste0(
+            sub(
+                paste0("^", this_pre_before), this_pre_after,
+                basename(file_before)
+            ),
+            "temp_slurmjobs"
+        )
+    )
+    file.rename(file_before, file_after)
+
+    return(log_dir)
 }
