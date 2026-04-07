@@ -161,7 +161,7 @@ renumber <- function(base_dir, pre_before, pre_after, plots_and_processed = FALS
     #   and 'plots' directories, if they exist
     if (plots_and_processed) {
         #   Split the path into components (OS-independent via fs)
-        path_parts <- fs::path_split(base_dir)[[1]]
+        path_parts <- fs::path_split(normalizePath(base_dir))[[1]]
         path_prefix <- path_parts[1]
         path_parts <- path_parts[2:length(path_parts)]
 
