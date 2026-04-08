@@ -92,7 +92,10 @@ test_that(
             dir.create(file.path(base_dir, dir_type, "02_first"))
         }
         writeLines(
-            "# some code",
+            c(
+                "some_path = here('processed-data', '01_second', 'a.txt')",
+                "some_variable = '01'"
+            ),
             con = file.path(base_dir, "code", "01_second.R")
         )
         writeLines(
@@ -112,6 +115,52 @@ test_that(
         expect_identical(
             sort(list.files(file.path(base_dir, "code"))),
             c("01_first.R", "02_second.R")
+        )
+
+        #   This is an especially tricky case, as even though the input prefix
+        #   was "01", we want to only replace instances of "01_second" within
+        #   the R script
+        content = readLines(file.path(base_dir, "code", "02_second.R"))
+        expect_identical(
+            content,
+            c(
+                "some_path = here('processed-data', '02_second', 'a.txt')",
+                "some_variable = '01'"
+            )
+        )
+
+        #   Start with a clean temporary directory
+        unlink(base_dir, recursive = TRUE)
+        dir.create(base_dir)
+
+        #   Attempt a sketchy renaming that would effectively delete files. It
+        #   should both throw an error and not touch any files up until the 
+        #   error is thrown
+        job_single(
+            file.path(base_dir, "01_first.sh"),
+            create_logdir = FALSE,
+            create_shell = TRUE, command = "Rscript 01_first.R"
+        )
+        writeLines("# some code", con = file.path(base_dir, "01_first.R"))
+        job_single(
+            file.path(base_dir, "02_second.sh"),
+            create_logdir = FALSE,
+            create_shell = TRUE, command = "python 02_second.py"
+        )
+        starting_files <- list.files(base_dir)
+        expect_error(
+            renumber(
+                base_dir, c("01_first", "02_second"),
+                c("02_something", "02_something")
+            ),
+            "^The proposed renaming plan"
+        )
+        expect_equal(setequal(list.files(base_dir), starting_files), TRUE)
+
+        #   Attempt another dangerous rename that overwrites an existing file
+        expect_error(
+            renumber(base_dir, "01_first", "02_second"),
+            "^The proposed renaming plan"
         )
     }
 )
