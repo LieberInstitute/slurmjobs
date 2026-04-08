@@ -121,9 +121,9 @@ not.</p></dd>
 <span class="r-in"><span>    logdir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">base_dir</span>, <span class="st">"logs"</span><span class="op">)</span>, create_logdir <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
 <span class="r-in"><span>    create_shell <span class="op">=</span> <span class="cn">TRUE</span>, command <span class="op">=</span> <span class="st">"Rscript 01_should_be_second.R"</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 2026-04-07 20:20:52.557237 creating the logs directory at:  /tmp/Rtmpf2I8Mc/slurmjobs_scripts/logs</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 2026-04-07 20:20:52.562139 creating the shell file /tmp/Rtmpf2I8Mc/slurmjobs_scripts/01_should_be_second.sh</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> To submit the job use: sbatch /tmp/Rtmpf2I8Mc/slurmjobs_scripts/01_should_be_second.sh</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> 2026-04-08 20:35:43.813905 creating the logs directory at:  /tmp/RtmpmSN2nl/slurmjobs_scripts/logs</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> 2026-04-08 20:35:43.818445 creating the shell file /tmp/RtmpmSN2nl/slurmjobs_scripts/01_should_be_second.sh</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> To submit the job use: sbatch /tmp/RtmpmSN2nl/slurmjobs_scripts/01_should_be_second.sh</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/writeLines.html" class="external-link">writeLines</a></span><span class="op">(</span><span class="st">"# some code"</span>, con <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">base_dir</span>, <span class="st">"01_should_be_second.R"</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">#   Create an array originally designed to be submitted second</span></span></span>
@@ -134,9 +134,9 @@ not.</p></dd>
 <span class="r-in"><span>        gene <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"gene_1"</span>, <span class="st">"gene_2"</span><span class="op">)</span>, method <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"method_1"</span>, <span class="st">"method_2"</span><span class="op">)</span></span></span>
 <span class="r-in"><span>    <span class="op">)</span> </span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 2026-04-07 20:20:52.564904 creating the logs directory at:  /tmp/Rtmpf2I8Mc/slurmjobs_scripts/logs</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 2026-04-07 20:20:52.56643 Creating the shell file 02_should_be_first.sh and corresponding R script 02_should_be_first.R</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> To submit the script pair, use: sbatch /tmp/Rtmpf2I8Mc/slurmjobs_scripts/02_should_be_first.sh</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> 2026-04-08 20:35:43.821132 creating the logs directory at:  /tmp/RtmpmSN2nl/slurmjobs_scripts/logs</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> 2026-04-08 20:35:43.822655 Creating the shell file 02_should_be_first.sh and corresponding R script 02_should_be_first.R</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> To submit the script pair, use: sbatch /tmp/RtmpmSN2nl/slurmjobs_scripts/02_should_be_first.sh</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">#   Swap the order of the scripts</span></span></span>
 <span class="r-in"><span><span class="fu">renumber</span><span class="op">(</span><span class="va">base_dir</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"01"</span>, <span class="st">"02"</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"02"</span>, <span class="st">"01"</span><span class="op">)</span><span class="op">)</span></span></span>
