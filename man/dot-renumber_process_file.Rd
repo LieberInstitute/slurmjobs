@@ -11,8 +11,6 @@
   this_pre_after,
   all_files,
   is_shell,
-  edit_content,
-  expected_one_file,
   negate_pattern = FALSE
 )
 }

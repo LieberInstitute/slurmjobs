@@ -4,7 +4,13 @@
 \alias{renumber}
 \title{Re-order scripts and logs with a series of prefices (usually numbers)}
 \usage{
-renumber(base_dir, pre_before, pre_after, expect_matches = TRUE)
+renumber(
+  base_dir,
+  pre_before,
+  pre_after,
+  expect_matches = TRUE,
+  recursive_edits = FALSE
+)
 }
 \arguments{
 \item{base_dir}{A \code{character(1)} path to a directory containing the scripts
@@ -19,6 +25,13 @@ in \code{base_dir}.}
 \item{expect_matches}{A \code{logical(1)} indicating whether to expect that all
 prefices in \code{pre_before} will match a file in \code{base_dir}, throwing an error if
 not.}
+
+\item{recursive_edits}{A \code{logical(1)} indicating whether to recursively search
+\code{base_dir} for R, shell, and Python scripts and replace any instances of the
+prefices in \code{pre_before} with the corresponding prefices in \code{pre_after}.
+Because of the slight risk where prefices are not uniquely identifiable
+and unexpected edits take place, the default is \code{FALSE}; you must opt in
+intentionally.}
 }
 \description{
 This function re-orders the prefices in names of scripts-- originally

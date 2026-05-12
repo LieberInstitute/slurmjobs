@@ -16,12 +16,19 @@
 #' @param expect_matches A `logical(1)` indicating whether to expect that all
 #' prefices in `pre_before` will match a file in `base_dir`, throwing an error if
 #' not.
+#' @param recursive_edits A `logical(1)` indicating whether to recursively search
+#' `base_dir` for R, shell, and Python scripts and replace any instances of the
+#' prefices in `pre_before` with the corresponding prefices in `pre_after`.
+#' Because of the slight risk where prefices are not uniquely identifiable
+#' and unexpected edits take place, the default is `FALSE`; you must opt in
+#' intentionally.
 #' 
 #' @return NULL
 #' @export
 #' @author Nicholas J. Eagles
 #'
 #' @importFrom fs is_absolute_path
+#' @import stringr
 #' 
 #' @examples
 #' base_dir <- file.path(tempdir(), "slurmjobs_scripts")
@@ -49,7 +56,10 @@
 #' 
 #' #   Check that the scripts have been properly renamed
 #' list.files(base_dir)
-renumber <- function(base_dir, pre_before, pre_after, expect_matches = TRUE) {
+renumber <- function(
+        base_dir, pre_before, pre_after, expect_matches = TRUE,
+        recursive_edits = FALSE
+    ) {
     if (!dir.exists(base_dir)) {
         stop("'base_dir' must exist.")
     }
@@ -57,22 +67,36 @@ renumber <- function(base_dir, pre_before, pre_after, expect_matches = TRUE) {
         stop("'pre_before' and 'pre_after' must be the same length.")
     }
 
-    #   Check the all the prefices in 'pre_before' match a file in 'base_dir'
-    all_files <- list.files(base_dir, full.names = TRUE)
-    matches <- sapply(
-        pre_before,
-        function(x) length(grep(paste0("^", x), basename(all_files)))
-    )
-    if (expect_matches && !all(matches > 0)) {
-        stop(
-            "At least one prefix in 'pre_before' did not match a file in 'base_dir'. Consider setting 'expect_matches = FALSE' to ignore missing prefixes."
+    all_files <- list.files(base_dir, full.names = TRUE)  
+    for (x in pre_before) {
+        matching_files <- basename(all_files)[
+            grepl(paste0("^", x), basename(all_files))
+        ]
+      
+        #   Check the all the prefices in 'pre_before' match a file in 'base_dir'
+        if (expect_matches && (length(matching_files) == 0)) {
+            stop(
+                "Prefix '", x, "' did not match a file in 'base_dir'. Consider setting 'expect_matches = FALSE' to ignore missing prefixes."
+            )
+        }
+        
+        #   Prefices must uniquely specify basenames of files, a safety/
+        #   convenience feature to prevent accidentally matching short strings
+        #   in shell or other files and mistakenly modifying them
+        matching_base = str_extract(
+            matching_files, sprintf("^(%s[^.]*)\\.?.*", x), group = 1
         )
+        if (length(unique(matching_base)) > 1) {
+            stop(
+                "Prefix '", x, "' matches multiple files with different base names, which is usually unintentional. If this was actually desired, consider modifying 'pre_before' to be more specific."
+            )
+        }
     }
 
-    #   Gather a full renaming plan of all files (source and destination paths),
-    #   without modifying any files
+    #   Gather a full renaming plan of all files (source and destination paths).
+    #   Does not modify any files
     rename_plan_df = .renumber_loop(
-        base_dir, pre_before, pre_after, all_files, dry_run = TRUE
+        base_dir, pre_before, pre_after, all_files
     )
   
     #   Now simulate the plan to make sure it's safe. This could be done more
@@ -94,10 +118,38 @@ renumber <- function(base_dir, pre_before, pre_after, expect_matches = TRUE) {
         )
     }
     
-    #   Now make the edits to the code files. Return the same plan as earlier
-    rename_plan_df = .renumber_loop(
-        base_dir, pre_before, pre_after, all_files, dry_run = FALSE
-    )
+    if (recursive_edits) {
+        all_code_files = list.files(
+            base_dir, pattern = "\\.(R|sh|py)$", full.names = TRUE,
+            recursive = TRUE
+        )
+        full_pre_before = sapply(
+            pre_before,
+            function(x) {
+                matching_files <- basename(all_files)[
+                    grepl(paste0("^", x), basename(all_files))
+                ]
+                matching_base = stringr::str_extract(
+                    matching_files, sprintf("^(%s[^.]*)\\.?.*", x), group = 1
+                )
+                #   Guaranteed to give one value based on earlier checks
+                return(unique(matching_base)) 
+            }
+        )
+        full_pre_after = stringr::str_replace(
+            full_pre_before, paste0("^", pre_before),
+            paste0(pre_after, 'temp_slurmjobs')
+        )
+        for (this_code_file in all_code_files) {
+            this_code_file |>
+                readLines() |>
+                stringr::str_replace_all(
+                    setNames(full_pre_after, full_pre_before)
+                ) |>
+                stringr::str_replace_all('temp_slurmjobs', '') |>
+                writeLines(con = this_code_file)
+        }
+    }
 
     source_paths = rename_plan_df$before
     intermediate_paths = rename_plan_df$after
@@ -109,7 +161,7 @@ renumber <- function(base_dir, pre_before, pre_after, expect_matches = TRUE) {
     file.rename(intermediate_paths, destination_paths)
 
     return(invisible(NULL))
-}
+    }
 
 #' Helper function to rename a single file pattern
 #' 
@@ -120,7 +172,7 @@ renumber <- function(base_dir, pre_before, pre_after, expect_matches = TRUE) {
 #' @keywords internal
 .renumber_process_file = function(
         base_dir, file_regex, this_pre_before, this_pre_after, all_files,
-        is_shell, edit_content, expected_one_file, negate_pattern = FALSE
+        is_shell, negate_pattern = FALSE
     ) {
     second_condition = grepl(sprintf("%s$", file_regex), basename(all_files))
     if (negate_pattern) {
@@ -131,11 +183,11 @@ renumber <- function(base_dir, pre_before, pre_after, expect_matches = TRUE) {
         second_condition
     ]
 
-    if (expected_one_file) {
+    if (is_shell) {
         if (length(file_before) > 1) {
             stop(
-                "Expected at most one file with prefix '", this_pre_before,
-                "'. Found ", length(file_before), "."
+                "Expected at most one shell script with prefix '", 
+                this_pre_before, "'. Found ", length(file_before), "."
             )
         }
     }
@@ -151,15 +203,13 @@ renumber <- function(base_dir, pre_before, pre_after, expect_matches = TRUE) {
     full_pre_after <- sub(
         paste0("^", this_pre_before), this_pre_after, full_pre_before
     )
-    
-    if (edit_content || is_shell) {
-        file_content = readLines(file_before)
-    }
 
     log_files_before <- character(0)
     log_files_after <- character(0)
   
     if (is_shell) {
+        file_content = readLines(file_before)
+      
         #   For 'job_loop', use the path in the line starting with
         #   'log_path='. Otherwise use the log in the line starting with
         #   '#SBATCH -o'.
@@ -185,19 +235,10 @@ renumber <- function(base_dir, pre_before, pre_after, expect_matches = TRUE) {
             this_pre_before = this_pre_before,
             this_pre_after = this_pre_after,
             all_files = list.files(log_dir, full.names = TRUE),
-            is_shell = FALSE,
-            edit_content = FALSE,
-            expected_one_file = FALSE
+            is_shell = FALSE
         )
         log_files_before <- rename_df$before
         log_files_after <- rename_df$after
-    }
-
-    if (edit_content) {
-        #   Re-write the file in place, replacing references to the
-        #   old prefix
-        file_content <- gsub(full_pre_before, full_pre_after, file_content)
-        writeLines(file_content, con = file_before)
     }
 
     #   Plan to rename scripts but append temporary suffix to avoid repeated
@@ -227,18 +268,16 @@ renumber <- function(base_dir, pre_before, pre_after, expect_matches = TRUE) {
 #' 
 #' @author Nicholas J. Eagles
 #' @keywords internal
-.renumber_loop = function(base_dir, pre_before, pre_after, all_files, dry_run) {
+.renumber_loop = function(base_dir, pre_before, pre_after, all_files) {
     rename_plan_df_list = list()
     for (i in seq_len(length(pre_before))) {
         rename_plan_df_list[[length(rename_plan_df_list) + 1]] = .renumber_process_file(
             base_dir = base_dir,
-            file_regex = "\\.(R|py)",
+            file_regex = "\\.sh",
             this_pre_before = pre_before[i],
             this_pre_after = pre_after[i],
             all_files = all_files,
-            is_shell = FALSE,
-            edit_content = !dry_run,
-            expected_one_file = TRUE
+            is_shell = TRUE
         )
 
         rename_plan_df_list[[length(rename_plan_df_list) + 1]] = .renumber_process_file(
@@ -247,20 +286,7 @@ renumber <- function(base_dir, pre_before, pre_after, expect_matches = TRUE) {
             this_pre_before = pre_before[i],
             this_pre_after = pre_after[i],
             all_files = all_files,
-            is_shell = TRUE,
-            edit_content = !dry_run,
-            expected_one_file = TRUE
-        )
-
-        rename_plan_df_list[[length(rename_plan_df_list) + 1]] = .renumber_process_file(
-            base_dir = base_dir,
-            file_regex = "\\.(R|py|sh)",
-            this_pre_before = pre_before[i],
-            this_pre_after = pre_after[i],
-            all_files = all_files,
             is_shell = FALSE,
-            edit_content = FALSE,
-            expected_one_file = FALSE,
             negate_pattern = TRUE
         )
     }

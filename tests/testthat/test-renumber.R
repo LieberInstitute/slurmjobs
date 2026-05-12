@@ -49,7 +49,10 @@ test_that(
             )
         }
 
-        renumber(base_dir, c("01", "02", "03"), c("02", "03", "01"))
+        renumber(
+            base_dir, c("01", "02", "03"), c("02", "03", "01"),
+            recursive_edits = TRUE
+        )
 
         #   Check that the scripts have been properly renamed
         expected_files <- c(
@@ -83,14 +86,11 @@ test_that(
         expect_equal(any(grepl("^(02_third|03_third)", content)), FALSE)
         expect_equal(length(grep("^Rscript 01_third\\.R", content)), 1)
 
-        #   Check proper functioning of the 'plots_and_processed' parameter
-        #   (when TRUE-- the other tests implicitly check FALSE)
+        #   Start with a clean temporary directory
+        unlink(base_dir, recursive = TRUE)
+        dir.create(base_dir)
         dir.create(file.path(base_dir, "code"))
-        for (dir_type in c("processed-data", "plots")) {
-            dir.create(file.path(base_dir, dir_type))
-            dir.create(file.path(base_dir, dir_type, "01_second"))
-            dir.create(file.path(base_dir, dir_type, "02_first"))
-        }
+
         writeLines(
             c(
                 "some_path = here('processed-data', '01_second', 'a.txt')",
@@ -104,14 +104,8 @@ test_that(
         )
         renumber(
             file.path(base_dir, "code"), c("01", "02"), c("02", "01"),
-            plots_and_processed = TRUE
+            recursive_edits = TRUE
         )
-        for (dir_type in c("processed-data", "plots")) {
-             expect_identical(
-                sort(list.files(file.path(base_dir, dir_type))),
-                c("01_first", "02_second")
-            )
-        }
         expect_identical(
             sort(list.files(file.path(base_dir, "code"))),
             c("01_first.R", "02_second.R")
@@ -161,6 +155,38 @@ test_that(
         expect_error(
             renumber(base_dir, "01_first", "02_second"),
             "^The proposed renaming plan"
+        )
+
+        #   Start with a clean temporary directory
+        unlink(base_dir, recursive = TRUE)
+        dir.create(base_dir)
+        dir.create(file.path(base_dir, "01_QC"))
+
+        writeLines(
+            "here('processed-data', '01_QC', '01_script.R')",
+            con = file.path(base_dir, "01_QC", "01_script.R")
+        )
+        renumber(base_dir, "01", "02", recursive_edits = TRUE)
+
+        #   At this point the R script should have instances of '01_QC' (not
+        #   '01'!) replaced with '02_QC', and the directory should have been
+        #   renamed
+        expect_equal(list.files(base_dir), "02_QC")
+        expect_equal(
+            readLines(file.path(base_dir, "02_QC", "01_script.R")),
+            "here('processed-data', '02_QC', '01_script.R')"
+        )
+
+        #   But if we don't allow recursive edits, the script shouldn't be
+        #   edited
+        writeLines(
+            "here('processed-data', '01_QC', '01_script.R')",
+            con = file.path(base_dir, "02_QC", "01_script.R")
+        )
+        renumber(base_dir, "02", "01", recursive_edits = FALSE)
+        expect_equal(
+            readLines(file.path(base_dir, "01_QC", "01_script.R")),
+            "here('processed-data', '01_QC', '01_script.R')"
         )
     }
 )
