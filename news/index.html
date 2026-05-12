@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">slurmjobs</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.3.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.4.0</span>
       </span>
     </div>
 
@@ -50,6 +50,13 @@
       <small>Source: <a href="https://github.com/LieberInstitute/slurmjobs/blob/devel/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="page-header" data-toc-text="1.4.0" id="slurmjobs-140">slurmjobs 1.4.0<a class="anchor" aria-label="anchor" href="#slurmjobs-140"></a></h2>
+<p>NEW FEATURES</p>
+<ul><li>Safety upgrades to <code><a href="../reference/renumber.html">renumber()</a></code>: it now behaves “atomically”, simulating a full rename plan, verifying changes can be executed without issues, and renaming in one call if so.</li>
+<li>Added <code>recursive_edits</code> parameter to <code><a href="../reference/renumber.html">renumber()</a></code>, allowing smarter updates of file references within all scripts under <code>base_dir</code>.</li>
+<li>Added <code>expect_matches</code> parameter to <code><a href="../reference/renumber.html">renumber()</a></code>, which can be useful for renaming <code>processed-data</code> or <code>plots</code> directories where some prefixes may be missing.</li>
+</ul></div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="1.3.0" id="slurmjobs-130">slurmjobs 1.3.0<a class="anchor" aria-label="anchor" href="#slurmjobs-130"></a></h2>
 <p>NEW FEATURES</p>

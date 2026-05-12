@@ -22,7 +22,7 @@ log files they produce."><!-- mathjax --><script src="https://cdnjs.cloudflare.c
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">slurmjobs</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.3.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.4.0</span>
       </span>
     </div>
 
@@ -70,8 +70,8 @@ log files they produce.</p>
 <span>  <span class="va">base_dir</span>,</span>
 <span>  <span class="va">pre_before</span>,</span>
 <span>  <span class="va">pre_after</span>,</span>
-<span>  plots_and_processed <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  expect_matches <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span>  expect_matches <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  recursive_edits <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -94,15 +94,19 @@ in <code>base_dir</code>.</p></dd>
 in <code>base_dir</code>.</p></dd>
 
 
-<dt id="arg-plots-and-processed">plots_and_processed<a class="anchor" aria-label="anchor" href="#arg-plots-and-processed"></a></dt>
-<dd><p>A <code>logical(1)</code> indicating whether to also re-order
-the corresponding <code>plots</code> and <code>processed-data</code> directories, if they exist.</p></dd>
-
-
 <dt id="arg-expect-matches">expect_matches<a class="anchor" aria-label="anchor" href="#arg-expect-matches"></a></dt>
 <dd><p>A <code>logical(1)</code> indicating whether to expect that all
 prefices in <code>pre_before</code> will match a file in <code>base_dir</code>, throwing an error if
 not.</p></dd>
+
+
+<dt id="arg-recursive-edits">recursive_edits<a class="anchor" aria-label="anchor" href="#arg-recursive-edits"></a></dt>
+<dd><p>A <code>logical(1)</code> indicating whether to recursively search
+<code>base_dir</code> for R, shell, and Python scripts and replace any instances of the
+prefices in <code>pre_before</code> with the corresponding prefices in <code>pre_after</code>.
+Because of the slight risk where prefices are not uniquely identifiable
+and unexpected edits take place, the default is <code>FALSE</code>; you must opt in
+intentionally.</p></dd>
 
 </dl></div>
     <div id="author">
@@ -121,9 +125,9 @@ not.</p></dd>
 <span class="r-in"><span>    logdir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">base_dir</span>, <span class="st">"logs"</span><span class="op">)</span>, create_logdir <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
 <span class="r-in"><span>    create_shell <span class="op">=</span> <span class="cn">TRUE</span>, command <span class="op">=</span> <span class="st">"Rscript 01_should_be_second.R"</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 2026-04-08 20:35:43.813905 creating the logs directory at:  /tmp/RtmpmSN2nl/slurmjobs_scripts/logs</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 2026-04-08 20:35:43.818445 creating the shell file /tmp/RtmpmSN2nl/slurmjobs_scripts/01_should_be_second.sh</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> To submit the job use: sbatch /tmp/RtmpmSN2nl/slurmjobs_scripts/01_should_be_second.sh</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> 2026-05-12 18:34:27.308574 creating the logs directory at:  /tmp/RtmpDp4cGZ/slurmjobs_scripts/logs</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> 2026-05-12 18:34:27.309834 creating the shell file /tmp/RtmpDp4cGZ/slurmjobs_scripts/01_should_be_second.sh</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> To submit the job use: sbatch /tmp/RtmpDp4cGZ/slurmjobs_scripts/01_should_be_second.sh</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/writeLines.html" class="external-link">writeLines</a></span><span class="op">(</span><span class="st">"# some code"</span>, con <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">base_dir</span>, <span class="st">"01_should_be_second.R"</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">#   Create an array originally designed to be submitted second</span></span></span>
@@ -134,9 +138,9 @@ not.</p></dd>
 <span class="r-in"><span>        gene <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"gene_1"</span>, <span class="st">"gene_2"</span><span class="op">)</span>, method <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"method_1"</span>, <span class="st">"method_2"</span><span class="op">)</span></span></span>
 <span class="r-in"><span>    <span class="op">)</span> </span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 2026-04-08 20:35:43.821132 creating the logs directory at:  /tmp/RtmpmSN2nl/slurmjobs_scripts/logs</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 2026-04-08 20:35:43.822655 Creating the shell file 02_should_be_first.sh and corresponding R script 02_should_be_first.R</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> To submit the script pair, use: sbatch /tmp/RtmpmSN2nl/slurmjobs_scripts/02_should_be_first.sh</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> 2026-05-12 18:34:27.312434 creating the logs directory at:  /tmp/RtmpDp4cGZ/slurmjobs_scripts/logs</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> 2026-05-12 18:34:27.314 Creating the shell file 02_should_be_first.sh and corresponding R script 02_should_be_first.R</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> To submit the script pair, use: sbatch /tmp/RtmpDp4cGZ/slurmjobs_scripts/02_should_be_first.sh</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">#   Swap the order of the scripts</span></span></span>
 <span class="r-in"><span><span class="fu">renumber</span><span class="op">(</span><span class="va">base_dir</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"01"</span>, <span class="st">"02"</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"02"</span>, <span class="st">"01"</span><span class="op">)</span><span class="op">)</span></span></span>
