@@ -324,7 +324,7 @@ be quite a process.
 
 The `renumber()` function was developed to address situations like this. It
 renames scripts based on a set of prefices, updates references to the old script
-names with each shell script, and even renames any existing logs associated with
+names within other scripts, and even renames any existing logs associated with
 each script. To demonstrate its function, we'll generate some scripts and
 associated logs, then renumber them.
 
@@ -386,11 +386,13 @@ list.files(file.path(base_dir, 'logs'))
 
 Suppose we wish to simply swap the order of the first and second script. We must
 provide the directory containing the scripts, the beginning prefices to change,
-finally the replacement prefices.
+and finally the replacement prefices. We'll specify `recursive_edits = TRUE` to
+ensure that references to the old script names are updated within any scripts under
+`base_dir`.
 
 ```{r "renumber"}
 #   Re-order scripts (and logs)
-renumber(base_dir, c("01", "02"), c("02", "01"))
+renumber(base_dir, c("01", "02"), c("02", "01"), recursive_edits = TRUE)
 ```
 
 We can see the names of the scripts and logs have been correctly updated.
@@ -416,7 +418,9 @@ readLines(file.path(base_dir, "01_should_be_first.sh"))
 
 Despite being developed for a somewhat specific use case, `renumber()` can be
 applied to other renaming tasks. It can rename a set of directories, and
-prefices need not be numbers.
+prefices need not be numbers. If you're renaming directories containing scripts
+that reference the directory names, be sure to specify `recursive_edits = TRUE`
+to update references in the scripts.
 
 Let's first create some directories as an example.
 
