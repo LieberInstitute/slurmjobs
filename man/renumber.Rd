@@ -4,13 +4,7 @@
 \alias{renumber}
 \title{Re-order scripts and logs with a series of prefices (usually numbers)}
 \usage{
-renumber(
-  base_dir,
-  pre_before,
-  pre_after,
-  plots_and_processed = FALSE,
-  expect_matches = TRUE
-)
+renumber(base_dir, pre_before, pre_after, expect_matches = TRUE)
 }
 \arguments{
 \item{base_dir}{A \code{character(1)} path to a directory containing the scripts
@@ -21,9 +15,6 @@ in \code{base_dir}.}
 
 \item{pre_after}{A \code{character()} vector of replacement prefices among scripts
 in \code{base_dir}.}
-
-\item{plots_and_processed}{A \code{logical(1)} indicating whether to also re-order
-the corresponding \code{plots} and \code{processed-data} directories, if they exist.}
 
 \item{expect_matches}{A \code{logical(1)} indicating whether to expect that all
 prefices in \code{pre_before} will match a file in \code{base_dir}, throwing an error if

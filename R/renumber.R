@@ -13,8 +13,6 @@
 #' in `base_dir`.
 #' @param pre_after A `character()` vector of replacement prefices among scripts
 #' in `base_dir`.
-#' @param plots_and_processed A `logical(1)` indicating whether to also re-order
-#' the corresponding `plots` and `processed-data` directories, if they exist.
 #' @param expect_matches A `logical(1)` indicating whether to expect that all
 #' prefices in `pre_before` will match a file in `base_dir`, throwing an error if
 #' not.
@@ -51,10 +49,7 @@
 #' 
 #' #   Check that the scripts have been properly renamed
 #' list.files(base_dir)
-renumber <- function(
-        base_dir, pre_before, pre_after, plots_and_processed = FALSE,
-        expect_matches = TRUE
-    ) {
+renumber <- function(base_dir, pre_before, pre_after, expect_matches = TRUE) {
     if (!dir.exists(base_dir)) {
         stop("'base_dir' must exist.")
     }
@@ -94,15 +89,9 @@ renumber <- function(
         base_dir, sub('temp_slurmjobs$', '', basename(ending_paths))
     )
     if (length(unique(ending_paths)) != length(all_files)) {
-        if (plots_and_processed) {
-            stop(
-                "The proposed renaming plan would effectively result in deletion of at least one file or directory. Please check which files exist in 'base_dir', corresponding plots and processed-data directories, and if supplied prefixes would result in an overwrite."
-            )
-        } else {
-            stop(
-                "The proposed renaming plan would effectively result in deletion of at least one file or directory. Please check which files exist in 'base_dir' and if supplied prefixes would result in an overwrite."
-            )
-        }
+        stop(
+            "The proposed renaming plan would effectively result in deletion of at least one file or directory. Please check which files exist in 'base_dir' and if supplied prefixes would result in an overwrite."
+        )
     }
     
     #   Now make the edits to the code files. Return the same plan as earlier
@@ -118,50 +107,6 @@ renumber <- function(
     )
     file.rename(source_paths, intermediate_paths)
     file.rename(intermediate_paths, destination_paths)
-
-    #   For code directories, also renumber the corresponding 'processed-data'
-    #   and 'plots' directories, if they exist
-    if (plots_and_processed) {
-        #   Split the path into components (OS-independent via fs)
-        path_parts <- fs::path_split(normalizePath(base_dir))[[1]]
-        path_prefix <- path_parts[1]
-        path_parts <- path_parts[2:length(path_parts)]
-
-        #   Find the index of the 'code' component (use the last occurrence in
-        #   case 'code' appears multiple times in the path)
-        code_index <- rev(which(path_parts == "code"))[1]
-
-        if (!is.na(code_index)) {
-            #   The sub-path below 'code' is the same for sibling directories,
-            #   if it exists
-            if (code_index == length(path_parts)) {
-                sub_path <- character(0)
-            } else {
-                sub_path <- path_parts[seq(code_index + 1, length(path_parts))]
-            }
-
-            for (sibling in c("processed-data", "plots")) {
-                sibling_parts <- c(
-                    path_parts[seq_len(code_index - 1)],
-                    sibling,
-                    sub_path
-                )
-                sibling_dir <- paste0(
-                    path_prefix, do.call(file.path, as.list(sibling_parts))
-                )
-
-                if (dir.exists(sibling_dir)) {
-                    renumber(
-                        sibling_dir,
-                        pre_before,
-                        pre_after,
-                        plots_and_processed = FALSE,
-                        expect_matches = FALSE
-                    )
-                }
-            }
-        }
-    }
 
     return(invisible(NULL))
 }
