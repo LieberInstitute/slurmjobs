@@ -1,5 +1,11 @@
 # slurmjobs 1.4.0
 
+NEW FEATURES
+
+* Safety upgrades to `renumber()`: it now behaves "atomically", simulating a full rename plan, verifying changes can be executed without issues, and renaming in one call if so.
+* Added `recursive_edits` parameter to `renumber()`, allowing smarter updates of file references within all scripts under `base_dir`.
+* Added `expect_matches` parameter to `renumber()`, which can be useful for renaming `processed-data` or `plots` directories where some prefixes may be missing.
+
 # slurmjobs 1.3.0
 
 NEW FEATURES
