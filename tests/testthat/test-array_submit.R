@@ -88,15 +88,16 @@ test_that("array_submit repeatedly infers task IDs without restoring", {
         .package = "slurmjobs"
     )
 
-    for (limit in c("%5", "")) {
+    for (array in c("1-10%5", "1-10", "1-100000%5", "1-10%5 ")) {
+        limit <- sub("^[0-9-]+", "", array)
         basic_job()
         sh_file <- paste0(script_name, ".sh")
         script <- readLines(sh_file)
-        script <- sub("^(#SBATCH --array=1-10)%5$", paste0("\\1", limit), script)
+        script <- sub("^#SBATCH --array=1-10%5$", paste0("#SBATCH --array=", array), script)
         writeLines(script, sh_file)
         log_dir <- "logs"
         dir.create(log_dir, recursive = TRUE, showWarnings = FALSE)
-        current_tasks <- 1:10
+        current_tasks <- c(3L, 6L, 8L, as.integer(sub("^1-([0-9]+).*$", "\\1", array)))
 
         for (failed_tasks in list(c(8L, 3L, 6L), c(3L, 6L), 3L, 3L)) {
             expected_job_id <- as.character(1000L + max(current_tasks))

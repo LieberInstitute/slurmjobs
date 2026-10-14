@@ -80,12 +80,13 @@ array_submit <- function(name, task_ids = NULL, submit = FALSE, restore = TRUE, 
 
         max_task <- str_extract(
             job_original[grep("^#SBATCH --array", job_original)],
-            "^#SBATCH --array=([0-9]+(?:-[0-9]+)?(?:,[0-9]+(?:-[0-9]+)?)*)(?:%[0-9]+)?$",
+            "^#SBATCH --array=([0-9]+(?:-[0-9]+)?(?:,[0-9]+(?:-[0-9]+)?)*)(?:%[0-9]+)?[ \t]*$",
             group = 1
         )
 
         if (!is.na(max_task)) {
-            max_task <- as.character(max(as.numeric(str_extract_all(max_task, "[0-9]+")[[1]])))
+            task_bounds <- str_extract_all(max_task, "[0-9]+")[[1]]
+            max_task <- task_bounds[which.max(as.numeric(task_bounds))]
         }
 
         if (verbose) {
@@ -223,7 +224,7 @@ array_submit <- function(name, task_ids = NULL, submit = FALSE, restore = TRUE, 
     #   Just replace the array line with the specified tasks, and overwrite the
     #   script in place
     job_new <- sub(
-        "^#SBATCH --array=[0-9,\\-]+(%[0-9]+)?$",
+        "^#SBATCH --array=[0-9,\\-]+(%.*|[ \t]*)$",
         paste0("#SBATCH --array=", paste(task_ids, collapse = ","), "\\1"),
         job_original
     )
