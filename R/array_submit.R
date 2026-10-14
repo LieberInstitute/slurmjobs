@@ -80,9 +80,13 @@ array_submit <- function(name, task_ids = NULL, submit = FALSE, restore = TRUE, 
 
         max_task <- str_extract(
             job_original[grep("^#SBATCH --array", job_original)],
-            "^#SBATCH --array=[0-9]+-([0-9]+)%[0-9]+$",
+            "^#SBATCH --array=([0-9]+(?:-[0-9]+)?(?:,[0-9]+(?:-[0-9]+)?)*)(?:%[0-9]+)?$",
             group = 1
         )
+
+        if (!is.na(max_task)) {
+            max_task <- as.character(max(as.numeric(str_extract_all(max_task, "[0-9]+")[[1]])))
+        }
 
         if (verbose) {
             message(sprintf("The highest task in %s.sh was %s.", name, max_task))
@@ -219,8 +223,8 @@ array_submit <- function(name, task_ids = NULL, submit = FALSE, restore = TRUE, 
     #   Just replace the array line with the specified tasks, and overwrite the
     #   script in place
     job_new <- sub(
-        "^#SBATCH --array=[0-9,\\-]+%(.*)$",
-        paste0("#SBATCH --array=", paste(task_ids, collapse = ","), "%\\1"),
+        "^#SBATCH --array=[0-9,\\-]+(%[0-9]+)?$",
+        paste0("#SBATCH --array=", paste(task_ids, collapse = ","), "\\1"),
         job_original
     )
     writeLines(job_new, con = sh_file)

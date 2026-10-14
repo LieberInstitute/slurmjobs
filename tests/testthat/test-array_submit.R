@@ -72,6 +72,51 @@ test_that(
     }
 )
 
+test_that("array_submit repeatedly infers task IDs without restoring", {
+    local_dir(local_tempdir())
+    local_mocked_bindings(
+        job_report = function(job_id) {
+            expect_identical(job_id, expected_job_id)
+            data.frame(
+                array_task_id = c(failed_tasks, setdiff(current_tasks, failed_tasks)),
+                status = c(
+                    rep("FAILED", length(failed_tasks)),
+                    rep("COMPLETED", length(setdiff(current_tasks, failed_tasks)))
+                )
+            )
+        },
+        .package = "slurmjobs"
+    )
+
+    for (limit in c("%5", "")) {
+        basic_job()
+        sh_file <- paste0(script_name, ".sh")
+        script <- readLines(sh_file)
+        script <- sub("^(#SBATCH --array=1-10)%5$", paste0("\\1", limit), script)
+        writeLines(script, sh_file)
+        log_dir <- "logs"
+        dir.create(log_dir, recursive = TRUE, showWarnings = FALSE)
+        current_tasks <- 1:10
+
+        for (failed_tasks in list(c(8L, 3L, 6L), c(3L, 6L), 3L, 3L)) {
+            expected_job_id <- as.character(1000L + max(current_tasks))
+            writeLines(
+                paste0("Job id: ", expected_job_id),
+                file.path(log_dir, paste0(script_name, "_", max(current_tasks), ".txt"))
+            )
+            expect_no_error(array_submit(script_name, restore = FALSE, verbose = TRUE))
+            updated_script <- readLines(sh_file)
+            array_line <- grep("^#SBATCH --array=", updated_script)
+            expect_identical(
+                updated_script[array_line],
+                paste0("#SBATCH --array=", paste(failed_tasks, collapse = ","), limit)
+            )
+            expect_identical(updated_script[-array_line], script[-array_line])
+            current_tasks <- failed_tasks
+        }
+    }
+})
+
 #   Removing the '--array=' line should yield a specific error message
 test_that(
     "array_submit_broken_script",
