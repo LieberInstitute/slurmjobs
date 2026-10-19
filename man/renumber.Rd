@@ -9,7 +9,8 @@ renumber(
   pre_before,
   pre_after,
   expect_matches = TRUE,
-  recursive_edits = FALSE
+  recursive_edits = FALSE,
+  protect_log_location = TRUE
 )
 }
 \arguments{
@@ -32,6 +33,13 @@ prefices in \code{pre_before} with the corresponding prefices in \code{pre_after
 Because of the slight risk where prefices are not uniquely identifiable
 and unexpected edits take place, the default is \code{FALSE}; you must opt in
 intentionally.}
+
+\item{protect_log_location}{A \code{logical(1)}, default \code{TRUE}, requiring log files
+selected through shell scripts to be inside the project returned by
+\code{\link[here:here]{here::here()}}. Logs may be outside \code{base_dir}. Set \code{FALSE} to permit logs in
+any directory referenced by shell scripts, without consulting \code{here}.
+This disables only log location checks; collision, link, and recovery checks
+remain active, and non-log changes must still stay within \code{base_dir}.}
 }
 \description{
 This function re-orders the prefices in names of scripts-- originally
@@ -42,6 +50,18 @@ within the shell or R scripts are also updated, along with the names of
 log files they produce.
 }
 \details{
+Non-log changes are confined to the physical directory selected by
+\code{base_dir}. Its symbolic-link aliases resolve to that same scope. Selected
+symbolic links and hard-linked files are refused; recursive editing does not
+follow linked directories.
+
+By default, log files selected for renaming must be within the physical project
+root returned by \code{here::here()}, which uses the current R session's project
+context, not \code{base_dir}, to determine the root. If no logs are selected, an
+outside or missing log directory does not prevent renumbering. The project
+root and log protection setting are saved in the journal, so recovery uses the
+original policy even from a different working directory or project context.
+
 The complete rename plan, including logs, is checked before changes.
 Hidden files and dangling symbolic links count as occupied destinations.
 Script edits are prepared in a private recovery directory; logs and data
@@ -90,7 +110,9 @@ job_loop(
 )
 
 #   Swap the order of the scripts
-renumber(base_dir, c("01", "02"), c("02", "01"))
+# This temporary example is outside the current project.
+renumber(base_dir, c("01", "02"), c("02", "01"),
+    protect_log_location = FALSE)
 
 #   Check that the scripts have been properly renamed
 list.files(base_dir)

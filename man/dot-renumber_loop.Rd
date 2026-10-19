@@ -4,7 +4,7 @@
 \alias{.renumber_loop}
 \title{Helper function to gather a plan for renaming all files}
 \usage{
-.renumber_loop(base_dir, pre_before, pre_after, all_files)
+.renumber_loop(base_dir, pre_before, pre_after, all_files, log_root = base_dir)
 }
 \description{
 This is employed by \code{renumber()}. A data.frame is returned with columns

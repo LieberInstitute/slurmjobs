@@ -22,6 +22,7 @@
 # Replace our own journal via a sibling temporary file. Never alter originals
 # unless the intent for their next change has already been saved successfully.
 .renumber_save_journal <- function(journal, directory) {
+    .renumber_check_journal_paths(journal, directory)
     temporary <- file.path(directory, "journal-next.rds")
     saveRDS(journal, temporary)
     destination <- file.path(directory, "journal.rds")
@@ -55,14 +56,17 @@
     invisible(NULL)
 }
 
-.renumber_record_move <- function(state, from, to) {
-    operation <- list(kind = "move", from = from, to = to, stamp = .renumber_stamp(from))
+.renumber_record_move <- function(state, from, to, is_log = FALSE) {
+    .renumber_assert_move_paths(c(from, to), is_log, state$journal)
+    operation <- list(kind = "move", from = from, to = to, is_log = is_log,
+        stamp = .renumber_stamp(from))
     state$journal$operations <- c(state$journal$operations, list(operation))
     .renumber_save_journal(state$journal, state$directory)
     .renumber_move(from, to)
 }
 
 .renumber_cleanup <- function(journal, directory) {
+    .renumber_check_journal_paths(journal, directory)
     allowed <- c("journal.rds", "journal-next.rds", "journal-previous.rds",
         basename(journal$prepared), basename(journal$backups))
     entries <- list.files(directory, all.files = TRUE, no.. = TRUE, full.names = TRUE)
@@ -105,11 +109,19 @@
 #' These checks do not protect against changes between checks and writes/renames.
 #' Once a call
 #' committed successfully, recovery only finishes cleaning up its temporary files.
+#' Recovery validates non-log paths against the original physical `base_dir`.
+#' Log moves use the saved project root when `protect_log_location` was `TRUE`,
+#' or may be outside the project when it was `FALSE`. Recovery never recomputes
+#' the project with `here`. A moved journal or a path outside its saved scope is
+#' refused. Older journals without log provenance remain confined to `base_dir`.
 #' The journal is private local package state; do not edit it or use an untrusted
 #' recovery directory.
 #' @return Invisibly `NULL` on successful rollback or cleanup.
 #' @export
 renumber_recover <- function(recovery_dir) {
+    if (basename(recovery_dir) != ".slurmjobs-renumber" || fs::link_exists(recovery_dir)) {
+        stop("Expected an unlinked .slurmjobs-renumber recovery directory.")
+    }
     directory <- normalizePath(recovery_dir, mustWork = TRUE)
     # A session can stop after deleting the journal but before removing its
     # now-empty directory. Explicit recovery may finish that last cleanup step.
@@ -117,7 +129,12 @@ renumber_recover <- function(recovery_dir) {
         if (unlink(directory, recursive = TRUE) != 0L) stop("Cannot remove empty recovery directory.")
         return(invisible(NULL))
     }
+    # Validate metadata paths before reading a potentially redirected journal.
+    .renumber_assert_within(file.path(directory,
+        c("journal.rds", "journal-next.rds", "journal-previous.rds")), directory,
+        reject_aliases = TRUE)
     journal <- .renumber_read_journal(directory)
+    .renumber_check_journal_paths(journal, directory)
     if (!identical(journal$status, "committed")) {
         while (length(journal$operations)) {
             index <- length(journal$operations)
@@ -190,15 +207,23 @@ renumber_recover <- function(recovery_dir) {
     edits
 }
 
-.renumber_transaction <- function(base_dir, plan, files, replacements) {
+.renumber_transaction <- function(base_dir, plan, files, replacements,
+        protect_log_location = TRUE, log_root = base_dir) {
     directory <- file.path(base_dir, ".slurmjobs-renumber")
+    .renumber_assert_plan(data.frame(before = plan$before, after = plan$staged,
+        is_log = plan$is_log), base_dir, log_root)
+    .renumber_assert_plan(data.frame(before = plan$before, after = plan$final,
+        is_log = plan$is_log), base_dir, log_root)
+    .renumber_assert_within(c(files, directory), base_dir, reject_aliases = TRUE)
     if (!dir.create(directory, mode = "0700", showWarnings = FALSE)) {
         stop("Cannot create recovery directory: ", directory)
     }
     state <- new.env(parent = emptyenv())
     state$directory <- directory
     # Register possible preparation paths before writing any of them.
-    state$journal <- list(format = 2L, status = "preparing", operations = list(),
+    state$journal <- list(format = 2L, base_dir = base_dir,
+        log_policy = list(protect = protect_log_location, root = log_root),
+        status = "preparing", operations = list(),
         prepared = file.path(directory, paste0("prepared-", seq_along(files))),
         backups = file.path(directory, paste0("original-", seq_along(files))))
     # If initial journaling fails, no original has been touched; keep the folder
@@ -234,17 +259,18 @@ renumber_recover <- function(recovery_dir) {
         if (!identical(inventory, .renumber_inventory(unique(c(plan$before, files))))) {
             stop("Inputs changed during preparation.")
         }
-        .renumber_validate_plan(data.frame(before = plan$before, after = plan$staged))
+        .renumber_validate_plan(data.frame(before = plan$before, after = plan$staged,
+            is_log = plan$is_log), base_dir, log_root)
         state$journal$status <- "publishing"
         .renumber_save_journal(state$journal, directory)
         for (edit in edits) {
             .renumber_record_edit(state, edit)
         }
         for (i in seq_len(nrow(plan))) {
-            .renumber_record_move(state, plan$before[i], plan$staged[i])
+            .renumber_record_move(state, plan$before[i], plan$staged[i], plan$is_log[i])
         }
         for (i in seq_len(nrow(plan))) {
-            .renumber_record_move(state, plan$staged[i], plan$final[i])
+            .renumber_record_move(state, plan$staged[i], plan$final[i], plan$is_log[i])
         }
         state$journal$status <- "committed"
         .renumber_save_journal(state$journal, directory)
@@ -298,6 +324,9 @@ renumber_recover <- function(recovery_dir) {
 }
 
 .renumber_record_edit <- function(state, edit) {
+    .renumber_assert_within(edit$path, state$journal$base_dir, reject_aliases = TRUE)
+    .renumber_assert_within(c(edit$backup, edit$prepared), state$directory,
+        reject_aliases = TRUE)
     if (!.renumber_matches(edit$path, edit$stamp) ||
         !identical(.renumber_hash(edit$path), edit$original_hash)) {
         stop("Script changed before publication: ", edit$path)

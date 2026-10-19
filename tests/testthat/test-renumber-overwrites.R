@@ -133,7 +133,7 @@ test_that("moving a parent and its log child is rejected before content changes"
     writeLines("source log", file.path(path, "01_qc", "01_qc.txt"))
     writeLines(c("#SBATCH -o 01_qc/01_qc.txt", "echo work"), file.path(path, "01_qc.sh"))
     before <- overwrite_snapshot(path)
-    expect_error(renumber(path, "01", "02", recursive_edits = TRUE), "source inside")
+    expect_error(renumber(path, "01", "02", recursive_edits = TRUE, protect_log_location = FALSE), "source inside")
     expect_identical(overwrite_snapshot(path), before)
 })
 

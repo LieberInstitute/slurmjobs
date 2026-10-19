@@ -11,7 +11,10 @@
   this_pre_after,
   all_files,
   is_shell,
-  negate_pattern = FALSE
+  negate_pattern = FALSE,
+  scope_dir = base_dir,
+  log_root = scope_dir,
+  is_log = FALSE
 )
 }
 \description{

@@ -23,7 +23,26 @@
 #' and unexpected edits take place, the default is `FALSE`; you must opt in
 #' intentionally.
 #'
-#' @details The complete rename plan, including logs, is checked before changes.
+#' @param protect_log_location A `logical(1)`, default `TRUE`, requiring log files
+#' selected through shell scripts to be inside the project returned by
+#' [here::here()]. Logs may be outside `base_dir`. Set `FALSE` to permit logs in
+#' any directory referenced by shell scripts, without consulting `here`.
+#' This disables only log location checks; collision, link, and recovery checks
+#' remain active, and non-log changes must still stay within `base_dir`.
+#'
+#' @details Non-log changes are confined to the physical directory selected by
+#' `base_dir`. Its symbolic-link aliases resolve to that same scope. Selected
+#' symbolic links and hard-linked files are refused; recursive editing does not
+#' follow linked directories.
+#'
+#' By default, log files selected for renaming must be within the physical project
+#' root returned by `here::here()`, which uses the current R session's project
+#' context, not `base_dir`, to determine the root. If no logs are selected, an
+#' outside or missing log directory does not prevent renumbering. The project
+#' root and log protection setting are saved in the journal, so recovery uses the
+#' original policy even from a different working directory or project context.
+#'
+#' The complete rename plan, including logs, is checked before changes.
 #' Hidden files and dangling symbolic links count as occupied destinations.
 #' Script edits are prepared in a private recovery directory; logs and data
 #' directories are renamed in place, without copying their contents. Only changed
@@ -78,14 +97,20 @@
 #' )
 #'
 #' #   Swap the order of the scripts
-#' renumber(base_dir, c("01", "02"), c("02", "01"))
+#' # This temporary example is outside the current project.
+#' renumber(base_dir, c("01", "02"), c("02", "01"),
+#'     protect_log_location = FALSE)
 #' 
 #' #   Check that the scripts have been properly renamed
 #' list.files(base_dir)
 renumber <- function(
         base_dir, pre_before, pre_after, expect_matches = TRUE,
-        recursive_edits = FALSE
+        recursive_edits = FALSE, protect_log_location = TRUE
     ) {
+    if (!is.logical(protect_log_location) || length(protect_log_location) != 1L ||
+        is.na(protect_log_location)) {
+        stop("'protect_log_location' must be TRUE or FALSE.")
+    }
     if (!dir.exists(base_dir)) {
         stop("'base_dir' must exist.")
     }
@@ -102,6 +127,7 @@ renumber <- function(
         return(invisible(NULL))
     }
     base_dir <- normalizePath(base_dir, mustWork = TRUE)
+    log_root <- if (protect_log_location) .renumber_project_root() else NULL
     recovery_dir <- file.path(base_dir, ".slurmjobs-renumber")
     if (.renumber_path_exists(recovery_dir)) {
         stop("An unfinished renumber operation exists. Inspect and run renumber_recover('",
@@ -137,7 +163,7 @@ renumber <- function(
     #   Gather a full renaming plan of all files (source and destination paths).
     #   Does not modify any files
     rename_plan_df = .renumber_loop(
-        base_dir, pre_before, pre_after, all_files
+        base_dir, pre_before, pre_after, all_files, log_root = log_root
     )
 
     # Freeze edit candidates before validating destinations. A file arriving at
@@ -148,9 +174,9 @@ renumber <- function(
         character()
     }
   
-    # Validate the actual paths, not just immediate entries in base_dir. Logs
-    # can live in another directory and can alias paths through symlinked parents.
-    rename_plan <- .renumber_validate_plan(rename_plan_df)
+    # Validate physical paths, including paths obtained from shell log directives.
+    .renumber_assert_within(all_code_files, base_dir, reject_aliases = TRUE)
+    rename_plan <- .renumber_validate_plan(rename_plan_df, base_dir, log_root)
     if (nrow(rename_plan) == 0L) {
         return(invisible(NULL))
     }
@@ -166,7 +192,8 @@ renumber <- function(
             paste0(pre_after[index], substring(stem, nchar(pre_before[index]) + 1L))
         }, character(1)), stems)
     }
-    .renumber_transaction(base_dir, rename_plan, all_code_files, replacements)
+    .renumber_transaction(base_dir, rename_plan, all_code_files, replacements,
+        protect_log_location, log_root)
     invisible(NULL)
 }
 
@@ -180,14 +207,20 @@ renumber <- function(
     fs::file_exists(paths) | fs::dir_exists(paths) | fs::link_exists(paths)
 }
 
-.renumber_validate_plan <- function(plan) {
+.renumber_validate_plan <- function(plan, base_dir, log_root = base_dir) {
+    if (is.null(plan$is_log)) plan$is_log <- rep(FALSE, nrow(plan))
+    if (!is.logical(plan$is_log) || anyNA(plan$is_log)) stop("Invalid log provenance in rename plan.")
+    .renumber_assert_plan(plan, base_dir, log_root)
     plan <- data.frame(
         before = .renumber_canonical_paths(plan$before),
         staged = .renumber_canonical_paths(plan$after),
+        is_log = plan$is_log,
         stringsAsFactors = FALSE
     )
     plan$final <- file.path(dirname(plan$staged),
         sub("temp_slurmjobs$", "", basename(plan$staged)))
+    .renumber_assert_plan(data.frame(before = plan$before, after = plan$final,
+        is_log = plan$is_log), base_dir, log_root)
     reject <- function(reason) stop("The proposed renaming plan ", reason, call. = FALSE)
     if (anyDuplicated(plan$before)) reject("has duplicate source paths.")
     if (anyDuplicated(plan$staged) || anyDuplicated(plan$final)) {
@@ -222,7 +255,8 @@ renumber <- function(
 #' @keywords internal
 .renumber_process_file = function(
         base_dir, file_regex, this_pre_before, this_pre_after, all_files,
-        is_shell, negate_pattern = FALSE
+        is_shell, negate_pattern = FALSE, scope_dir = base_dir,
+        log_root = scope_dir, is_log = FALSE
     ) {
     second_condition = grepl(sprintf("%s$", file_regex), basename(all_files))
     if (negate_pattern) {
@@ -243,9 +277,14 @@ renumber <- function(
     }
 
     if (length(file_before) == 0) {
-        return(data.frame(before = character(0), after = character(0)))
+        return(data.frame(before = character(0), after = character(0), is_log = logical(0)))
     }
 
+    if (is_log) {
+        .renumber_assert_log_paths(file_before, log_root, reject_aliases = TRUE)
+    } else {
+        .renumber_assert_within(file_before, scope_dir, reject_aliases = TRUE)
+    }
     full_pre_before <- stringr::str_extract(
         basename(file_before),
         sprintf("(^%s.*)%s$", this_pre_before, file_regex), group = 1
@@ -271,11 +310,15 @@ renumber <- function(
             str_replace("^(#SBATCH -o |log_path=)", "") |>
             dirname()
 
+        # Shell scripts without a log directive have no associated log plan.
+        if (is.na(last_occurence)) {
+            log_dir <- character()
+        }
+
         #   If the log is specified with a relative path, make sure it's
         #   relative to the directory containing the shell script
-        if (!fs::is_absolute_path(log_dir)) {
-            log_dir <- file.path(dirname(file_before), log_dir) |>
-                normalizePath(mustWork = FALSE)
+        if (length(log_dir) && !fs::is_absolute_path(log_dir)) {
+            log_dir <- file.path(dirname(file_before), log_dir)
         }
 
         #   Use recursion to plan to rename logs, where they exist
@@ -284,8 +327,9 @@ renumber <- function(
             file_regex = "\\.(txt|log)",
             this_pre_before = this_pre_before,
             this_pre_after = this_pre_after,
-            all_files = list.files(log_dir, full.names = TRUE),
-            is_shell = FALSE
+            all_files = if (length(log_dir)) list.files(log_dir, full.names = TRUE) else character(),
+            is_shell = FALSE, scope_dir = scope_dir, log_root = log_root,
+            is_log = TRUE
         )
         log_files_before <- rename_df$before
         log_files_after <- rename_df$after
@@ -305,7 +349,8 @@ renumber <- function(
     )
     plan_df = data.frame(
         before = c(file_before, log_files_before),
-        after = c(file_after, log_files_after)
+        after = c(file_after, log_files_after),
+        is_log = c(rep(is_log, length(file_before)), rep(TRUE, length(log_files_before)))
     )
 
     return(plan_df)
@@ -318,7 +363,7 @@ renumber <- function(
 #' 
 #' @author Nicholas J. Eagles
 #' @keywords internal
-.renumber_loop = function(base_dir, pre_before, pre_after, all_files) {
+.renumber_loop = function(base_dir, pre_before, pre_after, all_files, log_root = base_dir) {
     rename_plan_df_list = list()
     for (i in seq_len(length(pre_before))) {
         rename_plan_df_list[[length(rename_plan_df_list) + 1]] = .renumber_process_file(
@@ -327,7 +372,7 @@ renumber <- function(
             this_pre_before = pre_before[i],
             this_pre_after = pre_after[i],
             all_files = all_files,
-            is_shell = TRUE
+            is_shell = TRUE, log_root = log_root
         )
 
         rename_plan_df_list[[length(rename_plan_df_list) + 1]] = .renumber_process_file(
@@ -337,7 +382,7 @@ renumber <- function(
             this_pre_after = pre_after[i],
             all_files = all_files,
             is_shell = FALSE,
-            negate_pattern = TRUE
+            negate_pattern = TRUE, log_root = log_root
         )
     }
     rename_plan_df = do.call(rbind, rename_plan_df_list)

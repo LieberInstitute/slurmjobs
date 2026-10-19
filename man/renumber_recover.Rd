@@ -31,6 +31,11 @@ same file, so exclude concurrent writers during both execution and recovery.
 These checks do not protect against changes between checks and writes/renames.
 Once a call
 committed successfully, recovery only finishes cleaning up its temporary files.
+Recovery validates non-log paths against the original physical \code{base_dir}.
+Log moves use the saved project root when \code{protect_log_location} was \code{TRUE},
+or may be outside the project when it was \code{FALSE}. Recovery never recomputes
+the project with \code{here}. A moved journal or a path outside its saved scope is
+refused. Older journals without log provenance remain confined to \code{base_dir}.
 The journal is private local package state; do not edit it or use an untrusted
 recovery directory.
 }

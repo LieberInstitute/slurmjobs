@@ -18,6 +18,8 @@ overwrite_snapshot <- function(path) {
 
 
 overwrite_fixture <- function(path, log_dir = file.path(path, "code", "logs")) {
+    testthat::local_mocked_bindings(.renumber_project_root = function() path,
+        .package = "slurmjobs", .env = parent.frame())
     dir.create(file.path(path, "code"))
     dir.create(log_dir, recursive = TRUE, showWarnings = FALSE)
     writeLines(c(paste("#SBATCH -o", file.path(log_dir, "01_qc.txt")), "Rscript 01_qc.R"),
@@ -25,5 +27,19 @@ overwrite_fixture <- function(path, log_dir = file.path(path, "code", "logs")) {
     writeLines('x <- "01_qc"', file.path(path, "code", "01_qc.R"))
     writeLines("original log", file.path(log_dir, "01_qc.txt"))
     log_dir
+}
+
+
+run_recovery_process <- function(fun, args) {
+    script <- withr::local_tempfile(fileext = ".R")
+    data <- withr::local_tempfile(fileext = ".rds")
+    environment(fun) <- .GlobalEnv
+    saveRDS(list(fun = fun, args = args, libraries = .libPaths()), data)
+    writeLines(c("input <- readRDS(commandArgs(TRUE)[1])",
+        ".libPaths(input$libraries)", "do.call(input$fun, input$args)"), script)
+    output <- suppressWarnings(system2(file.path(R.home("bin"), "Rscript"),
+        c("--vanilla", shQuote(script), shQuote(data)), stdout = TRUE, stderr = TRUE))
+    status <- attr(output, "status")
+    list(status = if (is.null(status)) 0L else status, output = output)
 }
 

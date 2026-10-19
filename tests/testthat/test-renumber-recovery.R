@@ -275,19 +275,6 @@ test_that("empty recovery folders and recursive directory links are handled safe
     expect_identical(overwrite_snapshot(path), before)
 })
 
-run_recovery_process <- function(fun, args) {
-    script <- withr::local_tempfile(fileext = ".R")
-    data <- withr::local_tempfile(fileext = ".rds")
-    environment(fun) <- .GlobalEnv
-    saveRDS(list(fun = fun, args = args, libraries = .libPaths()), data)
-    writeLines(c("input <- readRDS(commandArgs(TRUE)[1])",
-        ".libPaths(input$libraries)", "do.call(input$fun, input$args)"), script)
-    output <- suppressWarnings(system2(file.path(R.home("bin"), "Rscript"),
-        c("--vanilla", shQuote(script), shQuote(data)), stdout = TRUE, stderr = TRUE))
-    status <- attr(output, "status")
-    list(status = if (is.null(status)) 0L else status, output = output)
-}
-
 test_that("a fresh R session can recover abrupt process termination", {
     # quit() bypasses the transaction's error/interrupt handlers entirely.
     for (terminate_at in seq_len(4L)) {
@@ -318,9 +305,9 @@ test_that("a fresh R session can recover abrupt process termination", {
     }
 })
 
-test_that("external logs and edited scripts roll back together", {
+test_that("nested logs and edited scripts roll back together", {
     path <- normalizePath(withr::local_tempdir())
-    overwrite_fixture(path, file.path(path, "external-logs"))
+    overwrite_fixture(path)
     before <- overwrite_snapshot(path)
     move <- .renumber_move
     count <- 0L

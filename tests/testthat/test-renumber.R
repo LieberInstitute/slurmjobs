@@ -5,6 +5,7 @@ test_that(
         base_dir <- file.path(tempdir(), "temp_slurmjobs")
         unlink(base_dir, recursive = TRUE)
         dir.create(base_dir)
+        local_mocked_bindings(.renumber_project_root = function() normalizePath(base_dir))
 
         #   Create a set of scripts, some of which will be renumbered
 
