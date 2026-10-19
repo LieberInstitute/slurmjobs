@@ -56,18 +56,17 @@ test_that("dangling symlink destinations and intermediates are never replaced", 
     }
 })
 
-test_that("duplicate log destinations are rejected across the complete plan", {
+test_that("unrelated logs sharing a numeric prefix are not selected", {
     path <- normalizePath(withr::local_tempdir())
     log_dir <- overwrite_fixture(path)
-    # Different script stems collapse to the same log destination.
     writeLines(c(paste("#SBATCH -o", file.path(log_dir, "03_model.txt")), "Rscript 03_model.R"),
         file.path(path, "code", "03_model.sh"))
     writeLines("model", file.path(path, "code", "03_model.R"))
-    writeLines("other source log", file.path(log_dir, "03_qc.txt"))
-    before <- overwrite_snapshot(path)
-    expect_error(renumber(file.path(path, "code"), c("01", "03"), c("02", "02"),
-        recursive_edits = TRUE), "proposed renaming plan")
-    expect_identical(overwrite_snapshot(path), before)
+    writeLines("unrelated source log", file.path(log_dir, "03_qc.txt"))
+    expect_no_error(renumber(file.path(path, "code"), c("01", "03"), c("02", "02"),
+        recursive_edits = TRUE))
+    expect_identical(readLines(file.path(log_dir, "03_qc.txt")), "unrelated source log")
+    expect_identical(readLines(file.path(log_dir, "02_qc.txt")), "original log")
 })
 
 test_that("duplicate and aliased source paths are rejected", {

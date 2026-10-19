@@ -14,7 +14,8 @@
   negate_pattern = FALSE,
   scope_dir = base_dir,
   log_root = scope_dir,
-  is_log = FALSE
+  is_log = FALSE,
+  log_stem = NULL
 )
 }
 \description{

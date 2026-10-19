@@ -17,10 +17,10 @@ renumber(
 \item{base_dir}{A \code{character(1)} path to a directory containing the scripts
 to re-order.}
 
-\item{pre_before}{A \code{character()} vector of prefices to replace among scripts
-in \code{base_dir}.}
+\item{pre_before}{A \code{character()} vector of literal prefices to replace among
+scripts in \code{base_dir}. Regular-expression characters are treated literally.}
 
-\item{pre_after}{A \code{character()} vector of replacement prefices among scripts
+\item{pre_after}{A \code{character()} vector of literal replacement prefices among scripts
 in \code{base_dir}.}
 
 \item{expect_matches}{A \code{logical(1)} indicating whether to expect that all
@@ -61,6 +61,18 @@ context, not \code{base_dir}, to determine the root. If no logs are selected, an
 outside or missing log directory does not prevent renumbering. The project
 root and log protection setting are saved in the journal, so recovery uses the
 original policy even from a different working directory or project context.
+
+Matching uses literal filename prefixes throughout. File stems remove only
+the final extension, retaining embedded dots; directory stems retain the full
+basename. A stem is never shortened past a supplied prefix that includes an
+extension or the whole filename. Distinct stems matched by the same prefix
+are rejected as ambiguous.
+
+Associated logs must have the full shell-script stem followed by \code{.txt} or
+\code{.log}, optionally with an underscore suffix (the \code{job_loop()} convention) or
+a dot and numeric task ID (the \code{job_single()} array convention). Logs sharing
+only the numeric prefix are not selected. The shell-script stem and replacement
+are interpreted literally, including any embedded dots or regex characters.
 
 The complete rename plan, including logs, is checked before changes.
 Hidden files and dangling symbolic links count as occupied destinations.

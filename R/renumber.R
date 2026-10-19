@@ -9,9 +9,9 @@
 #'
 #' @param base_dir A `character(1)` path to a directory containing the scripts
 #' to re-order.
-#' @param pre_before A `character()` vector of prefices to replace among scripts
-#' in `base_dir`.
-#' @param pre_after A `character()` vector of replacement prefices among scripts
+#' @param pre_before A `character()` vector of literal prefices to replace among
+#' scripts in `base_dir`. Regular-expression characters are treated literally.
+#' @param pre_after A `character()` vector of literal replacement prefices among scripts
 #' in `base_dir`.
 #' @param expect_matches A `logical(1)` indicating whether to expect that all
 #' prefices in `pre_before` will match a file in `base_dir`, throwing an error if
@@ -41,6 +41,18 @@
 #' outside or missing log directory does not prevent renumbering. The project
 #' root and log protection setting are saved in the journal, so recovery uses the
 #' original policy even from a different working directory or project context.
+#'
+#' Matching uses literal filename prefixes throughout. File stems remove only
+#' the final extension, retaining embedded dots; directory stems retain the full
+#' basename. A stem is never shortened past a supplied prefix that includes an
+#' extension or the whole filename. Distinct stems matched by the same prefix
+#' are rejected as ambiguous.
+#'
+#' Associated logs must have the full shell-script stem followed by `.txt` or
+#' `.log`, optionally with an underscore suffix (the `job_loop()` convention) or
+#' a dot and numeric task ID (the `job_single()` array convention). Logs sharing
+#' only the numeric prefix are not selected. The shell-script stem and replacement
+#' are interpreted literally, including any embedded dots or regex characters.
 #'
 #' The complete rename plan, including logs, is checked before changes.
 #' Hidden files and dangling symbolic links count as occupied destinations.
@@ -135,10 +147,11 @@ renumber <- function(
     }
 
     all_files <- list.files(base_dir, full.names = TRUE)  
-    for (x in pre_before) {
-        matching_files <- basename(all_files)[
-            grepl(paste0("^", x), basename(all_files))
-        ]
+    prefix_stems <- vector("list", length(pre_before))
+    for (i in seq_along(pre_before)) {
+        x <- pre_before[i]
+        matching_paths <- all_files[startsWith(basename(all_files), x)]
+        matching_files <- basename(matching_paths)
       
         #   Check the all the prefices in 'pre_before' match a file in 'base_dir'
         if (expect_matches && (length(matching_files) == 0)) {
@@ -150,9 +163,8 @@ renumber <- function(
         #   Prefices must uniquely specify basenames of files, a safety/
         #   convenience feature to prevent accidentally matching short strings
         #   in shell or other files and mistakenly modifying them
-        matching_base = str_extract(
-            matching_files, sprintf("^(%s[^.]*)\\.?.*", x), group = 1
-        )
+        matching_base <- .renumber_stems(matching_paths, x)
+        prefix_stems[[i]] <- unique(matching_base)
         if (length(unique(matching_base)) > 1) {
             stop(
                 "Prefix '", x, "' matches multiple files with different base names, which is usually unintentional. If this was actually desired, consider modifying 'pre_before' to be more specific."
@@ -182,15 +194,11 @@ renumber <- function(
     }
     replacements <- character()
     if (recursive_edits) {
-        stems <- unique(unlist(lapply(pre_before, function(prefix) {
-            matches <- basename(all_files)[grepl(paste0("^", prefix), basename(all_files))]
-            unique(stringr::str_extract(matches, sprintf("^(%s[^.]*)\\.?.*", prefix), group = 1))
-        }), use.names = FALSE))
-        stems <- stems[!is.na(stems)]
-        replacements <- stats::setNames(vapply(stems, function(stem) {
-            index <- which(vapply(pre_before, function(prefix) startsWith(stem, prefix), logical(1)))[1]
-            paste0(pre_after[index], substring(stem, nchar(pre_before[index]) + 1L))
-        }, character(1)), stems)
+        for (i in seq_along(pre_before)) {
+            stems <- prefix_stems[[i]]
+            replacements <- c(replacements, stats::setNames(
+                .renumber_replace_prefix(stems, pre_before[i], pre_after[i]), stems))
+        }
     }
     .renumber_transaction(base_dir, rename_plan, all_code_files, replacements,
         protect_log_location, log_root)
@@ -256,16 +264,20 @@ renumber <- function(
 .renumber_process_file = function(
         base_dir, file_regex, this_pre_before, this_pre_after, all_files,
         is_shell, negate_pattern = FALSE, scope_dir = base_dir,
-        log_root = scope_dir, is_log = FALSE
+        log_root = scope_dir, is_log = FALSE, log_stem = NULL
     ) {
     second_condition = grepl(sprintf("%s$", file_regex), basename(all_files))
     if (negate_pattern) {
         second_condition = !second_condition
     }
     file_before <- all_files[
-        grepl(sprintf("^%s", this_pre_before), basename(all_files)) &
+        startsWith(basename(all_files), this_pre_before) &
         second_condition
     ]
+
+    if (is_log) {
+        file_before <- file_before[.renumber_log_matches(basename(file_before), log_stem)]
+    }
 
     if (is_shell) {
         if (length(file_before) > 1) {
@@ -285,14 +297,6 @@ renumber <- function(
     } else {
         .renumber_assert_within(file_before, scope_dir, reject_aliases = TRUE)
     }
-    full_pre_before <- stringr::str_extract(
-        basename(file_before),
-        sprintf("(^%s.*)%s$", this_pre_before, file_regex), group = 1
-    )
-    full_pre_after <- sub(
-        paste0("^", this_pre_before), this_pre_after, full_pre_before
-    )
-
     log_files_before <- character(0)
     log_files_after <- character(0)
   
@@ -321,15 +325,24 @@ renumber <- function(
             log_dir <- file.path(dirname(file_before), log_dir)
         }
 
+        # Match the full shell-script stem, retaining the package's loop and
+        # numeric task suffix conventions rather than selecting every log with
+        # the same numeric prefix.
+        shell_name <- basename(file_before)
+        shell_stem <- substr(shell_name, 1L, nchar(shell_name) - 3L)
+        new_shell_name <- .renumber_replace_prefix(shell_name, this_pre_before, this_pre_after)
+        new_shell_stem <- if (endsWith(new_shell_name, ".sh")) {
+            substr(new_shell_name, 1L, nchar(new_shell_name) - 3L)
+        } else new_shell_name
         #   Use recursion to plan to rename logs, where they exist
         rename_df = .renumber_process_file(
             base_dir = log_dir,
             file_regex = "\\.(txt|log)",
-            this_pre_before = this_pre_before,
-            this_pre_after = this_pre_after,
+            this_pre_before = shell_stem,
+            this_pre_after = new_shell_stem,
             all_files = if (length(log_dir)) list.files(log_dir, full.names = TRUE) else character(),
             is_shell = FALSE, scope_dir = scope_dir, log_root = log_root,
-            is_log = TRUE
+            is_log = TRUE, log_stem = shell_stem
         )
         log_files_before <- rename_df$before
         log_files_after <- rename_df$after
@@ -340,10 +353,7 @@ renumber <- function(
     file_after <- file.path(
         base_dir,
         paste0(
-            sub(
-                paste0("^", this_pre_before), this_pre_after,
-                basename(file_before)
-            ),
+            .renumber_replace_prefix(basename(file_before), this_pre_before, this_pre_after),
             "temp_slurmjobs"
         )
     )
@@ -387,4 +397,34 @@ renumber <- function(
     }
     rename_plan_df = do.call(rbind, rename_plan_df_list)
     return(rename_plan_df)
+}
+
+
+.renumber_replace_prefix <- function(names, before, after) {
+    if (!length(names)) return(character())
+    if (!all(startsWith(names, before))) stop("Internal literal prefix mismatch.")
+    paste0(after, substring(names, nchar(before) + 1L))
+}
+
+.renumber_stems <- function(paths, prefix) {
+    names <- basename(paths)
+    stems <- names
+    files <- !dir.exists(paths)
+    stems[files] <- tools::file_path_sans_ext(names[files])
+    # A prefix can deliberately include the extension or the entire filename.
+    # Never shorten a stem past the literal prefix that selected it.
+    short <- !startsWith(stems, prefix)
+    stems[short] <- names[short]
+    stems
+}
+
+.renumber_log_matches <- function(names, stem) {
+    if (is.null(stem) || length(stem) != 1L || !nzchar(stem)) {
+        stop("Log discovery requires one full script stem.")
+    }
+    stems <- tools::file_path_sans_ext(names)
+    dotted <- startsWith(stems, paste0(stem, "."))
+    numeric_task <- rep(FALSE, length(names))
+    numeric_task[dotted] <- grepl("^[0-9]+$", substring(stems[dotted], nchar(stem) + 2L))
+    stems == stem | startsWith(stems, paste0(stem, "_")) | numeric_task
 }
