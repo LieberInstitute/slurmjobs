@@ -48,7 +48,7 @@
 #' extension or the whole filename. Distinct stems matched by the same prefix
 #' are rejected as ambiguous.
 #'
-#' Associated logs must have the full shell-script stem followed by `.txt` or
+#' Associated logs must be regular files with the full shell-script stem followed by `.txt` or
 #' `.log`, optionally with an underscore suffix (the `job_loop()` convention) or
 #' a dot and numeric task ID (the `job_single()` array convention). Logs sharing
 #' only the numeric prefix are not selected. The shell-script stem and replacement

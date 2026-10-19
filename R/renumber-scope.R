@@ -86,6 +86,18 @@
 .renumber_assert_log_paths <- function(paths, log_root, reject_aliases = FALSE) {
     .renumber_assert_within(paths, log_root, reject_aliases,
         scope_name = "the project directory returned by here::here()")
+    # Source checks also run before moves and recovery. Log exceptions authorize
+    # regular files only, never directories whose names happen to end in .txt.
+    if (reject_aliases) {
+        existing <- paths[.renumber_path_exists(paths)]
+        if (length(existing)) {
+            info <- fs::file_info(existing, fail = TRUE)
+            if (any(info$type != "file")) {
+                stop("Log targets must be regular files: ",
+                    paste(existing[info$type != "file"], collapse = ", "), call. = FALSE)
+            }
+        }
+    }
 }
 
 .renumber_assert_plan <- function(plan, base_dir, log_root) {

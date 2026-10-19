@@ -3,6 +3,53 @@ project_log_fixture <- function(log_root) {
     list(project = log_root, base = file.path(log_root, "code"), logs = file.path(log_root, "logs"))
 }
 
+test_that("directories cannot be renamed through the log exception", {
+    for (protect in c(FALSE, TRUE)) {
+        for (external in c(FALSE, TRUE)) {
+            for (extension in c("txt", "log")) {
+                path <- normalizePath(withr::local_tempdir())
+                logs <- if (external) file.path(path, "private-data") else file.path(path, "code", "logs")
+                overwrite_fixture(path, logs)
+                file.remove(file.path(logs, "01_qc.txt"))
+                target <- file.path(logs, paste0("01_qc.", extension))
+                dir.create(target)
+                writeLines("unrelated project data", file.path(target, "sentinel.txt"))
+                writeLines("01_qc must remain unchanged", file.path(target, "references.R"))
+                writeLines(c(paste("#SBATCH -o", target), "Rscript 01_qc.R"),
+                    file.path(path, "code", "01_qc.sh"))
+                before <- overwrite_snapshot(path)
+                expect_error(renumber(file.path(path, "code"), "01", "02",
+                    recursive_edits = TRUE, protect_log_location = protect),
+                    "Log targets must be regular files")
+                expect_identical(overwrite_snapshot(path), before)
+                expect_false(dir.exists(file.path(path, "code", ".slurmjobs-renumber")))
+            }
+        }
+    }
+})
+
+test_that("recovery cannot move directories recorded as logs", {
+    for (protect in c(FALSE, TRUE)) {
+        path <- normalizePath(withr::local_tempdir())
+        fixture <- project_log_fixture(path)
+        target <- file.path(fixture$logs, "01_qc.txt")
+        file.remove(target)
+        dir.create(target)
+        writeLines("unrelated data", file.path(target, "sentinel.txt"))
+        directory <- file.path(fixture$base, ".slurmjobs-renumber")
+        dir.create(directory)
+        saveRDS(list(format = 2L, base_dir = fixture$base,
+            log_policy = list(protect = protect, root = path), status = "publishing",
+            prepared = character(), backups = character(),
+            operations = list(list(kind = "move", is_log = TRUE,
+                from = file.path(fixture$logs, "02_qc.txt"), to = target,
+                stamp = .renumber_stamp(target)))), file.path(directory, "journal.rds"))
+        before <- overwrite_snapshot(path)
+        expect_error(renumber_recover(directory), "Log targets must be regular files")
+        expect_identical(overwrite_snapshot(path), before)
+    }
+})
+
 test_that("logs outside base_dir but inside here project are renamed", {
     for (recursive in c(FALSE, TRUE)) {
         for (relative in c(FALSE, TRUE)) {
