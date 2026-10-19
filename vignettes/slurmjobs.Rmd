@@ -388,7 +388,11 @@ Suppose we wish to simply swap the order of the first and second script. We must
 provide the directory containing the scripts, the beginning prefices to change,
 and finally the replacement prefices. We'll specify `recursive_edits = TRUE` to
 ensure that references to the old script names are updated within any scripts under
-`base_dir`.
+`base_dir`. This particular example also needs `protect_log_location = FALSE`; as
+a safety feature, `renumber()` by default refuses to modify logs outside of what's
+determined to be the project directory (via `here::here()`). Since we're working in
+a temporary directory distinct from what `here()` finds as the project, we'll
+override the safety requirement.
 
 ```{r "renumber"}
 #   Re-order scripts (and logs)
@@ -442,7 +446,11 @@ Let's rename them and check the result.
 
 ```{r "renumber_dirs"}
 #   Re-order directories and check their new names
-renumber(base_dir, c("first", "then", "finally"), c("3rd", "1st", "2nd"))
+renumber(
+    base_dir,
+    c("first", "then", "finally"), c("3rd", "1st", "2nd"),
+    protect_log_location = FALSE
+)
 list.files(base_dir)
 ```
 
