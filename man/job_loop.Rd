@@ -73,9 +73,9 @@ job_loop(
 
 }
 \seealso{
-Other shell-script creation and submission functions: 
-\code{\link{array_submit}()},
-\code{\link{job_single}()}
+Other shell-script creation and submission functions:
+\code{\link[=array_submit]{array_submit()}},
+\code{\link[=job_single]{job_single()}}
 }
 \author{
 Nicholas J. Eagles

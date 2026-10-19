@@ -32,9 +32,9 @@ if (system("which sbatch") == 0) {
 }
 }
 \seealso{
-Other monitoring and informational functions: 
-\code{\link{job_report}()},
-\code{\link{partition_info}()}
+Other monitoring and informational functions:
+\code{\link[=job_report]{job_report()}},
+\code{\link[=partition_info]{partition_info()}}
 }
 \author{
 Nicholas J. Eagles

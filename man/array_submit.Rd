@@ -64,9 +64,9 @@ array_submit(
 
 }
 \seealso{
-Other shell-script creation and submission functions: 
-\code{\link{job_loop}()},
-\code{\link{job_single}()}
+Other shell-script creation and submission functions:
+\code{\link[=job_loop]{job_loop()}},
+\code{\link[=job_single]{job_single()}}
 }
 \author{
 Leonardo Collado-Torres

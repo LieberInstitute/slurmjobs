@@ -40,9 +40,9 @@ if (system("which sbatch") == 0) {
 }
 }
 \seealso{
-Other monitoring and informational functions: 
-\code{\link{job_info}()},
-\code{\link{job_report}()}
+Other monitoring and informational functions:
+\code{\link[=job_info]{job_info()}},
+\code{\link[=job_report]{job_report()}}
 }
 \author{
 Nicholas J. Eagles
