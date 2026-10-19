@@ -396,7 +396,8 @@ override the safety requirement.
 
 ```{r "renumber"}
 #   Re-order scripts (and logs)
-renumber(base_dir, c("01", "02"), c("02", "01"), recursive_edits = TRUE)
+renumber(base_dir, c("01", "02"), c("02", "01"), recursive_edits = TRUE,
+    protect_log_location = FALSE)
 ```
 
 We can see the names of the scripts and logs have been correctly updated.
