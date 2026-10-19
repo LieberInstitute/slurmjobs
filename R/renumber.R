@@ -22,7 +22,33 @@
 #' Because of the slight risk where prefices are not uniquely identifiable
 #' and unexpected edits take place, the default is `FALSE`; you must opt in
 #' intentionally.
-#' 
+#'
+#' @details The complete rename plan, including logs, is checked before changes.
+#' Hidden files and dangling symbolic links count as occupied destinations.
+#' Script edits are prepared in a private recovery directory; logs and data
+#' directories are renamed in place, without copying their contents. Only changed
+#' scripts have their original bytes backed up. Prepared edits are written into
+#' the existing script files, retaining their identity, ownership and ordinary
+#' ACLs and extended attributes. Timestamps change, and the operating system may
+#' clear special security attributes on modification. Linked script edit targets
+#' are refused. An interrupted write can leave partial contents until recovery.
+#'
+#' A journal records each move or script edit before execution. Errors and R
+#' interrupts trigger rollback in reverse order. If rollback cannot finish, the error reports the
+#' recovery directory. After inspecting the affected files, call
+#' [renumber_recover()] with that directory to retry rollback. A leftover recovery
+#' directory blocks another call in the same base directory.
+#'
+#' Renaming uses base R with destination checks immediately before each move.
+#' This is not an atomic transaction: other processes can observe intermediate
+#' paths, and a destination created between the check and rename can be replaced.
+#' Do not run against files being modified by other processes. Rename recovery
+#' refuses occupied destinations or changed objects. Script recovery checks file
+#' identity while allowing partial contents from an unfinished write; see
+#' [renumber_recover()] for its conflict checks.
+#' Recovery survives ordinary R-session termination, but is not a guarantee
+#' against power loss, storage corruption, or arbitrary concurrent changes.
+#'
 #' @return NULL
 #' @export
 #' @author Nicholas J. Eagles
@@ -66,6 +92,21 @@ renumber <- function(
     if (length(pre_before) != length(pre_after)) {
         stop("'pre_before' and 'pre_after' must be the same length.")
     }
+    for (prefixes in list(pre_before, pre_after)) {
+        if (!is.character(prefixes) || anyNA(prefixes) ||
+            any(!nzchar(prefixes)) || any(grepl("[/\\\\]", prefixes))) {
+            stop("Prefixes must be non-empty character strings without path separators.")
+        }
+    }
+    if (length(pre_before) == 0L) {
+        return(invisible(NULL))
+    }
+    base_dir <- normalizePath(base_dir, mustWork = TRUE)
+    recovery_dir <- file.path(base_dir, ".slurmjobs-renumber")
+    if (.renumber_path_exists(recovery_dir)) {
+        stop("An unfinished renumber operation exists. Inspect and run renumber_recover('",
+            recovery_dir, "').", call. = FALSE)
+    }
 
     all_files <- list.files(base_dir, full.names = TRUE)  
     for (x in pre_before) {
@@ -98,70 +139,79 @@ renumber <- function(
     rename_plan_df = .renumber_loop(
         base_dir, pre_before, pre_after, all_files
     )
-  
-    #   Now simulate the plan to make sure it's safe. This could be done more
-    #   cleanly with dplyr::replace_values() but I don't want to depend on such
-    #   a recent version of dplyr
-    ending_paths = all_files
-    lookup = setNames(rename_plan_df$after, rename_plan_df$before)
-    ending_paths = case_when(
-            ending_paths %in% names(lookup) ~ lookup[ending_paths],
-            TRUE ~ ending_paths
-        ) |>
-        unname()
-    ending_paths = file.path(
-        base_dir, sub('temp_slurmjobs$', '', basename(ending_paths))
-    )
-    if (length(unique(ending_paths)) != length(all_files)) {
-        stop(
-            "The proposed renaming plan would effectively result in deletion of at least one file or directory. Please check which files exist in 'base_dir' and if supplied prefixes would result in an overwrite."
-        )
+
+    # Freeze edit candidates before validating destinations. A file arriving at
+    # a previously absent destination later must not be swept into recursive edits.
+    all_code_files <- if (recursive_edits) {
+        .renumber_code_files(base_dir)
+    } else {
+        character()
     }
-    
+  
+    # Validate the actual paths, not just immediate entries in base_dir. Logs
+    # can live in another directory and can alias paths through symlinked parents.
+    rename_plan <- .renumber_validate_plan(rename_plan_df)
+    if (nrow(rename_plan) == 0L) {
+        return(invisible(NULL))
+    }
+    replacements <- character()
     if (recursive_edits) {
-        all_code_files = list.files(
-            base_dir, pattern = "\\.(R|sh|py)$", full.names = TRUE,
-            recursive = TRUE
-        )
-        full_pre_before = sapply(
-            pre_before,
-            function(x) {
-                matching_files <- basename(all_files)[
-                    grepl(paste0("^", x), basename(all_files))
-                ]
-                matching_base = stringr::str_extract(
-                    matching_files, sprintf("^(%s[^.]*)\\.?.*", x), group = 1
-                )
-                #   Guaranteed to give one value based on earlier checks
-                return(unique(matching_base)) 
-            }
-        )
-        full_pre_after = stringr::str_replace(
-            full_pre_before, paste0("^", pre_before),
-            paste0(pre_after, 'temp_slurmjobs')
-        )
-        for (this_code_file in all_code_files) {
-            this_code_file |>
-                readLines() |>
-                stringr::str_replace_all(
-                    setNames(full_pre_after, full_pre_before)
-                ) |>
-                stringr::str_replace_all('temp_slurmjobs', '') |>
-                writeLines(con = this_code_file)
+        stems <- unique(unlist(lapply(pre_before, function(prefix) {
+            matches <- basename(all_files)[grepl(paste0("^", prefix), basename(all_files))]
+            unique(stringr::str_extract(matches, sprintf("^(%s[^.]*)\\.?.*", prefix), group = 1))
+        }), use.names = FALSE))
+        stems <- stems[!is.na(stems)]
+        replacements <- stats::setNames(vapply(stems, function(stem) {
+            index <- which(vapply(pre_before, function(prefix) startsWith(stem, prefix), logical(1)))[1]
+            paste0(pre_after[index], substring(stem, nchar(pre_before[index]) + 1L))
+        }, character(1)), stems)
+    }
+    .renumber_transaction(base_dir, rename_plan, all_code_files, replacements)
+    invisible(NULL)
+}
+
+# Resolve parents but not the last component: a dangling symlink itself is an
+# occupied directory entry, not its missing target.
+.renumber_canonical_paths <- function(paths) {
+    file.path(normalizePath(dirname(paths), mustWork = TRUE), basename(paths))
+}
+
+.renumber_path_exists <- function(paths) {
+    fs::file_exists(paths) | fs::dir_exists(paths) | fs::link_exists(paths)
+}
+
+.renumber_validate_plan <- function(plan) {
+    plan <- data.frame(
+        before = .renumber_canonical_paths(plan$before),
+        staged = .renumber_canonical_paths(plan$after),
+        stringsAsFactors = FALSE
+    )
+    plan$final <- file.path(dirname(plan$staged),
+        sub("temp_slurmjobs$", "", basename(plan$staged)))
+    reject <- function(reason) stop("The proposed renaming plan ", reason, call. = FALSE)
+    if (anyDuplicated(plan$before)) reject("has duplicate source paths.")
+    if (anyDuplicated(plan$staged) || anyDuplicated(plan$final)) {
+        reject("has duplicate destination paths.")
+    }
+    for (source in plan$before) {
+        if (any(startsWith(plan$before, paste0(source, "/")))) {
+            reject("contains both a directory and a source inside it.")
         }
     }
-
-    source_paths = rename_plan_df$before
-    intermediate_paths = rename_plan_df$after
-    destination_paths = file.path(
-        dirname(intermediate_paths),
-        sub('temp_slurmjobs$', '', basename(intermediate_paths))
-    )
-    file.rename(source_paths, intermediate_paths)
-    file.rename(intermediate_paths, destination_paths)
-
-    return(invisible(NULL))
+    if (any(!.renumber_path_exists(plan$before))) reject("has missing source paths.")
+    occupied <- .renumber_path_exists(plan$final) & !plan$final %in% plan$before
+    if (any(occupied)) {
+        reject(paste0("would overwrite an existing destination: ",
+            paste(plan$final[occupied], collapse = ", ")))
     }
+    if (any(.renumber_path_exists(plan$staged))) {
+        reject("would overwrite an existing temporary path.")
+    }
+    if (any(plan$staged %in% c(plan$before, plan$final))) {
+        reject("has overlapping temporary and source/destination paths.")
+    }
+    plan
+}
 
 #' Helper function to rename a single file pattern
 #' 

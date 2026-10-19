@@ -41,6 +41,33 @@ where script names begin with \code{01}, \code{02}, etc. References to script na
 within the shell or R scripts are also updated, along with the names of
 log files they produce.
 }
+\details{
+The complete rename plan, including logs, is checked before changes.
+Hidden files and dangling symbolic links count as occupied destinations.
+Script edits are prepared in a private recovery directory; logs and data
+directories are renamed in place, without copying their contents. Only changed
+scripts have their original bytes backed up. Prepared edits are written into
+the existing script files, retaining their identity, ownership and ordinary
+ACLs and extended attributes. Timestamps change, and the operating system may
+clear special security attributes on modification. Linked script edit targets
+are refused. An interrupted write can leave partial contents until recovery.
+
+A journal records each move or script edit before execution. Errors and R
+interrupts trigger rollback in reverse order. If rollback cannot finish, the error reports the
+recovery directory. After inspecting the affected files, call
+\code{\link[=renumber_recover]{renumber_recover()}} with that directory to retry rollback. A leftover recovery
+directory blocks another call in the same base directory.
+
+Renaming uses base R with destination checks immediately before each move.
+This is not an atomic transaction: other processes can observe intermediate
+paths, and a destination created between the check and rename can be replaced.
+Do not run against files being modified by other processes. Rename recovery
+refuses occupied destinations or changed objects. Script recovery checks file
+identity while allowing partial contents from an unfinished write; see
+\code{\link[=renumber_recover]{renumber_recover()}} for its conflict checks.
+Recovery survives ordinary R-session termination, but is not a guarantee
+against power loss, storage corruption, or arbitrary concurrent changes.
+}
 \examples{
 base_dir <- file.path(tempdir(), "slurmjobs_scripts")
 dir.create(base_dir)

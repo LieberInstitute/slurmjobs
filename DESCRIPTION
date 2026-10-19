@@ -22,7 +22,7 @@ Suggests:
     knitcitations,
     rmarkdown,
     sessioninfo,
-    testthat (>= 3.0.0),
+    testthat (>= 3.2.0),
     withr
 Config/testthat/edition: 3
 VignetteBuilder: knitr
@@ -33,6 +33,7 @@ Imports:
     stringr,
     purrr,
     utils,
+    tools,
     lubridate
 Depends: 
     R (>= 4.1.0)
