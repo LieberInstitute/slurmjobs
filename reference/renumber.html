@@ -181,9 +181,9 @@ against power loss, storage corruption, or arbitrary concurrent changes.</p>
 <span class="r-in"><span>    logdir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">base_dir</span>, <span class="st">"logs"</span><span class="op">)</span>, create_logdir <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
 <span class="r-in"><span>    create_shell <span class="op">=</span> <span class="cn">TRUE</span>, command <span class="op">=</span> <span class="st">"Rscript 01_should_be_second.R"</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 2026-10-20 14:34:29.850072 creating the logs directory at:  /tmp/RtmpjNP5DW/slurmjobs_scripts/logs</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 2026-10-20 14:34:29.851357 creating the shell file /tmp/RtmpjNP5DW/slurmjobs_scripts/01_should_be_second.sh</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> To submit the job use: sbatch /tmp/RtmpjNP5DW/slurmjobs_scripts/01_should_be_second.sh</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> 2026-10-20 14:47:36.65089 creating the logs directory at:  /tmp/RtmphO2hMb/slurmjobs_scripts/logs</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> 2026-10-20 14:47:36.652282 creating the shell file /tmp/RtmphO2hMb/slurmjobs_scripts/01_should_be_second.sh</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> To submit the job use: sbatch /tmp/RtmphO2hMb/slurmjobs_scripts/01_should_be_second.sh</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/writeLines.html" class="external-link">writeLines</a></span><span class="op">(</span><span class="st">"# some code"</span>, con <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">base_dir</span>, <span class="st">"01_should_be_second.R"</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">#   Create an array originally designed to be submitted second</span></span></span>
@@ -194,9 +194,9 @@ against power loss, storage corruption, or arbitrary concurrent changes.</p>
 <span class="r-in"><span>        gene <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"gene_1"</span>, <span class="st">"gene_2"</span><span class="op">)</span>, method <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"method_1"</span>, <span class="st">"method_2"</span><span class="op">)</span></span></span>
 <span class="r-in"><span>    <span class="op">)</span> </span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 2026-10-20 14:34:29.853989 creating the logs directory at:  /tmp/RtmpjNP5DW/slurmjobs_scripts/logs</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 2026-10-20 14:34:29.855533 Creating the shell file 02_should_be_first.sh and corresponding R script 02_should_be_first.R</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> To submit the script pair, use: sbatch /tmp/RtmpjNP5DW/slurmjobs_scripts/02_should_be_first.sh</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> 2026-10-20 14:47:36.655155 creating the logs directory at:  /tmp/RtmphO2hMb/slurmjobs_scripts/logs</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> 2026-10-20 14:47:36.656858 Creating the shell file 02_should_be_first.sh and corresponding R script 02_should_be_first.R</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> To submit the script pair, use: sbatch /tmp/RtmphO2hMb/slurmjobs_scripts/02_should_be_first.sh</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">#   Swap the order of the scripts</span></span></span>
 <span class="r-in"><span><span class="co"># This temporary example is outside the current project.</span></span></span>
