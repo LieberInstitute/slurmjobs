@@ -1,3 +1,21 @@
+test_that("occupancy includes dangling links without resolving their targets", {
+    skip_on_os("windows")
+    path <- normalizePath(withr::local_tempdir())
+    regular <- file.path(path, "file")
+    directory <- file.path(path, "directory")
+    missing <- file.path(path, "missing")
+    dangling <- file.path(path, "dangling")
+    writeLines("keep me", regular)
+    dir.create(directory)
+    expect_true(file.symlink(missing, dangling))
+    expect_identical(.renumber_path_exists(c(regular, directory, dangling, missing)),
+        c(TRUE, TRUE, TRUE, FALSE))
+    expect_identical(.renumber_path_exists(character()), logical())
+    expect_error(.renumber_move(regular, dangling), "Occupied move destination")
+    expect_identical(readLines(regular), "keep me")
+    expect_identical(Sys.readlink(dangling), missing)
+})
+
 test_that("existing log destinations are rejected before recursive edits", {
     for (external in c(FALSE, TRUE)) {
         path <- normalizePath(withr::local_tempdir())

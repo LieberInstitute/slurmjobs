@@ -15,7 +15,7 @@
         stop("The proposed renaming plan includes a dangling linked path: ", path,
             call. = FALSE)
     }
-    resolved <- normalizePath(ancestor, mustWork = TRUE)
+    resolved <- normalizePath(ancestor, winslash = "/", mustWork = TRUE)
     if (length(suffix)) {
         resolved <- fs::path_norm(do.call(file.path, c(list(resolved), as.list(suffix))))
     }
@@ -53,7 +53,9 @@
     base_dir <- journal$base_dir
     if (is.null(base_dir)) base_dir <- dirname(directory) # earlier local journals
     journal$base_dir <- base_dir
-    expected <- file.path(base_dir, ".slurmjobs-renumber")
+    # Native Windows separators may occur in older journals or caller paths.
+    directory <- as.character(fs::path_norm(directory))
+    expected <- as.character(fs::path_norm(file.path(base_dir, ".slurmjobs-renumber")))
     if (!identical(directory, expected) || fs::link_exists(directory)) {
         stop("Recovery directory moved or linked; refusing changes outside its original base_dir.")
     }
@@ -80,7 +82,7 @@
 
 
 .renumber_project_root <- function() {
-    normalizePath(here::here(), mustWork = TRUE)
+    normalizePath(here::here(), winslash = "/", mustWork = TRUE)
 }
 
 .renumber_assert_log_paths <- function(paths, log_root, reject_aliases = FALSE) {

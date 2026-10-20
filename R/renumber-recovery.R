@@ -71,7 +71,7 @@
         basename(journal$prepared), basename(journal$backups))
     entries <- list.files(directory, all.files = TRUE, no.. = TRUE, full.names = TRUE)
     if (any(!basename(entries) %in% allowed) ||
-        any(fs::dir_exists(entries) | fs::link_exists(entries))) {
+        any(dir.exists(entries) | fs::link_exists(entries))) {
         stop("Unexpected entries in recovery directory; retained for inspection: ", directory)
     }
     # Remove recovery metadata last, so interrupted cleanup remains retryable.
@@ -122,7 +122,7 @@ renumber_recover <- function(recovery_dir) {
     if (basename(recovery_dir) != ".slurmjobs-renumber" || fs::link_exists(recovery_dir)) {
         stop("Expected an unlinked .slurmjobs-renumber recovery directory.")
     }
-    directory <- normalizePath(recovery_dir, mustWork = TRUE)
+    directory <- normalizePath(recovery_dir, winslash = "/", mustWork = TRUE)
     # A session can stop after deleting the journal but before removing its
     # now-empty directory. Explicit recovery may finish that last cleanup step.
     if (!length(list.files(directory, all.files = TRUE, no.. = TRUE))) {
@@ -183,7 +183,7 @@ renumber_recover <- function(recovery_dir) {
         # Refuse linked targets rather than follow aliases silently.
         info <- fs::file_info(path)
         if (fs::link_exists(path) || info$type != "file" || info$hard_links > 1 ||
-            normalizePath(path, mustWork = TRUE) != .renumber_canonical_paths(path)) {
+            normalizePath(path, winslash = "/", mustWork = TRUE) != .renumber_canonical_paths(path)) {
             stop("Cannot edit a linked or non-regular script: ", path)
         }
         original <- readBin(path, "raw", n = info$size)

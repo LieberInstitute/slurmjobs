@@ -138,7 +138,7 @@ renumber <- function(
     if (length(pre_before) == 0L) {
         return(invisible(NULL))
     }
-    base_dir <- normalizePath(base_dir, mustWork = TRUE)
+    base_dir <- normalizePath(base_dir, winslash = "/", mustWork = TRUE)
     log_root <- if (protect_log_location) .renumber_project_root() else NULL
     recovery_dir <- file.path(base_dir, ".slurmjobs-renumber")
     if (.renumber_path_exists(recovery_dir)) {
@@ -208,11 +208,12 @@ renumber <- function(
 # Resolve parents but not the last component: a dangling symlink itself is an
 # occupied directory entry, not its missing target.
 .renumber_canonical_paths <- function(paths) {
-    file.path(normalizePath(dirname(paths), mustWork = TRUE), basename(paths))
+    file.path(normalizePath(dirname(paths), winslash = "/", mustWork = TRUE), basename(paths))
 }
 
 .renumber_path_exists <- function(paths) {
-    fs::file_exists(paths) | fs::dir_exists(paths) | fs::link_exists(paths)
+    # Inspect the entry itself: resolving a dangling link can throw in fs::dir_exists().
+    !is.na(fs::file_info(paths, fail = FALSE, follow = FALSE)$type)
 }
 
 .renumber_validate_plan <- function(plan, base_dir, log_root = base_dir) {

@@ -14,6 +14,49 @@ run_recovery_fixture <- function(path) {
     renumber(path, c("01", "02"), c("02", "01"), recursive_edits = TRUE)
 }
 
+test_that("native separator paths support recursive edits and rollback", {
+    for (fail in c(FALSE, TRUE)) {
+        # On Windows this deliberately supplies backslashes, as in the vignette.
+        path <- normalizePath(withr::local_tempdir())
+        source <- file.path(path, "01_qc.R")
+        writeLines("01_qc original", source)
+        before <- overwrite_snapshot(path)
+        if (fail) {
+            move <- .renumber_move
+            count <- 0L
+            error <- with_mocked_bindings(
+                tryCatch(renumber(path, "01", "02", recursive_edits = TRUE), error = identity),
+                .renumber_move = function(from, to) {
+                    count <<- count + 1L
+                    if (count == 1L) stop("injected native-path move failure")
+                    move(from, to)
+                })
+            expect_s3_class(error, "slurmjobs_rename_error")
+            expect_true(error$recovered)
+            expect_identical(overwrite_snapshot(path), before)
+        } else {
+            expect_no_error(renumber(path, "01", "02", recursive_edits = TRUE))
+            expect_identical(readLines(file.path(path, "02_qc.R")), "02_qc original")
+            expect_false(file.exists(source))
+        }
+        expect_false(dir.exists(file.path(path, ".slurmjobs-renumber")))
+    }
+})
+
+test_that("recovery accepts native paths saved in a journal", {
+    path <- normalizePath(withr::local_tempdir())
+    directory <- file.path(path, ".slurmjobs-renumber")
+    dir.create(directory)
+    source <- file.path(path, "01_qc.R")
+    writeLines("original", source)
+    saveRDS(list(format = 2L, base_dir = path, status = "publishing",
+        prepared = character(), backups = character(), operations = list()),
+        file.path(directory, "journal.rds"))
+    expect_no_error(renumber_recover(directory))
+    expect_false(dir.exists(directory))
+    expect_identical(readLines(source), "original")
+})
+
 test_that("prepared edits preserve line endings and substitute swaps simultaneously", {
     path <- recovery_fixture()
     expect_no_error(run_recovery_fixture(path))
