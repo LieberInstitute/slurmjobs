@@ -195,17 +195,24 @@ test_that("recovery conflicts preserve competing files and all recovery material
 })
 
 test_that("a destination arriving before a move is preserved", {
-    path <- normalizePath(withr::local_tempdir())
+    # Match renumber()'s destination spelling on Windows so injection is reached.
+    path <- normalizePath(withr::local_tempdir(), winslash = "/")
     writeLines("original", file.path(path, "01_qc.R"))
     move <- .renumber_move
     target <- file.path(path, "02_qc.R")
+    injected <- FALSE
     err <- with_mocked_bindings(
         tryCatch(renumber(path, "01", "02"), error = identity),
         .renumber_move = function(from, to) {
-            if (identical(to, target)) writeLines("concurrent writer", target)
+            if (identical(to, target)) {
+                injected <<- TRUE
+                writeLines("concurrent writer", target)
+            }
             move(from, to)
         }
     )
+    expect_true(injected)
+    expect_s3_class(err, "slurmjobs_rename_error")
     expect_true(err$recovered)
     expect_identical(readLines(target), "concurrent writer")
     expect_identical(readLines(file.path(path, "01_qc.R")), "original")
