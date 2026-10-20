@@ -71,7 +71,8 @@ log files they produce.</p>
 <span>  <span class="va">pre_before</span>,</span>
 <span>  <span class="va">pre_after</span>,</span>
 <span>  expect_matches <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  recursive_edits <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span>  recursive_edits <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  protect_log_location <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -85,12 +86,12 @@ to re-order.</p></dd>
 
 
 <dt id="arg-pre-before">pre_before<a class="anchor" aria-label="anchor" href="#arg-pre-before"></a></dt>
-<dd><p>A <code><a href="https://rdrr.io/r/base/character.html" class="external-link">character()</a></code> vector of prefices to replace among scripts
-in <code>base_dir</code>.</p></dd>
+<dd><p>A <code><a href="https://rdrr.io/r/base/character.html" class="external-link">character()</a></code> vector of literal prefices to replace among
+scripts in <code>base_dir</code>. Regular-expression characters are treated literally.</p></dd>
 
 
 <dt id="arg-pre-after">pre_after<a class="anchor" aria-label="anchor" href="#arg-pre-after"></a></dt>
-<dd><p>A <code><a href="https://rdrr.io/r/base/character.html" class="external-link">character()</a></code> vector of replacement prefices among scripts
+<dd><p>A <code><a href="https://rdrr.io/r/base/character.html" class="external-link">character()</a></code> vector of literal replacement prefices among scripts
 in <code>base_dir</code>.</p></dd>
 
 
@@ -108,7 +109,62 @@ Because of the slight risk where prefices are not uniquely identifiable
 and unexpected edits take place, the default is <code>FALSE</code>; you must opt in
 intentionally.</p></dd>
 
+
+<dt id="arg-protect-log-location">protect_log_location<a class="anchor" aria-label="anchor" href="#arg-protect-log-location"></a></dt>
+<dd><p>A <code>logical(1)</code>, default <code>TRUE</code>, requiring log files
+selected through shell scripts to be inside the project returned by
+<code><a href="https://here.r-lib.org/reference/here.html" class="external-link">here::here()</a></code>. Logs may be outside <code>base_dir</code>. Set <code>FALSE</code> to permit logs in
+any directory referenced by shell scripts, without consulting <code>here</code>.
+This disables only log location checks; collision, link, and recovery checks
+remain active, and non-log changes must still stay within <code>base_dir</code>.</p></dd>
+
 </dl></div>
+    <div id="details">
+    <h2>Details</h2>
+    <p>Non-log changes are confined to the physical directory selected by
+<code>base_dir</code>. Its symbolic-link aliases resolve to that same scope. Selected
+symbolic links and hard-linked files are refused; recursive editing does not
+follow linked directories.</p>
+<p>By default, log files selected for renaming must be within the physical project
+root returned by <code><a href="https://here.r-lib.org/reference/here.html" class="external-link">here::here()</a></code>, which uses the current R session's project
+context, not <code>base_dir</code>, to determine the root. If no logs are selected, an
+outside or missing log directory does not prevent renumbering. The project
+root and log protection setting are saved in the journal, so recovery uses the
+original policy even from a different working directory or project context.</p>
+<p>Matching uses literal filename prefixes throughout. File stems remove only
+the final extension, retaining embedded dots; directory stems retain the full
+basename. A stem is never shortened past a supplied prefix that includes an
+extension or the whole filename. Distinct stems matched by the same prefix
+are rejected as ambiguous.</p>
+<p>Associated logs must be regular files with the full shell-script stem followed by <code>.txt</code> or
+<code>.log</code>, optionally with an underscore suffix (the <code><a href="job_loop.html">job_loop()</a></code> convention) or
+a dot and numeric task ID (the <code><a href="job_single.html">job_single()</a></code> array convention). Logs sharing
+only the numeric prefix are not selected. The shell-script stem and replacement
+are interpreted literally, including any embedded dots or regex characters.</p>
+<p>The complete rename plan, including logs, is checked before changes.
+Hidden files and dangling symbolic links count as occupied destinations.
+Script edits are prepared in a private recovery directory; logs and data
+directories are renamed in place, without copying their contents. Only changed
+scripts have their original bytes backed up. Prepared edits are written into
+the existing script files, retaining their identity, ownership and ordinary
+ACLs and extended attributes. Timestamps change, and the operating system may
+clear special security attributes on modification. Linked script edit targets
+are refused. An interrupted write can leave partial contents until recovery.</p>
+<p>A journal records each move or script edit before execution. Errors and R
+interrupts trigger rollback in reverse order. If rollback cannot finish, the error reports the
+recovery directory. After inspecting the affected files, call
+<code><a href="renumber_recover.html">renumber_recover()</a></code> with that directory to retry rollback. A leftover recovery
+directory blocks another call in the same base directory.</p>
+<p>Renaming uses base R with destination checks immediately before each move.
+This is not an atomic transaction: other processes can observe intermediate
+paths, and a destination created between the check and rename can be replaced.
+Do not run against files being modified by other processes. Rename recovery
+refuses occupied destinations or changed objects. Script recovery checks file
+identity while allowing partial contents from an unfinished write; see
+<code><a href="renumber_recover.html">renumber_recover()</a></code> for its conflict checks.
+Recovery survives ordinary R-session termination, but is not a guarantee
+against power loss, storage corruption, or arbitrary concurrent changes.</p>
+    </div>
     <div id="author">
     <h2>Author</h2>
     <p>Nicholas J. Eagles</p>
@@ -125,9 +181,9 @@ intentionally.</p></dd>
 <span class="r-in"><span>    logdir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">base_dir</span>, <span class="st">"logs"</span><span class="op">)</span>, create_logdir <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
 <span class="r-in"><span>    create_shell <span class="op">=</span> <span class="cn">TRUE</span>, command <span class="op">=</span> <span class="st">"Rscript 01_should_be_second.R"</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 2026-10-14 19:46:06.617323 creating the logs directory at:  /tmp/RtmpOmuHNf/slurmjobs_scripts/logs</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 2026-10-14 19:46:06.618348 creating the shell file /tmp/RtmpOmuHNf/slurmjobs_scripts/01_should_be_second.sh</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> To submit the job use: sbatch /tmp/RtmpOmuHNf/slurmjobs_scripts/01_should_be_second.sh</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> 2026-10-20 14:34:29.850072 creating the logs directory at:  /tmp/RtmpjNP5DW/slurmjobs_scripts/logs</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> 2026-10-20 14:34:29.851357 creating the shell file /tmp/RtmpjNP5DW/slurmjobs_scripts/01_should_be_second.sh</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> To submit the job use: sbatch /tmp/RtmpjNP5DW/slurmjobs_scripts/01_should_be_second.sh</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/writeLines.html" class="external-link">writeLines</a></span><span class="op">(</span><span class="st">"# some code"</span>, con <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">base_dir</span>, <span class="st">"01_should_be_second.R"</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">#   Create an array originally designed to be submitted second</span></span></span>
@@ -138,12 +194,14 @@ intentionally.</p></dd>
 <span class="r-in"><span>        gene <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"gene_1"</span>, <span class="st">"gene_2"</span><span class="op">)</span>, method <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"method_1"</span>, <span class="st">"method_2"</span><span class="op">)</span></span></span>
 <span class="r-in"><span>    <span class="op">)</span> </span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 2026-10-14 19:46:06.62031 creating the logs directory at:  /tmp/RtmpOmuHNf/slurmjobs_scripts/logs</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 2026-10-14 19:46:06.621522 Creating the shell file 02_should_be_first.sh and corresponding R script 02_should_be_first.R</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> To submit the script pair, use: sbatch /tmp/RtmpOmuHNf/slurmjobs_scripts/02_should_be_first.sh</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> 2026-10-20 14:34:29.853989 creating the logs directory at:  /tmp/RtmpjNP5DW/slurmjobs_scripts/logs</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> 2026-10-20 14:34:29.855533 Creating the shell file 02_should_be_first.sh and corresponding R script 02_should_be_first.R</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> To submit the script pair, use: sbatch /tmp/RtmpjNP5DW/slurmjobs_scripts/02_should_be_first.sh</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">#   Swap the order of the scripts</span></span></span>
-<span class="r-in"><span><span class="fu">renumber</span><span class="op">(</span><span class="va">base_dir</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"01"</span>, <span class="st">"02"</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"02"</span>, <span class="st">"01"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="co"># This temporary example is outside the current project.</span></span></span>
+<span class="r-in"><span><span class="fu">renumber</span><span class="op">(</span><span class="va">base_dir</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"01"</span>, <span class="st">"02"</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"02"</span>, <span class="st">"01"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>    protect_log_location <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">#   Check that the scripts have been properly renamed</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span><span class="va">base_dir</span><span class="op">)</span></span></span>
