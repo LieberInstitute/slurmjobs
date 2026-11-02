@@ -16,7 +16,21 @@
         c(path, unlist(lapply(children, walk), use.names = FALSE))
     }
     paths <- sort(unique(unlist(lapply(paths, walk), use.names = FALSE)))
-    stats::setNames(lapply(paths, .renumber_stamp), paths)
+    if (!length(paths)) return(stats::setNames(list(), paths))
+    # Keep the same per-path records while querying metadata in one batch.
+    info <- fs::file_info(paths, fail = FALSE)
+    if (anyNA(info$type)) {
+        # Retain scalar diagnostics if any entry is unavailable.
+        return(stats::setNames(lapply(paths, .renumber_stamp), paths))
+    }
+    info <- as.data.frame(info[
+        c("type", "device_id", "inode", "size", "modification_time")])
+    stamps <- lapply(seq_along(paths), function(i) {
+        stamp <- info[i, , drop = FALSE]
+        rownames(stamp) <- NULL
+        stamp
+    })
+    stats::setNames(stamps, paths)
 }
 
 # Replace our own journal via a sibling temporary file. Never alter originals

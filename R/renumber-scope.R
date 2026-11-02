@@ -32,15 +32,27 @@
     prefix <- if (!is.null(base_dir)) {
         paste0(sub("/$", "", as.character(fs::path_norm(base_dir))), "/")
     } else NULL
-    for (path in paths) {
-        resolved <- .renumber_resolve_path(path)
+    if (!length(paths)) return(invisible(NULL))
+    # Batch metadata and physical-path resolution within this check only. Never
+    # reuse these results across journal saves or filesystem mutations.
+    info <- fs::file_info(paths, fail = FALSE, follow = FALSE)
+    exists <- !is.na(info$type)
+    links <- exists & info$type == "symlink"
+    resolvable <- exists & !(links & !file.exists(paths))
+    resolved_paths <- character(length(paths))
+    resolved_paths[resolvable] <- as.character(fs::path_norm(normalizePath(
+        paths[resolvable], winslash = "/", mustWork = TRUE)))
+    for (i in seq_along(paths)) {
+        path <- paths[[i]]
+        # Retain ancestor resolution for missing paths, and the original
+        # diagnostics and input order for dangling links and other failures.
+        resolved <- if (resolvable[i]) resolved_paths[i] else .renumber_resolve_path(path)
         if (!is.null(prefix) && !startsWith(resolved, prefix)) {
             stop("The proposed renaming plan includes a path outside ", scope_name,
                 " (", base_dir, "): ", path, call. = FALSE)
         }
-        if (reject_aliases && .renumber_path_exists(path)) {
-            info <- fs::file_info(path)
-            if (fs::link_exists(path) || (info$type == "file" && info$hard_links > 1)) {
+        if (reject_aliases && exists[i]) {
+            if (links[i] || (info$type[i] == "file" && info$hard_links[i] > 1)) {
                 stop("The proposed renaming plan includes a linked or non-regular target: ",
                     path, call. = FALSE)
             }
