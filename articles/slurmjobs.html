@@ -84,7 +84,7 @@ Biology, Johns Hopkins
 University<br><a class="author_email" href="mailto:#"></a><a href="mailto:lcolladotor@gmail.com" class="email">lcolladotor@gmail.com</a>
       </address>
                   
-            <h4 data-toc-skip class="date">20 October 2026</h4>
+            <h4 data-toc-skip class="date">2 November 2026</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/LieberInstitute/slurmjobs/blob/devel/vignettes/slurmjobs.Rmd" class="external-link"><code>vignettes/slurmjobs.Rmd</code></a></small>
       <div class="hidden name"><code>slurmjobs.Rmd</code></div>
@@ -206,7 +206,7 @@ name, and when the job starts and ends.</p>
 <span><span class="fu"><a href="../reference/job_single.html">job_single</a></span><span class="op">(</span></span>
 <span>    name <span class="op">=</span> <span class="st">"my_shell_script"</span>, memory <span class="op">=</span> <span class="st">"10G"</span>, cores <span class="op">=</span> <span class="fl">2</span>, create_shell <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; 2026-10-20 14:47:40.454214 creating the logs directory at:  logs</span></span>
+<span><span class="co">#&gt; 2026-11-02 20:44:53.802716 creating the logs directory at:  logs</span></span>
 <span><span class="co">#&gt; #!/bin/bash</span></span>
 <span><span class="co">#&gt; #SBATCH -p shared</span></span>
 <span><span class="co">#&gt; #SBATCH --mem=10G</span></span>
@@ -230,7 +230,7 @@ name, and when the job starts and ends.</p>
 <span><span class="co">#&gt; echo "Task id: ${SLURM_ARRAY_TASK_ID}"</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; ## Load the R module</span></span>
-<span><span class="co">#&gt; module load conda_R/4.5</span></span>
+<span><span class="co">#&gt; module load conda_R/4.6</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; ## List current modules for reproducibility</span></span>
 <span><span class="co">#&gt; module list</span></span>
@@ -250,7 +250,7 @@ job– in this case, one with 10 tasks.</p>
 <span>    name <span class="op">=</span> <span class="st">"my_array_job"</span>, memory <span class="op">=</span> <span class="st">"5G"</span>, cores <span class="op">=</span> <span class="fl">1</span>, create_shell <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>    task_num <span class="op">=</span> <span class="fl">10</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; 2026-10-20 14:47:40.524769 creating the logs directory at:  logs</span></span>
+<span><span class="co">#&gt; 2026-11-02 20:44:53.848974 creating the logs directory at:  logs</span></span>
 <span><span class="co">#&gt; #!/bin/bash</span></span>
 <span><span class="co">#&gt; #SBATCH -p shared</span></span>
 <span><span class="co">#&gt; #SBATCH --mem=5G</span></span>
@@ -275,7 +275,7 @@ job– in this case, one with 10 tasks.</p>
 <span><span class="co">#&gt; echo "Task id: ${SLURM_ARRAY_TASK_ID}"</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; ## Load the R module</span></span>
-<span><span class="co">#&gt; module load conda_R/4.5</span></span>
+<span><span class="co">#&gt; module load conda_R/4.6</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; ## List current modules for reproducibility</span></span>
 <span><span class="co">#&gt; module list</span></span>
@@ -345,7 +345,7 @@ R. Let’s make that a bit more concrete.</p>
 <span><span class="co">#&gt; echo "Task id: ${SLURM_ARRAY_TASK_ID}"</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; ## Load the R module</span></span>
-<span><span class="co">#&gt; module load conda_R/4.5</span></span>
+<span><span class="co">#&gt; module load conda_R/4.6</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; ## List current modules for reproducibility</span></span>
 <span><span class="co">#&gt; module list</span></span>
@@ -426,8 +426,8 @@ re-submit failed tasks.</p>
 <span>    name <span class="op">=</span> <span class="st">"my_array_job"</span>, memory <span class="op">=</span> <span class="st">"5G"</span>, cores <span class="op">=</span> <span class="fl">1</span>, create_shell <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>    task_num <span class="op">=</span> <span class="fl">10</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; 2026-10-20 14:47:40.727637 creating the logs directory at:  logs</span></span>
-<span><span class="co">#&gt; 2026-10-20 14:47:40.729055 creating the shell file my_array_job.sh</span></span>
+<span><span class="co">#&gt; 2026-11-02 20:44:53.979784 creating the logs directory at:  logs</span></span>
+<span><span class="co">#&gt; 2026-11-02 20:44:53.981001 creating the shell file my_array_job.sh</span></span>
 <span><span class="co">#&gt; To submit the job use: sbatch my_array_job.sh</span></span>
 <span></span>
 <span><span class="co">#   Suppose that tasks 3, 6, 7, and 8 failed</span></span>
@@ -656,9 +656,9 @@ logs, then renumber them.</p>
 <span>    logdir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">base_dir</span>, <span class="st">"logs"</span><span class="op">)</span>, create_logdir <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>    create_shell <span class="op">=</span> <span class="cn">TRUE</span>, command <span class="op">=</span> <span class="st">"Rscript 01_should_be_second.R"</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; 2026-10-20 14:47:41.520064 creating the logs directory at:  /tmp/RtmpPpo87Z/slurmjobs_scripts/logs</span></span>
-<span><span class="co">#&gt; 2026-10-20 14:47:41.521553 creating the shell file /tmp/RtmpPpo87Z/slurmjobs_scripts/01_should_be_second.sh</span></span>
-<span><span class="co">#&gt; To submit the job use: sbatch /tmp/RtmpPpo87Z/slurmjobs_scripts/01_should_be_second.sh</span></span>
+<span><span class="co">#&gt; 2026-11-02 20:44:54.549057 creating the logs directory at:  /tmp/Rtmp9r1pjZ/slurmjobs_scripts/logs</span></span>
+<span><span class="co">#&gt; 2026-11-02 20:44:54.550241 creating the shell file /tmp/Rtmp9r1pjZ/slurmjobs_scripts/01_should_be_second.sh</span></span>
+<span><span class="co">#&gt; To submit the job use: sbatch /tmp/Rtmp9r1pjZ/slurmjobs_scripts/01_should_be_second.sh</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/writeLines.html" class="external-link">writeLines</a></span><span class="op">(</span><span class="st">"# some code"</span>, con <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">base_dir</span>, <span class="st">"01_should_be_second.R"</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co">#   Create an array originally designed to be submitted second</span></span>
@@ -670,8 +670,8 @@ logs, then renumber them.</p>
 <span>        gene <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"gene_1"</span>, <span class="st">"gene_2"</span><span class="op">)</span>, method <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"method_1"</span>, <span class="st">"method_2"</span><span class="op">)</span></span>
 <span>    <span class="op">)</span> </span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; 2026-10-20 14:47:41.525595 Creating the shell file 02_should_be_first.sh and corresponding R script 02_should_be_first.R</span></span>
-<span><span class="co">#&gt; To submit the script pair, use: sbatch /tmp/RtmpPpo87Z/slurmjobs_scripts/02_should_be_first.sh</span></span></code></pre></div>
+<span><span class="co">#&gt; 2026-11-02 20:44:54.55341 Creating the shell file 02_should_be_first.sh and corresponding R script 02_should_be_first.R</span></span>
+<span><span class="co">#&gt; To submit the script pair, use: sbatch /tmp/Rtmp9r1pjZ/slurmjobs_scripts/02_should_be_first.sh</span></span></code></pre></div>
 <p>Next, generate some corresponding logs. Note that
 <code><a href="../reference/renumber.html">renumber()</a></code> can handle missing logs, so we’ll intentionally
 generate only some of the logs to demonstrate this.</p>
@@ -753,7 +753,7 @@ command were updated.</p>
 <span><span class="co">#&gt; [17] "method=${all_method[$(( $SLURM_ARRAY_TASK_ID / 1 % 2 ))]}"                                                      </span></span>
 <span><span class="co">#&gt; [18] ""                                                                                                               </span></span>
 <span><span class="co">#&gt; [19] "## Explicitly pipe script output to a log"                                                                      </span></span>
-<span><span class="co">#&gt; [20] "log_path=/tmp/RtmpPpo87Z/slurmjobs_scripts/logs/01_should_be_first_${gene}_${method}_${SLURM_ARRAY_TASK_ID}.txt"</span></span>
+<span><span class="co">#&gt; [20] "log_path=/tmp/Rtmp9r1pjZ/slurmjobs_scripts/logs/01_should_be_first_${gene}_${method}_${SLURM_ARRAY_TASK_ID}.txt"</span></span>
 <span><span class="co">#&gt; [21] ""                                                                                                               </span></span>
 <span><span class="co">#&gt; [22] "{"                                                                                                              </span></span>
 <span><span class="co">#&gt; [23] "set -e"                                                                                                         </span></span>
@@ -769,7 +769,7 @@ command were updated.</p>
 <span><span class="co">#&gt; [33] "echo \"Task id: ${SLURM_ARRAY_TASK_ID}\""                                                                       </span></span>
 <span><span class="co">#&gt; [34] ""                                                                                                               </span></span>
 <span><span class="co">#&gt; [35] "## Load the R module"                                                                                           </span></span>
-<span><span class="co">#&gt; [36] "module load conda_R/4.5"                                                                                        </span></span>
+<span><span class="co">#&gt; [36] "module load conda_R/4.6"                                                                                        </span></span>
 <span><span class="co">#&gt; [37] ""                                                                                                               </span></span>
 <span><span class="co">#&gt; [38] "## List current modules for reproducibility"                                                                    </span></span>
 <span><span class="co">#&gt; [39] "module list"                                                                                                    </span></span>
@@ -787,6 +787,37 @@ command were updated.</p>
 <span><span class="co">#&gt; [51] ""</span></span></code></pre></div>
 </div>
 <div class="section level3">
+<h3 id="safety-and-recovery">Safety and Recovery<a class="anchor" aria-label="anchor" href="#safety-and-recovery"></a>
+</h3>
+<p>Commit scripts before renumbering and review the resulting diff. With
+<code>recursive_edits = TRUE</code>, replacements can theoretically lose
+information: if <code>01_qc</code> becomes <code>02_qc</code>, existing
+references to both names become indistinguishable. An inverse
+replacement cannot tell them apart. Git can restore committed originals;
+simply tracking a file does not preserve its uncommitted edits.</p>
+<p>Under ordinary circumstances, with no intervening changes or occupied
+destinations, reversing the original prefix vectors is a powerful way to
+undo renumbering. For example, to undo the swap above:</p>
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">before</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"01"</span>, <span class="st">"02"</span><span class="op">)</span></span>
+<span><span class="va">after</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"02"</span>, <span class="st">"01"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/renumber.html">renumber</a></span><span class="op">(</span><span class="va">base_dir</span>, pre_before <span class="op">=</span> <span class="va">after</span>, pre_after <span class="op">=</span> <span class="va">before</span>,</span>
+<span>    recursive_edits <span class="op">=</span> <span class="cn">TRUE</span>, protect_log_location <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
+<p>If content replacements are ambiguous, reverse names with
+<code>recursive_edits = FALSE</code> and restore affected script
+contents from the pre-renumber commit instead. Git cannot restore files
+it never recorded, such as ignored logs or untracked scripts.</p>
+<p><code><a href="../reference/renumber.html">renumber()</a></code> attempts automatic rollback after errors or R
+interrupts. If R terminates or rollback cannot finish, call
+<code><a href="../reference/renumber_recover.html">renumber_recover()</a></code> with the reported recovery directory to
+retry rollback; it stops on conflicts rather than overwriting unexpected
+files. If renumbering committed but cleanup failed, recovery only
+finishes cleanup. <strong>This is not a general undo function:</strong>
+a fully successful call removes its recovery files, so
+<code><a href="../reference/renumber_recover.html">renumber_recover()</a></code> cannot reverse an arbitrary completed
+<code><a href="../reference/renumber.html">renumber()</a></code> call.</p>
+</div>
+<div class="section level3">
 <h3 id="other-uses">Other Uses<a class="anchor" aria-label="anchor" href="#other-uses"></a>
 </h3>
 <p>Despite being developed for a somewhat specific use case,
@@ -796,7 +827,7 @@ renaming directories containing scripts that reference the directory
 names, be sure to specify <code>recursive_edits = TRUE</code> to update
 references in the scripts.</p>
 <p>Let’s first create some directories as an example.</p>
-<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">#   Create a base directory where we could have plots</span></span>
 <span><span class="va">base_dir</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"plots"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/files2.html" class="external-link">dir.create</a></span><span class="op">(</span><span class="va">base_dir</span><span class="op">)</span></span>
@@ -810,7 +841,7 @@ references in the scripts.</p>
 <span><span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span><span class="va">base_dir</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "finally_analysis"    "first_visualization" "then_QC"</span></span></code></pre></div>
 <p>Let’s rename them and check the result.</p>
-<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">#   Re-order directories and check their new names</span></span>
 <span><span class="fu"><a href="../reference/renumber.html">renumber</a></span><span class="op">(</span></span>
 <span>    <span class="va">base_dir</span>,</span>
@@ -853,7 +884,7 @@ Cheng, Chang, and Iannone, 2026)</li>
 </ul>
 <p>This package was developed using <em><a href="https://bioconductor.org/packages/3.24/biocthis" class="external-link">biocthis</a></em>.</p>
 <p>Code for creating the vignette</p>
-<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">## Create the vignette</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://github.com/rstudio/rmarkdown" class="external-link">"rmarkdown"</a></span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="fu"><a href="https://pkgs.rstudio.com/rmarkdown/reference/render.html" class="external-link">render</a></span><span class="op">(</span><span class="st">"slurmjobs.Rmd"</span>, <span class="st">"BiocStyle::html_document"</span><span class="op">)</span><span class="op">)</span></span>
@@ -862,9 +893,9 @@ Cheng, Chang, and Iannone, 2026)</li>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://yihui.org/knitr/" class="external-link">"knitr"</a></span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/knit.html" class="external-link">knit</a></span><span class="op">(</span><span class="st">"slurmjobs.Rmd"</span>, tangle <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <p>Date the vignette was generated.</p>
-<pre><code><span><span class="co">#&gt; [1] "2026-10-20 14:47:44 UTC"</span></span></code></pre>
+<pre><code><span><span class="co">#&gt; [1] "2026-11-02 20:44:56 UTC"</span></span></code></pre>
 <p>Wallclock time spent generating the vignette.</p>
-<pre><code><span><span class="co">#&gt; Time difference of 5.243 secs</span></span></code></pre>
+<pre><code><span><span class="co">#&gt; Time difference of 3.486 secs</span></span></code></pre>
 <p><code>R</code> session information.</p>
 <pre><code><span><span class="co">#&gt; <span style="color: #00BBBB; font-weight: bold;">─ Session info ───────────────────────────────────────────────────────────────────────────────────────────────────────</span></span></span>
 <span><span class="co">#&gt;  <span style="color: #555555; font-style: italic;">setting </span> <span style="color: #555555; font-style: italic;">value</span></span></span>
@@ -876,8 +907,8 @@ Cheng, Chang, and Iannone, 2026)</li>
 <span><span class="co">#&gt;  collate  en_US.UTF-8</span></span>
 <span><span class="co">#&gt;  ctype    en_US.UTF-8</span></span>
 <span><span class="co">#&gt;  tz       UTC</span></span>
-<span><span class="co">#&gt;  date     2026-10-20</span></span>
-<span><span class="co">#&gt;  pandoc   3.12.1 @ /usr/bin/ (via rmarkdown)</span></span>
+<span><span class="co">#&gt;  date     2026-11-02</span></span>
+<span><span class="co">#&gt;  pandoc   3.13 @ /usr/bin/ (via rmarkdown)</span></span>
 <span><span class="co">#&gt;  quarto   1.10.18 @ /usr/local/bin/quarto</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB; font-weight: bold;">─ Packages ───────────────────────────────────────────────────────────────────────────────────────────────────────────</span></span></span>
@@ -911,7 +942,7 @@ Cheng, Chang, and Iannone, 2026)</li>
 <span><span class="co">#&gt;  otel            0.2.0      <span style="color: #555555;">2025-08-29</span> <span style="color: #555555;">[2]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM (R 4.6.0)</span></span></span>
 <span><span class="co">#&gt;  pillar          1.11.1     <span style="color: #555555;">2025-09-17</span> <span style="color: #555555;">[2]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM (R 4.6.0)</span></span></span>
 <span><span class="co">#&gt;  pkgconfig       2.0.3      <span style="color: #555555;">2019-09-22</span> <span style="color: #555555;">[2]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM (R 4.6.0)</span></span></span>
-<span><span class="co">#&gt;  pkgdown         <span style="color: #BB00BB; font-weight: bold;">2.2.1.9000</span> <span style="color: #555555;">2026-10-14</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">Github (r-lib/pkgdown@f69b62a)</span></span></span>
+<span><span class="co">#&gt;  pkgdown         <span style="color: #BB00BB; font-weight: bold;">2.2.1.9000</span> <span style="color: #555555;">2026-11-02</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">Github (r-lib/pkgdown@f69b62a)</span></span></span>
 <span><span class="co">#&gt;  plyr            1.8.9      <span style="color: #555555;">2023-10-02</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM (R 4.6.0)</span></span></span>
 <span><span class="co">#&gt;  purrr           1.2.2      <span style="color: #555555;">2026-04-10</span> <span style="color: #555555;">[2]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM (R 4.6.0)</span></span></span>
 <span><span class="co">#&gt;  R6              2.6.1      <span style="color: #555555;">2025-02-15</span> <span style="color: #555555;">[2]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM (R 4.6.0)</span></span></span>
@@ -922,7 +953,7 @@ Cheng, Chang, and Iannone, 2026)</li>
 <span><span class="co">#&gt;  rmarkdown       2.32       <span style="color: #555555;">2026-09-01</span> <span style="color: #555555;">[2]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM (R 4.6.0)</span></span></span>
 <span><span class="co">#&gt;  sass            0.4.10     <span style="color: #555555;">2025-04-11</span> <span style="color: #555555;">[2]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM (R 4.6.0)</span></span></span>
 <span><span class="co">#&gt;  sessioninfo   * 1.2.4      <span style="color: #555555;">2026-06-04</span> <span style="color: #555555;">[2]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM (R 4.6.0)</span></span></span>
-<span><span class="co">#&gt;  slurmjobs     * 1.4.0      <span style="color: #555555;">2026-10-20</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">local</span></span></span>
+<span><span class="co">#&gt;  slurmjobs     * 1.4.0      <span style="color: #555555;">2026-11-02</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">local</span></span></span>
 <span><span class="co">#&gt;  stringi         1.8.9      <span style="color: #555555;">2026-08-04</span> <span style="color: #555555;">[2]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM (R 4.6.0)</span></span></span>
 <span><span class="co">#&gt;  stringr         1.6.0      <span style="color: #555555;">2025-11-04</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM (R 4.6.0)</span></span></span>
 <span><span class="co">#&gt;  systemfonts     1.3.2      <span style="color: #555555;">2026-03-05</span> <span style="color: #555555;">[2]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM (R 4.6.0)</span></span></span>
