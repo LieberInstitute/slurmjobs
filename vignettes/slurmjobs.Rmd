@@ -419,6 +419,37 @@ updated.
 readLines(file.path(base_dir, "01_should_be_first.sh"))
 ```
 
+## Safety and Recovery
+
+Commit scripts before renumbering and review the resulting diff. With
+`recursive_edits = TRUE`, replacements can theoretically lose information: if
+`01_qc` becomes `02_qc`, existing references to both names become indistinguishable.
+An inverse replacement cannot tell them apart. Git can restore committed originals;
+simply tracking a file does not preserve its uncommitted edits.
+
+Under ordinary circumstances, with no intervening changes or occupied destinations,
+reversing the original prefix vectors is a powerful way to undo renumbering. For
+example, to undo the swap above:
+
+```{r "renumber_undo"}
+before <- c("01", "02")
+after <- c("02", "01")
+renumber(base_dir, pre_before = after, pre_after = before,
+    recursive_edits = TRUE, protect_log_location = FALSE)
+```
+
+If content replacements are ambiguous, reverse names with `recursive_edits = FALSE`
+and restore affected script contents from the pre-renumber commit instead. Git
+cannot restore files it never recorded, such as ignored logs or untracked scripts.
+
+`renumber()` attempts automatic rollback after errors or R interrupts. If R
+terminates or rollback cannot finish, call `renumber_recover()` with the reported
+recovery directory to retry rollback; it stops on conflicts rather than overwriting
+unexpected files. If renumbering committed but cleanup failed, recovery only
+finishes cleanup. **This is not a general undo function:** a fully successful call
+removes its recovery files, so `renumber_recover()` cannot reverse an arbitrary
+completed `renumber()` call.
+
 ## Other Uses
 
 Despite being developed for a somewhat specific use case, `renumber()` can be
