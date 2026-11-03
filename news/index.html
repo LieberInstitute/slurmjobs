@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">slurmjobs</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.4.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.5.0</span>
       </span>
     </div>
 
@@ -50,6 +50,22 @@
       <small>Source: <a href="https://github.com/LieberInstitute/slurmjobs/blob/devel/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="page-header" data-toc-text="1.5.0" id="slurmjobs-150">slurmjobs 1.5.0<a class="anchor" aria-label="anchor" href="#slurmjobs-150"></a></h2>
+<p>NEW FEATURES</p>
+<ul><li>
+<code><a href="../reference/renumber.html">renumber()</a></code> now attempts automatic rollback after errors or R interrupts. Added <code><a href="../reference/renumber_recover.html">renumber_recover()</a></code> to resume recovery of unfinished operations (not a general undo function for successful calls).</li>
+</ul><p>SIGNIFICANT USER-VISIBLE CHANGES</p>
+<ul><li>Non-log changes made by <code><a href="../reference/renumber.html">renumber()</a></code> are confined to <code>base_dir</code>. The new <code>protect_log_location = TRUE</code> parameter restricts associated logs to the project identified by <code><a href="https://here.r-lib.org/reference/here.html" class="external-link">here::here()</a></code>; set it to <code>FALSE</code> to allow logs outside that project.</li>
+<li>Unsafe linked targets are now refused, including selected symbolic links, hard-linked files, and linked directories encountered during recursive editing. Calls previously accepted may now fail these safety checks.</li>
+</ul><p>BUG FIXES</p>
+<ul><li>Strengthened <code><a href="../reference/renumber.html">renumber()</a></code> destination collision checks, including hidden files and dangling symbolic links, to avoid overwriting existing paths.</li>
+<li>Fixed literal prefix and filename-stem matching, including special characters and embedded dots. Associated logs now match full script stems rather than just numeric prefixes, avoiding unrelated logs and directories.</li>
+<li>Recursive replacements now occur simultaneously, avoiding cascading substitutions during swaps.</li>
+<li>Fixed task-ID inference for repeated <code><a href="../reference/array_submit.html">array_submit()</a></code> calls, including task lists, ranges, and optional concurrency limits.</li>
+</ul><p>DOCUMENTATION</p>
+<ul><li>Expanded the vignette’s guidance on safety, recovery, version control, and undoing renumbering.</li>
+</ul></div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="1.4.0" id="slurmjobs-140">slurmjobs 1.4.0<a class="anchor" aria-label="anchor" href="#slurmjobs-140"></a></h2>
 <p>NEW FEATURES</p>
