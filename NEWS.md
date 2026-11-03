@@ -1,3 +1,25 @@
+# slurmjobs 1.5.0
+
+NEW FEATURES
+
+* `renumber()` now attempts automatic rollback after errors or R interrupts. Added `renumber_recover()` to resume recovery of unfinished operations (not a general undo function for successful calls).
+
+SIGNIFICANT USER-VISIBLE CHANGES
+
+* Non-log changes made by `renumber()` are confined to `base_dir`. The new `protect_log_location = TRUE` parameter restricts associated logs to the project identified by `here::here()`; set it to `FALSE` to allow logs outside that project.
+* Unsafe linked targets are now refused, including selected symbolic links, hard-linked files, and linked directories encountered during recursive editing. Calls previously accepted may now fail these safety checks.
+
+BUG FIXES
+
+* Strengthened `renumber()` destination collision checks, including hidden files and dangling symbolic links, to avoid overwriting existing paths.
+* Fixed literal prefix and filename-stem matching, including special characters and embedded dots. Associated logs now match full script stems rather than just numeric prefixes, avoiding unrelated logs and directories.
+* Recursive replacements now occur simultaneously, avoiding cascading substitutions during swaps.
+* Fixed task-ID inference for repeated `array_submit()` calls, including task lists, ranges, and optional concurrency limits.
+
+DOCUMENTATION
+
+* Expanded the vignette's guidance on safety, recovery, version control, and undoing renumbering.
+
 # slurmjobs 1.4.0
 
 NEW FEATURES
